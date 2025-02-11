@@ -42,7 +42,7 @@ export function OverviewAppView() {
         </Grid>
 
         <Grid xs={12} md={4}>
-          <div style={{backgroundImage: `url('/public/assets/sunny.jpg')`,backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', width: '90%', height: '20vh', borderRadius: '1rem', display: 'flex', flexDirection: 'row'}}>
+          <div style={{backgroundImage: `url('/assets/sunny.jpg')`,backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', width: '90%', height: '20vh', borderRadius: '1rem', display: 'flex', flexDirection: 'row'}}>
             <div className='leftSide' style={{display: 'flex', flexDirection: 'column', width: '30%',justifyContent: 'center'}}>
               <h1 style={{fontSize:'3.5rem', fontWeight:'100', marginLeft: '1.3rem', color: 'black'}}>27&deg;</h1>
               </div>
