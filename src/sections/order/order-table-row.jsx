@@ -39,15 +39,8 @@ export function OrderTableRow({ row, selected, onSelectRow, onViewRow, onDeleteR
         />
       </TableCell>
 
-      {/* <TableCell>
-        <Link color="inherit" onClick={onViewRow} underline="always" sx={{ cursor: 'pointer' }}>
-          {row.orderNumber}
-        </Link>
-      </TableCell> */}
-
       <TableCell>
         <Stack spacing={2} direction="row" alignItems="center">
-          {/* <Avatar alt={row.customer.name} src={row.customer.avatarUrl} /> */}
 
           <Stack
             sx={{
@@ -75,8 +68,6 @@ export function OrderTableRow({ row, selected, onSelectRow, onViewRow, onDeleteR
       <TableCell align="right" sx={{ px: 1, whiteSpace: 'nowrap' }}>
         <IconButton
           color={collapse.value ? 'inherit' : 'default'}
-          // onClick={collapse.onToggle}
-          // sx={{ ...(collapse.value && { bgcolor: 'action.hover' }) }}
         >
           <Iconify icon="material-symbols:edit-rounded" />
         </IconButton>
