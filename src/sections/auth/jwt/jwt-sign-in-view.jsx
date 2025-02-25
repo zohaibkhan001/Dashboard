@@ -1,5 +1,5 @@
 import { z as zod } from 'zod';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -21,7 +21,9 @@ import { Iconify } from 'src/components/iconify';
 import { Form, Field } from 'src/components/hook-form';
 
 import { useAuthContext } from 'src/auth/hooks';
-import { signInWithPassword } from 'src/auth/context/jwt';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout, superAdminLogin } from 'src/utils/Redux/slices/superadminAuthSlice';
+import { toast } from 'react-toastify';
 
 // ----------------------------------------------------------------------
 
@@ -33,23 +35,23 @@ export const SignInSchema = zod.object({
   password: zod
     .string()
     .min(1, { message: 'Password is required!' })
-    .min(6, { message: 'Password must be at least 6 characters!' }),
+    .min(2, { message: 'Password must be at least 6 characters!' }),
 });
 
 // ----------------------------------------------------------------------
 
 export function JwtSignInView() {
+  const dispatch = useDispatch();
   const router = useRouter();
 
-  const { checkUserSession } = useAuthContext();
-
-  const [errorMsg, setErrorMsg] = useState('');
+  const { checkUserSession } = useAuthContext(); // ✅ Required to bypass AuthProvider
+  const { loading, error, isLoggedIn } = useSelector((state) => state.superAdminAuth);
 
   const password = useBoolean();
 
   const defaultValues = {
-    email: 'demo@minimals.cc',
-    password: '@demo1',
+    email: '',
+    password: '',
   };
 
   const methods = useForm({
@@ -62,40 +64,47 @@ export function JwtSignInView() {
     formState: { isSubmitting },
   } = methods;
 
-  const onSubmit = handleSubmit(async (data) => {
-    try {
-      await signInWithPassword({ email: data.email, password: data.password });
-      await checkUserSession?.();
+  // ✅ Redirect when authentication state is confirmed
+  // useEffect(() => {
+  //   if (isLoggedIn) {
+  //     checkUserSession?.(); // ✅ Ensures session is validated before redirection
+  //     toast.success('Login successful!');
+  //     router.replace(paths.dashboard.root);
+  //   }
+  // }, [isLoggedIn, checkUserSession, router]);
 
+  const onSubmit = handleSubmit(async (data) => {
+    const action = dispatch(superAdminLogin({ email: data.email, password: data.password }));
+
+    if (superAdminLogin.fulfilled.match(action)) {
+      toast.success(action.payload.msg); // ✅ Show success message
+      await checkUserSession?.(); // ✅ Validate session after login
+      // dispatch(logout());
       // router.refresh();
-    } catch (error) {
-      console.error(error);
-      setErrorMsg(error instanceof Error ? error.message : error);
+      console.log('login done');
+      // router.replace(paths.dashboard.root); // ✅ Redirect after session validation
+    } else {
+      throw new Error(action.payload || 'Login failed');
     }
   });
 
   const renderHead = (
     <Stack spacing={1.5} sx={{ mb: 5 }}>
       <Typography variant="h5">Sign in to your account</Typography>
-
-      <Stack direction="row" spacing={0.5}>
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          {`Don't have an account?`}
-        </Typography>
-
-        <Link component={RouterLink} href={paths.auth.jwt.signUp} variant="subtitle2">
-          Get started
-        </Link>
-      </Stack>
     </Stack>
   );
 
   const renderForm = (
     <Stack spacing={3}>
-      <Field.Text name="email" label="Email address" InputLabelProps={{ shrink: true }} />
+      <Field.Text
+        name="email"
+        label="Email address"
+        placeholder="Enter your email"
+        InputLabelProps={{ shrink: true }}
+      />
 
       <Stack spacing={1.5}>
-        <Link
+        {/* <Link
           component={RouterLink}
           href="#"
           variant="body2"
@@ -103,12 +112,12 @@ export function JwtSignInView() {
           sx={{ alignSelf: 'flex-end' }}
         >
           Forgot password?
-        </Link>
+        </Link> */}
 
         <Field.Text
           name="password"
           label="Password"
-          placeholder="6+ characters"
+          placeholder="Enter your password"
           type={password.value ? 'text' : 'password'}
           InputLabelProps={{ shrink: true }}
           InputProps={{
@@ -129,8 +138,8 @@ export function JwtSignInView() {
         size="large"
         type="submit"
         variant="contained"
-        loading={isSubmitting}
-        loadingIndicator="Sign in..."
+        loading={loading || isSubmitting}
+        loadingIndicator="Signing in..."
       >
         Sign in
       </LoadingButton>
@@ -141,15 +150,15 @@ export function JwtSignInView() {
     <>
       {renderHead}
 
-      <Alert severity="info" sx={{ mb: 3 }}>
+      {/* <Alert severity="info" sx={{ mb: 3 }}>
         Use <strong>{defaultValues.email}</strong>
         {' with password '}
         <strong>{defaultValues.password}</strong>
-      </Alert>
+      </Alert> */}
 
-      {!!errorMsg && (
+      {error && (
         <Alert severity="error" sx={{ mb: 3 }}>
-          {errorMsg}
+          {error}
         </Alert>
       )}
 

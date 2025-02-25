@@ -1,67 +1,63 @@
-import { useMemo, useEffect, useCallback } from 'react';
+import { useEffect, useMemo, useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { paths } from 'src/routes/paths';
+import { logout } from 'src/utils/Redux/slices/superadminAuthSlice'; // ✅ Removed checkUserSession
 
-import { useSetState } from 'src/hooks/use-set-state';
-
-import axios, { endpoints } from 'src/utils/axios';
-
-import { STORAGE_KEY } from './constant';
+import axios from 'src/utils/axios';
 import { AuthContext } from '../auth-context';
 import { setSession, isValidToken } from './utils';
 
 // ----------------------------------------------------------------------
 
 export function AuthProvider({ children }) {
-  const { state, setState } = useSetState({
-    user: null,
-    loading: true,
-  });
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const checkUserSession = useCallback(async () => {
+  const { user, token, isLoggedIn, loading } = useSelector((state) => state.superAdminAuth);
+
+  // ✅ Function to check user session using Redux state (no API call)
+  const checkUserSession = useCallback(() => {
     try {
-      const accessToken = sessionStorage.getItem(STORAGE_KEY);
-
-      if (accessToken && isValidToken(accessToken)) {
-        setSession(accessToken);
-
-        const res = await axios.get(endpoints.auth.me);
-
-        const { user } = res.data;
-
-        setState({ user: { ...user, accessToken }, loading: false });
+      if (token && isValidToken(token)) {
+        setSession(token, dispatch); // ✅ Apply token and set expiration handling
+        console.log('User session is valid.');
       } else {
-        setState({ user: null, loading: false });
+        console.warn('Token is invalid or expired.');
+        dispatch(logout()); // ✅ If token is invalid, log out
+        navigate(paths.auth.jwt.signIn, { replace: true });
       }
     } catch (error) {
-      console.error(error);
-      setState({ user: null, loading: false });
+      console.error('Error checking session:', error);
+      dispatch(logout()); // ✅ Log out on error
+      navigate(paths.auth.jwt.signIn, { replace: true });
     }
-  }, [setState]);
+  }, [dispatch, navigate, token]);
 
+  // ✅ Run once when the app loads (No need to call dispatch for session check)
   useEffect(() => {
-    checkUserSession();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    checkUserSession(); // ✅ Validate user session
+  }, [checkUserSession]);
 
   // ----------------------------------------------------------------------
 
-  const checkAuthenticated = state.user ? 'authenticated' : 'unauthenticated';
-
-  const status = state.loading ? 'loading' : checkAuthenticated;
+  const checkAuthenticated = isLoggedIn ? 'authenticated' : 'unauthenticated';
+  const status = loading ? 'loading' : checkAuthenticated;
 
   const memoizedValue = useMemo(
     () => ({
-      user: state.user
+      user: user
         ? {
-            ...state.user,
-            role: state.user?.role ?? 'admin',
+            ...user,
+            role: user?.role ?? 'admin',
           }
         : null,
-      checkUserSession,
+      checkUserSession, // ✅ Keeping function name unchanged
       loading: status === 'loading',
       authenticated: status === 'authenticated',
       unauthenticated: status === 'unauthenticated',
     }),
-    [checkUserSession, state.user, status]
+    [checkUserSession, user, status]
   );
 
   return <AuthContext.Provider value={memoizedValue}>{children}</AuthContext.Provider>;

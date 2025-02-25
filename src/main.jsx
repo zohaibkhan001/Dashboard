@@ -11,13 +11,11 @@ import { CONFIG } from './config-global';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
-  <StrictMode>
-    <HelmetProvider>
-      <BrowserRouter basename={CONFIG.site.basePath}>
-        <Suspense>
-          <App />
-        </Suspense>
-      </BrowserRouter>
-    </HelmetProvider>
-  </StrictMode>
+  <HelmetProvider>
+    <BrowserRouter basename={CONFIG.site.basePath}>
+      <Suspense>
+        <App />
+      </Suspense>
+    </BrowserRouter>
+  </HelmetProvider>
 );

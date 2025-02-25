@@ -2,6 +2,7 @@ import { paths } from 'src/routes/paths';
 
 import axios from 'src/utils/axios';
 
+import { logout } from 'src/utils/Redux/slices/superadminAuthSlice';
 import { STORAGE_KEY } from './constant';
 
 // ----------------------------------------------------------------------
@@ -51,40 +52,59 @@ export function isValidToken(accessToken) {
 
 // ----------------------------------------------------------------------
 
-export function tokenExpired(exp) {
+export function tokenExpired(exp, dispatch) {
   const currentTime = Date.now();
-  const timeLeft = exp * 1000 - currentTime;
+  const timeLeft = exp * 1000 - currentTime; // Convert seconds to milliseconds
 
   setTimeout(() => {
     try {
-      alert('Token expired!');
-      sessionStorage.removeItem(STORAGE_KEY);
-      window.location.href = paths.auth.jwt.signIn;
+      alert('Session expired! Please log in again.');
+      dispatch(logout()); // ✅ Dispatch Redux logout action
+      window.location.href = paths.auth.jwt.signIn; // ✅ Redirect to login
     } catch (error) {
       console.error('Error during token expiration:', error);
-      throw error;
     }
   }, timeLeft);
 }
 
 // ----------------------------------------------------------------------
 
-export async function setSession(accessToken) {
+// export async function setSession(accessToken) {
+//   try {
+//     if (accessToken) {
+//       sessionStorage.setItem(STORAGE_KEY, accessToken);
+
+//       axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+
+//       const decodedToken = jwtDecode(accessToken); // ~3 days by minimals server
+
+//       if (decodedToken && 'exp' in decodedToken) {
+//         tokenExpired(decodedToken.exp);
+//       } else {
+//         throw new Error('Invalid access token!');
+//       }
+//     } else {
+//       sessionStorage.removeItem(STORAGE_KEY);
+//       delete axios.defaults.headers.common.Authorization;
+//     }
+//   } catch (error) {
+//     console.error('Error during set session:', error);
+//     throw error;
+//   }
+// }
+
+export async function setSession(accessToken, dispatch) {
   try {
     if (accessToken) {
-      sessionStorage.setItem(STORAGE_KEY, accessToken);
-
       axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
 
-      const decodedToken = jwtDecode(accessToken); // ~3 days by minimals server
-
+      const decodedToken = jwtDecode(accessToken);
       if (decodedToken && 'exp' in decodedToken) {
-        tokenExpired(decodedToken.exp);
+        tokenExpired(decodedToken.exp, dispatch); // ✅ Trigger token expiration handling
       } else {
         throw new Error('Invalid access token!');
       }
     } else {
-      sessionStorage.removeItem(STORAGE_KEY);
       delete axios.defaults.headers.common.Authorization;
     }
   } catch (error) {

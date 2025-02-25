@@ -23,6 +23,10 @@ import { Form, Field } from 'src/components/hook-form';
 import { signUp } from 'src/auth/context/jwt';
 import { useAuthContext } from 'src/auth/hooks';
 
+import { createSuperAdminUser } from 'src/utils/Redux/slices/createAdminSlice';
+import { useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
+
 // ----------------------------------------------------------------------
 
 export const SignUpSchema = zod.object({
@@ -47,6 +51,8 @@ export function JwtSignUpView() {
 
   const password = useBoolean();
 
+  const dispatch = useDispatch();
+
   const [errorMsg, setErrorMsg] = useState('');
 
   const defaultValues = {
@@ -67,21 +73,31 @@ export function JwtSignUpView() {
   } = methods;
 
   const onSubmit = handleSubmit(async (data) => {
-    try {
-      await signUp({
-        email: data.email,
-        password: data.password,
-        firstName: data.firstName,
-        lastName: data.lastName,
-      });
-      await checkUserSession?.();
+    const payload = {
+      name: `${data.firstName} ${data.lastName}`, // ✅ Combine first and last name
+      email: data.email,
+      password: data.password,
+    };
 
-      router.refresh();
-    } catch (error) {
-      console.error(error);
-      setErrorMsg(error instanceof Error ? error.message : error);
-    }
+    dispatch(createSuperAdminUser(payload))
+      .then((action) => {
+        if (action.meta.requestStatus === 'fulfilled') {
+          toast.success(`${action.payload.msg}`, { position: 'top-center' }); // ✅ Success Toast
+          // checkUserSession?.();
+
+          console.log('Account supper admin created');
+          router.push(paths.auth.jwt.signIn); // ✅ Redirect to JWT sign-in
+        } else {
+          toast.error(action.payload.msg, { position: 'top-center' }); // ❌ Error Toast
+        }
+      })
+      .catch((error) => {
+        console.error('Unexpected error:', error);
+        toast.error('An error occurred. Please try again.');
+      });
   });
+
+  // console.log('test');
 
   const renderHead = (
     <Stack spacing={1.5} sx={{ mb: 5 }}>

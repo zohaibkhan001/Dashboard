@@ -23,6 +23,11 @@ import { AuthProvider as Auth0AuthProvider } from 'src/auth/context/auth0';
 import { AuthProvider as AmplifyAuthProvider } from 'src/auth/context/amplify';
 import { AuthProvider as SupabaseAuthProvider } from 'src/auth/context/supabase';
 import { AuthProvider as FirebaseAuthProvider } from 'src/auth/context/firebase';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { ToastContainer } from 'react-toastify';
+
+import { store, persistor } from './utils/Redux/store';
 
 // ----------------------------------------------------------------------
 
@@ -37,23 +42,39 @@ export default function App() {
   useScrollToTop();
 
   return (
-    <I18nProvider>
-    <LocalizationProvider>
-         <AuthProvider>
-          <SettingsProvider settings={defaultSettings}>
-             <ThemeProvider>
-                <MotionLazy>
-                 <CheckoutProvider>
-                   <Snackbar />
-                   <ProgressBar />
-                   <SettingsDrawer />
-                  <Router />
-                </CheckoutProvider>
-               </MotionLazy>
-            </ThemeProvider>
-          </SettingsProvider>
-         </AuthProvider>
-       </LocalizationProvider>
-     </I18nProvider>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <I18nProvider>
+          <LocalizationProvider>
+            <AuthProvider>
+              <SettingsProvider settings={defaultSettings}>
+                <ThemeProvider>
+                  <MotionLazy>
+                    <CheckoutProvider>
+                      <Snackbar />
+                      <ProgressBar />
+                      <SettingsDrawer />
+                      <Router />
+                      <ToastContainer
+                        position="top-center"
+                        autoClose={4000}
+                        hideProgressBar
+                        newestOnTop={false}
+                        closeOnClick
+                        rtl={false}
+                        pauseOnFocusLoss
+                        draggable
+                        pauseOnHover
+                        role="alert"
+                      />
+                    </CheckoutProvider>
+                  </MotionLazy>
+                </ThemeProvider>
+              </SettingsProvider>
+            </AuthProvider>
+          </LocalizationProvider>
+        </I18nProvider>
+      </PersistGate>
+    </Provider>
   );
 }
