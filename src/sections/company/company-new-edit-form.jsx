@@ -19,6 +19,7 @@ import { useRouter } from 'src/routes/hooks';
 import { toast } from 'src/components/snackbar';
 import { Form, Field } from 'src/components/hook-form';
 
+
 // ----------------------------------------------------------------------
 
 export const NewProductSchema = zod.object({
@@ -33,6 +34,7 @@ export function CompanyNewEditForm({ currentProduct }) {
   const defaultValues = useMemo(
     () => ({
       name: currentProduct?.name || '',
+      domains: [''],
     }),
     [currentProduct]
   );
@@ -137,63 +139,157 @@ export function CompanyNewEditForm({ currentProduct }) {
 
         <Divider />
 
-        <section style={
-          {
-            display: 'flex',
-            gap: '1rem',
-          }
-        }><Field.Text name="domain" label="Company Domain (example@domain.com" style={{ paddingRight: '2rem', width: '75%' }} />
+        <section style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {values.domains?.map((domain, index) => (
+            <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '1rem', width: '100%' }}>
+              <Field.Text
+                name={`domains.${index}`}
+                label={`Company Domain ${index + 1} (example@domain.com)`}
+                style={{ paddingRight: '2rem', width: '75%' }}
+              />
+
+              {(values.domains.length > 1 || (index === 0 && values.domains.length > 1)) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newDomains = [...values.domains];
+                    if (index === 0 && newDomains.length === 1) {
+                      // Reset to an empty field if only the initial input remains
+                      newDomains[0] = '';
+                    } else {
+                      // Remove the selected input field
+                      newDomains.splice(index, 1);
+                    }
+                    methods.setValue('domains', newDomains);
+                  }}
+                  style={{
+                    padding: '5px 5px',
+                    backgroundColor: 'red',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    width: '20%',
+                  }}
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          ))}
+
           <button
             type="button"
+            onClick={() => methods.setValue('domains', [...values.domains, ''])}
             style={{
-              position: 'absolute',
-              right: '1.8rem',
-              transform: 'translateY(25%)',
               padding: '10px 20px',
               backgroundColor: 'black',
               color: '#fff',
               border: 'none',
               borderRadius: '4px',
-              cursor: 'pointer'
-            }}>
+              cursor: 'pointer',
+              alignSelf: 'flex-start',
+            }}
+          >
             Add Company Domain
           </button>
         </section>
+
 
         <Divider />
 
         <h3>Contact Person Details</h3>
 
-        <section style={
-          {
-            display: 'flex',
-            gap: '1rem',
-          }
-        }><Field.Text name="name" label="Name" />
-          <Field.Text name="number" label="Contact Number" /></section>
+        <section style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          {(values.contacts?.length ? values.contacts : [{ name: '', number: '', email: '' }]).map(
+            (contact, index) => (
+              <div key={index} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
-        <section style={
-          {
-            display: 'flex',
-            gap: '1rem',
-          }
-        }><Field.Text name="email" label="Email" style={{ paddingRight: '2rem', width: '75%' }} />
+                {/* Name Input Field */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+
+                  <section style={{ display: 'flex', flexDirection: 'column', gap: '2rem', width: '100%' }}>
+                    <section style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Field.Text
+                        name={`contacts.${index}.name`}
+                        label="Name"
+                        style={{ paddingRight: '2rem', width: '50%' }}
+                      />
+
+                      <Field.Text
+                        name={`contacts.${index}.number`}
+                        label="Contact Number"
+                        style={{ paddingRight: '2rem', width: '50%' }}
+                      />
+                    </section>
+
+                    <section style={{ display: 'flex' }}>
+                      <Field.Text
+                        name={`contacts.${index}.email`}
+                        label="Email"
+                        style={{ paddingRight: '2rem', width: '75%' }}
+                      />
+
+                      {/* Remove Button */}
+                      {(values.contacts?.length > 1 || index > 0) && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newContacts = [...values.contacts];
+                            if (index === 0 && newContacts.length === 1) {
+                              // Reset to an empty field if only the initial input remains
+                              newContacts[0] = { name: '', number: '', email: '' };
+                            } else {
+                              // Remove the selected input field
+                              newContacts.splice(index, 1);
+                            }
+                            methods.setValue('contacts', newContacts);
+                          }}
+                          style={{
+                            padding: '5px 5px',
+                            backgroundColor: 'red',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            width: '20%',
+                          }}
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </section>
+
+
+                  </section>
+                </div>
+              </div>
+            )
+          )}
+
+          {/* Add Contact Button */}
           <button
             type="button"
+            onClick={() => {
+              const newContacts = [...(values.contacts || []), { name: '', number: '', email: '' }];
+              methods.setValue('contacts', newContacts);
+            }}
             style={{
-              position: 'absolute',
-              right: '1.8rem',
-              transform: 'translateY(25%)',
               padding: '10px 20px',
               backgroundColor: 'black',
               color: '#fff',
               border: 'none',
               borderRadius: '4px',
-              cursor: 'pointer'
-            }}>
+              cursor: 'pointer',
+              alignSelf: 'flex-start',
+            }}
+          >
             Add Contact Person
           </button>
         </section>
+
+
+
       </Stack>
     </Card>
   );
