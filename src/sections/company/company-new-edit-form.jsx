@@ -144,7 +144,7 @@ export function CompanyNewEditForm({ currentProduct }) {
             <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '1rem', width: '100%' }}>
               <Field.Text
                 name={`domains.${index}`}
-                label={`Company Domain ${index + 1} (example@domain.com)`}
+                label="Company Domain (example@domain.com)"
                 style={{ paddingRight: '2rem', width: '75%' }}
               />
 
