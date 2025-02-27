@@ -5,7 +5,7 @@ import { useMemo, useState, useEffect, useCallback } from 'react';
 
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
-import Switch from '@mui/material/Switch';
+// import Switch from '@mui/material/Switch';
 import Divider from '@mui/material/Divider';
 import CardHeader from '@mui/material/CardHeader';
 import Typography from '@mui/material/Typography';
@@ -216,7 +216,7 @@ export function GuestNewEditForm({ currentProduct }) {
             </section>
 
             <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
-              <Field.Text name="itemName" label="Item Name" style={{width: '80%'}} />
+            <Field.Text name="price" label="Price" style={{width: '80%'}} type="number" defaultValue=""/>
               <Button variant="contained" style={{width: '20%'}}>Add Item</Button>
             </section>
             </Stack>
@@ -240,7 +240,7 @@ export function GuestNewEditForm({ currentProduct }) {
             </section>
 
             <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
-              <Field.Text name="itemName" label="Item Name" style={{width: '80%'}} />
+            <Field.Text name="price" label="Price" style={{width: '80%'}} type="number" defaultValue=""/>
               <Button variant="contained" style={{width: '20%'}}>Add Item</Button>
             </section>
             </Stack>
@@ -260,7 +260,7 @@ export function GuestNewEditForm({ currentProduct }) {
             </section>
 
             <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
-              <Field.Text name="itemName" label="Item Name" style={{width: '80%'}} />
+            <Field.Text name="price" label="Price" style={{width: '80%'}} type="number" defaultValue=""/>
               <Button variant="contained" style={{width: '20%'}}>Add Item</Button>
             </section>
             </Stack>
@@ -280,7 +280,7 @@ export function GuestNewEditForm({ currentProduct }) {
             </section>
 
             <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
-              <Field.Text name="itemName" label="Item Name" style={{width: '80%'}} />
+            <Field.Text name="price" label="Price" style={{width: '80%'}} type="number" defaultValue=""/>
               <Button variant="contained" style={{width: '20%'}}>Add Item</Button>
             </section>
             </Stack>
@@ -300,7 +300,7 @@ export function GuestNewEditForm({ currentProduct }) {
             </section>
 
             <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
-              <Field.Text name="itemName" label="Item Name" style={{width: '80%'}} />
+            <Field.Text name="price" label="Price" style={{width: '80%'}} type="number" defaultValue=""/>
               <Button variant="contained" style={{width: '20%'}}>Add Item</Button>
             </section>
             </Stack>
@@ -320,7 +320,7 @@ export function GuestNewEditForm({ currentProduct }) {
             </section>
 
             <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
-              <Field.Text name="itemName" label="Item Name" style={{width: '80%'}} />
+            <Field.Text name="price" label="Price" style={{width: '80%'}} type="number" defaultValue=""/>
               <Button variant="contained" style={{width: '20%'}}>Add Item</Button>
             </section>
             </Stack>
@@ -340,7 +340,7 @@ export function GuestNewEditForm({ currentProduct }) {
             </section>
 
             <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
-              <Field.Text name="itemName" label="Item Name" style={{width: '80%'}} />
+            <Field.Text name="price" label="Price" style={{width: '80%'}} type="number" defaultValue=""/>
               <Button variant="contained" style={{width: '20%'}}>Add Item</Button>
             </section>
             </Stack>
@@ -360,7 +360,7 @@ export function GuestNewEditForm({ currentProduct }) {
             </section>
 
             <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
-              <Field.Text name="itemName" label="Item Name" style={{width: '80%'}} />
+            <Field.Text name="price" label="Price" style={{width: '80%'}} type="number" defaultValue=""/>
               <Button variant="contained" style={{width: '20%'}}>Add Item</Button>
             </section>
             </Stack>
@@ -370,6 +370,26 @@ export function GuestNewEditForm({ currentProduct }) {
           </Stack>
       </Card>
     )}
+
+  {selectedOption === 'live' && (
+        
+        <Card>
+          <CardHeader title="Details"/>
+          <Stack spacing={3} sx={{ p: 3 }}>
+            <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
+              <Field.Text name="fat" label="Fat" />
+              <Field.Text name="protein" label="Protein" />
+              <Field.Text name="calorie" label="Calorie" />
+            </section>
+
+            <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
+              <Field.Text name="price" label="Price" style={{width: '80%'}} type="number" defaultValue=""/>
+              <Button variant="contained" style={{width: '20%'}}>Add Item</Button>
+            </section>
+            </Stack>
+        </Card>
+      
+    )}
           </Card>
         </Stack>
       </Stack>
@@ -377,13 +397,7 @@ export function GuestNewEditForm({ currentProduct }) {
   );
 
   const renderActions = (
-    <Stack spacing={3} direction="row" alignItems="center" flexWrap="wrap">
-      <FormControlLabel
-        control={<Switch defaultChecked inputProps={{ id: 'publish-switch' }} />}
-        label="Create Meal"
-        sx={{ pl: 3, flexGrow: 1 }}
-      />
-
+    <Stack spacing={3} direction="row" justifyContent="flex-end" flexWrap="wrap">
       <LoadingButton type="submit" variant="contained" size="large" loading={isSubmitting}>
         {!currentProduct ? 'Create product' : 'Save changes'}
       </LoadingButton>
