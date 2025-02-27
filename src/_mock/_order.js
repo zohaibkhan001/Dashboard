@@ -3,30 +3,19 @@ import { _mock } from './_mock';
 // ----------------------------------------------------------------------
 
 export const ORDER_STATUS_OPTIONS = [
-  // { value: 'pending', label: 'Non-Active' },
+  // { value: 'pending', label: 'Pending' },
   { value: 'completed', label: 'Completed' },
   { value: 'cancelled', label: 'Cancelled' },
   { value: 'refunded', label: 'Refunded' },
-];
-
-export const COMPANY_STATUS_OPTIONS = [
-  // { value: 'pending', label: 'Non-Active' },
-  // { value: 'completed', label: 'Completed' },
-  // { value: 'cancelled', label: 'Cancelled' },
-  // { value: 'refunded', label: 'Refunded' },
 ];
 
 const ITEMS = [...Array(3)].map((_, index) => ({
   id: _mock.id(index),
   sku: `16H9UR${index}`,
   quantity: index + 1,
-  domain: _mock.domain(index),
   name: _mock.productName(index),
   coverUrl: _mock.image.product(index),
   price: _mock.number.price(index),
-  address :_mock.address(index),
-  pocName: _mock.pocName(index),
-  pocContact: _mock.pocContacts(index),
 }));
 
 export const _orders = [...Array(20)].map((_, index) => {
@@ -40,22 +29,15 @@ export const _orders = [...Array(20)].map((_, index) => {
 
   const totalQuantity = items.reduce((accumulator, item) => accumulator + item.quantity, 0);
 
-  const domain = _mock.domain(index);
-
   const subtotal = items.reduce((accumulator, item) => accumulator + item.price * item.quantity, 0);
 
   const totalAmount = subtotal - shipping - discount + taxes;
-
-  const address = _mock.address(index);
-
-  const pocName = _mock.pocName(index);
-
-  const pocContact= _mock.pocContacts(index);
 
   const customer = {
     id: _mock.id(index),
     name: _mock.fullName(index),
     email: _mock.email(index),
+    avatarUrl: _mock.image.avatar(index),
     ipAddress: '192.158.1.38',
   };
 
@@ -77,6 +59,7 @@ export const _orders = [...Array(20)].map((_, index) => {
 
   return {
     id: _mock.id(index),
+    orderNumber: `#601${index}`,
     createdAt: _mock.time(index),
     taxes,
     items,
@@ -86,12 +69,8 @@ export const _orders = [...Array(20)].map((_, index) => {
     discount,
     customer,
     delivery,
-    address,
     totalAmount,
     totalQuantity,
-    pocName,
-    pocContact,
-    domain,
     shippingAddress: {
       fullAddress: '19034 Verna Unions Apt. 164 - Honolulu, RI / 87535',
       phoneNumber: '365-374-4961',
@@ -99,8 +78,8 @@ export const _orders = [...Array(20)].map((_, index) => {
     payment: { cardType: 'mastercard', cardNumber: '**** **** **** 5678' },
     status:
       (index % 2 && 'completed') ||
-      (index % 3 && 'refunded') ||
+      (index % 3 && 'pending') ||
       (index % 4 && 'cancelled') ||
-      'completed',
+      'refunded',
   };
 });

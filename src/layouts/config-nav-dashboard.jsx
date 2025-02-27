@@ -48,7 +48,7 @@ export const navData = [
   {
     subheader: 'Overview',
     items: [
-      { title: 'App', path: paths.dashboard.root, icon: ICONS.dashboard },
+      { title: 'Dashboard', path: paths.dashboard.root, icon: ICONS.dashboard },
       { title: 'Companies', path: paths.dashboard.company.root, icon: ICONS.company },
       { title: 'Master Menu', path: paths.dashboard.product.root, icon: ICONS.menu },
       { title: 'Orders', path: paths.dashboard.order.root, icon: ICONS.order },

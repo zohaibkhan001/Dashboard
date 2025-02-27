@@ -19,7 +19,7 @@ import { fIsAfter, fIsBetween } from 'src/utils/format-time';
 
 import { varAlpha } from 'src/theme/styles';
 import { DashboardContent } from 'src/layouts/dashboard';
-import { _orders, COMPANY_STATUS_OPTIONS } from 'src/_mock';
+import { _company, COMPANY_STATUS_OPTIONS } from 'src/_mock';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCompanies } from 'src/utils/Redux/slices/companiesListSlice';
