@@ -19,7 +19,7 @@ import { fIsAfter, fIsBetween } from 'src/utils/format-time';
 
 import { varAlpha } from 'src/theme/styles';
 import { DashboardContent } from 'src/layouts/dashboard';
-import { _orders, COMPANY_STATUS_OPTIONS } from 'src/_mock';
+import { _company, COMPANY_STATUS_OPTIONS } from 'src/_mock';
 
 import { Label } from 'src/components/label';
 import { toast } from 'src/components/snackbar';
@@ -70,7 +70,7 @@ export function CompanyListView() {
 
   const confirm = useBoolean();
 
-  const [tableData, setTableData] = useState(_orders);
+  const [tableData, setTableData] = useState(_company);
 
   const filters = useSetState({
     name: '',
