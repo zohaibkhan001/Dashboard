@@ -6,12 +6,11 @@ import Tabs from '@mui/material/Tabs';
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
 import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
 import TableBody from '@mui/material/TableBody';
-import IconButton from '@mui/material/IconButton';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
+import { RouterLink } from 'src/routes/components';
 
 import { useBoolean } from 'src/hooks/use-boolean';
 import { useSetState } from 'src/hooks/use-set-state';
@@ -20,7 +19,7 @@ import { fIsAfter, fIsBetween } from 'src/utils/format-time';
 
 import { varAlpha } from 'src/theme/styles';
 import { DashboardContent } from 'src/layouts/dashboard';
-import { _orders, ORDER_STATUS_OPTIONS } from 'src/_mock';
+import { _orders, COMPANY_STATUS_OPTIONS } from 'src/_mock';
 
 import { Label } from 'src/components/label';
 import { toast } from 'src/components/snackbar';
@@ -36,36 +35,35 @@ import {
   getComparator,
   TableEmptyRows,
   TableHeadCustom,
-  TableSelectedAction,
   TablePaginationCustom,
 } from 'src/components/table';
 
-import { OrderTableRow } from '../order-table-row';
-import { OrderTableToolbar } from '../order-table-toolbar';
-import { OrderTableFiltersResult } from '../order-table-filters-result';
+import { CompanyTableRow } from '../company-table-row';
+import { CompanyTableToolbar } from '../company-table-toolbar';
+import { CompanyTableFiltersResult } from '../company-table-filters-result';
 
 // ----------------------------------------------------------------------
 
-const STATUS_OPTIONS = [{ value: 'all', label: 'All' }, ...ORDER_STATUS_OPTIONS];
+const STATUS_OPTIONS = [{ value: 'all', label: 'Active' }, ...COMPANY_STATUS_OPTIONS];
 
 const TABLE_HEAD = [
-  { id: 'orderNumber', label: 'Order', width: 88 },
-  { id: 'name', label: 'Customer' },
-  { id: 'createdAt', label: 'Date', width: 140 },
+  { id: 'orderNumber', label: 'Company Name', width: 250 },
+  { id: 'name', label: 'POC Contact', width: 250 },
   {
     id: 'totalQuantity',
-    label: 'Items',
-    width: 120,
+    label: 'Domains',
+    width: 250,
     align: 'center',
   },
-  { id: 'totalAmount', label: 'Price', width: 140 },
-  { id: 'status', label: 'Status', width: 110 },
+  { id: 'totalAmount', label: 'Address', width: 250 },
+  { id: 'status', label: 'POC Name', width: 250 },
   { id: '', width: 88 },
 ];
 
 // ----------------------------------------------------------------------
 
-export function OrderListView() {
+export function CompanyListView() {
+
   const table = useTable({ defaultOrderBy: 'orderNumber' });
 
   const router = useRouter();
@@ -127,7 +125,7 @@ export function OrderListView() {
 
   const handleViewRow = useCallback(
     (id) => {
-      router.push(paths.dashboard.order.details(id));
+      router.push(paths.dashboard.company.details(id));
     },
     [router]
   );
@@ -144,12 +142,22 @@ export function OrderListView() {
     <>
       <DashboardContent>
         <CustomBreadcrumbs
-          heading="Orders"
+          heading="Company Master List"
           links={[
             { name: 'Dashboard', href: paths.dashboard.root },
-            { name: 'Order', href: paths.dashboard.order.root },
+            { name: 'Company', href: paths.dashboard.company.root },
             { name: 'List' },
           ]}
+          action={
+            <Button
+              component={RouterLink}
+              href={paths.dashboard.company.new}
+              variant="contained"
+              startIcon={<Iconify icon="mingcute:add-line" />}
+            >
+              New Company
+            </Button>
+          }
           sx={{ mb: { xs: 3, md: 5 } }}
         />
 
@@ -176,13 +184,13 @@ export function OrderListView() {
                       'soft'
                     }
                     color={
-                      (tab.value === 'completed' && 'success') ||
+                      // (tab.value === 'completed' && 'success') ||
                       (tab.value === 'pending' && 'warning') ||
-                      (tab.value === 'cancelled' && 'error') ||
+                      // (tab.value === 'cancelled' && 'error') ||
                       'default'
                     }
                   >
-                    {['completed', 'pending', 'cancelled', 'refunded'].includes(tab.value)
+                    {['pending'].includes(tab.value)
                       ? tableData.filter((user) => user.status === tab.value).length
                       : tableData.length}
                   </Label>
@@ -191,14 +199,14 @@ export function OrderListView() {
             ))}
           </Tabs>
 
-          <OrderTableToolbar
+          <CompanyTableToolbar
             filters={filters}
             onResetPage={table.onResetPage}
             dateError={dateError}
           />
 
           {canReset && (
-            <OrderTableFiltersResult
+            <CompanyTableFiltersResult
               filters={filters}
               totalResults={dataFiltered.length}
               onResetPage={table.onResetPage}
@@ -207,24 +215,6 @@ export function OrderListView() {
           )}
 
           <Box sx={{ position: 'relative' }}>
-            <TableSelectedAction
-              dense={table.dense}
-              numSelected={table.selected.length}
-              rowCount={dataFiltered.length}
-              onSelectAllRows={(checked) =>
-                table.onSelectAllRows(
-                  checked,
-                  dataFiltered.map((row) => row.id)
-                )
-              }
-              action={
-                <Tooltip title="Delete">
-                  <IconButton color="primary" onClick={confirm.onTrue}>
-                    <Iconify icon="solar:trash-bin-trash-bold" />
-                  </IconButton>
-                </Tooltip>
-              }
-            />
 
             <Scrollbar sx={{ minHeight: 444 }}>
               <Table size={table.dense ? 'small' : 'medium'} sx={{ minWidth: 960 }}>
@@ -250,7 +240,7 @@ export function OrderListView() {
                       table.page * table.rowsPerPage + table.rowsPerPage
                     )
                     .map((row) => (
-                      <OrderTableRow
+                      <CompanyTableRow
                         key={row.id}
                         row={row}
                         selected={table.selected.includes(row.id)}

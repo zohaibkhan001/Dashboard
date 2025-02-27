@@ -159,9 +159,16 @@ export const paths = {
         edit: `${ROOTS.DASHBOARD}/post/${paramCase(MOCK_TITLE)}/edit`,
       },
     },
+    company: {
+      root: `${ROOTS.DASHBOARD}/company`,
+      new: `${ROOTS.DASHBOARD}/company/new`,
+      details: (id) => `${ROOTS.DASHBOARD}/company/${id}`,
+      demo: {
+        details: `${ROOTS.DASHBOARD}/company/${MOCK_ID}`,
+      },
+    },
     order: {
       root: `${ROOTS.DASHBOARD}/order`,
-      new: `${ROOTS.DASHBOARD}/order/new`,
       details: (id) => `${ROOTS.DASHBOARD}/order/${id}`,
       demo: {
         details: `${ROOTS.DASHBOARD}/order/${MOCK_ID}`,
