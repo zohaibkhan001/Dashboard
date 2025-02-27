@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
@@ -20,6 +20,9 @@ import { fIsAfter, fIsBetween } from 'src/utils/format-time';
 import { varAlpha } from 'src/theme/styles';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { _orders, COMPANY_STATUS_OPTIONS } from 'src/_mock';
+
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchCompanies } from 'src/utils/Redux/slices/companiesListSlice';
 
 import { Label } from 'src/components/label';
 import { toast } from 'src/components/snackbar';
@@ -47,30 +50,48 @@ import { CompanyTableFiltersResult } from '../company-table-filters-result';
 const STATUS_OPTIONS = [{ value: 'all', label: 'Active' }, ...COMPANY_STATUS_OPTIONS];
 
 const TABLE_HEAD = [
-  { id: 'orderNumber', label: 'Company Name', width: 250 },
-  { id: 'name', label: 'POC Contact', width: 250 },
+  { id: 'companyName', label: 'Company Name', width: 250 },
+  { id: 'contactPerson', label: 'POC Contact', width: 250 },
   {
-    id: 'totalQuantity',
+    id: 'domainName',
     label: 'Domains',
     width: 250,
     align: 'center',
   },
-  { id: 'totalAmount', label: 'Address', width: 250 },
-  { id: 'status', label: 'POC Name', width: 250 },
+  { id: 'companyAddress', label: 'Address', width: 250 },
+  { id: 'email', label: 'POC Contact Email', width: 250 },
   { id: '', width: 88 },
 ];
 
 // ----------------------------------------------------------------------
 
 export function CompanyListView() {
+  // const { token } = useSelector((state) => state.superAdminAuth);
+
+  // console.log(token);
+
+  const { companies, loading, error } = useSelector((state) => state.allCompanies);
+  console.log(companies);
 
   const table = useTable({ defaultOrderBy: 'orderNumber' });
+
+  const dispatch = useDispatch();
 
   const router = useRouter();
 
   const confirm = useBoolean();
 
-  const [tableData, setTableData] = useState(_orders);
+  const [tableData, setTableData] = useState([]);
+
+  useEffect(() => {
+    if (companies?.length) {
+      setTableData(companies);
+    }
+  }, [companies]);
+
+  useEffect(() => {
+    dispatch(fetchCompanies()); // ✅ Fetch companies when component mounts
+  }, [dispatch]);
 
   const filters = useSetState({
     name: '',
@@ -215,7 +236,6 @@ export function CompanyListView() {
           )}
 
           <Box sx={{ position: 'relative' }}>
-
             <Scrollbar sx={{ minHeight: 444 }}>
               <Table size={table.dense ? 'small' : 'medium'} sx={{ minWidth: 960 }}>
                 <TableHeadCustom
@@ -239,16 +259,23 @@ export function CompanyListView() {
                       table.page * table.rowsPerPage,
                       table.page * table.rowsPerPage + table.rowsPerPage
                     )
-                    .map((row) => (
-                      <CompanyTableRow
-                        key={row.id}
-                        row={row}
-                        selected={table.selected.includes(row.id)}
-                        onSelectRow={() => table.onSelectRow(row.id)}
-                        onDeleteRow={() => handleDeleteRow(row.id)}
-                        onViewRow={() => handleViewRow(row.id)}
-                      />
-                    ))}
+                    .map((row) => {
+                      const formattedRow = {
+                        ...row,
+                        domainName: row.domainName ? JSON.parse(row.domainName).join(', ') : 'N/A',
+                      };
+
+                      return (
+                        <CompanyTableRow
+                          key={formattedRow.company_id}
+                          row={formattedRow}
+                          selected={table.selected.includes(formattedRow.company_id)}
+                          onSelectRow={() => table.onSelectRow(formattedRow.company_id)}
+                          onDeleteRow={() => handleDeleteRow(formattedRow.company_id)}
+                          onViewRow={() => handleViewRow(formattedRow.company_id)}
+                        />
+                      );
+                    })}
 
                   <TableEmptyRows
                     height={table.dense ? 56 : 56 + 20}
@@ -314,10 +341,13 @@ function applyFilter({ inputData, comparator, filters, dateError }) {
 
   if (name) {
     inputData = inputData.filter(
-      (order) =>
-        order.orderNumber.toLowerCase().indexOf(name.toLowerCase()) !== -1 ||
-        order.customer.name.toLowerCase().indexOf(name.toLowerCase()) !== -1 ||
-        order.customer.email.toLowerCase().indexOf(name.toLowerCase()) !== -1
+      (company) =>
+        company.companyName.toLowerCase().includes(name.toLowerCase()) ||
+        company.contactPerson.toLowerCase().includes(name.toLowerCase()) ||
+        company.email.toLowerCase().includes(name.toLowerCase()) ||
+        (company.domainName ? JSON.parse(company.domainName).join(', ') : 'N/A')
+          .toLowerCase()
+          .includes(name.toLowerCase())
     );
   }
 

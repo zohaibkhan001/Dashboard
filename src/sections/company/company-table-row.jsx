@@ -35,13 +35,12 @@ export function CompanyTableRow({ row, selected, onSelectRow, onViewRow, onDelet
         <Checkbox
           checked={selected}
           onClick={onSelectRow}
-          inputProps={{ id: `row-checkbox-${row.id}`, 'aria-label': `Row checkbox` }}
+          inputProps={{ id: `row-checkbox-${row.company_id}`, 'aria-label': `Row checkbox` }}
         />
       </TableCell>
 
       <TableCell>
         <Stack spacing={2} direction="row" alignItems="center">
-
           <Stack
             sx={{
               typography: 'body2',
@@ -49,26 +48,49 @@ export function CompanyTableRow({ row, selected, onSelectRow, onViewRow, onDelet
               alignItems: 'flex-start',
             }}
           >
-            <Box component="span">{row.customer.name}</Box>
-            <Box component="span" sx={{ color: 'text.disabled' }}>
+            <Box component="span">{row.companyName}</Box>
+            {/* <Box component="span" sx={{ color: 'text.disabled' }}>
               {row.customer.email}
-            </Box>
+            </Box> */}
           </Stack>
         </Stack>
       </TableCell>
 
-      <TableCell> {row.pocContact} </TableCell>
+      <TableCell> {row.contactPerson} </TableCell>
 
-      <TableCell align="center"> {row.domain} </TableCell>
+      <TableCell align="center">
+        {/* <TableCell> */}
+        {(() => {
+          console.log(row.domainName); // Debugging log
 
-      <TableCell> {row.address} </TableCell>
+          try {
+            let domains;
 
-      <TableCell>{row.pocName}</TableCell>
+            // Check if domainName is a valid JSON array
+            if (row.domainName.startsWith('[') && row.domainName.endsWith(']')) {
+              domains = JSON.parse(row.domainName);
+            } else {
+              // If not JSON, assume it's a comma-separated string
+              domains = row.domainName.split(',').map((d) => d.trim());
+            }
+
+            if (Array.isArray(domains) && domains.length > 0) {
+              return domains.length > 1 ? `${domains[0]} +${domains.length - 1}` : domains[0];
+            }
+            return 'N/A'; // Handle empty or invalid domain lists
+          } catch (error) {
+            console.error('Domain parsing error:', error);
+            return 'N/A'; // Return fallback value if parsing fails
+          }
+        })()}
+      </TableCell>
+
+      <TableCell> {row.companyAddress} </TableCell>
+
+      <TableCell>{row.email}</TableCell>
 
       <TableCell align="right" sx={{ px: 1, whiteSpace: 'nowrap' }}>
-        <IconButton
-          color={collapse.value ? 'inherit' : 'default'}
-        >
+        <IconButton color={collapse.value ? 'inherit' : 'default'}>
           <Iconify icon="material-symbols:edit-rounded" />
         </IconButton>
 
@@ -79,61 +101,9 @@ export function CompanyTableRow({ row, selected, onSelectRow, onViewRow, onDelet
     </TableRow>
   );
 
-  const renderSecondary = (
-    <TableRow>
-      <TableCell sx={{ p: 0, border: 'none' }} colSpan={8}>
-        <Collapse
-          in={collapse.value}
-          timeout="auto"
-          unmountOnExit
-          sx={{ bgcolor: 'background.neutral' }}
-        >
-          <Paper sx={{ m: 1.5 }}>
-            {row.items.map((item) => (
-              <Stack
-                key={item.id}
-                direction="row"
-                alignItems="center"
-                sx={{
-                  p: (theme) => theme.spacing(1.5, 2, 1.5, 1.5),
-                  '&:not(:last-of-type)': {
-                    borderBottom: (theme) => `solid 2px ${theme.vars.palette.background.neutral}`,
-                  },
-                }}
-              >
-                <Avatar
-                  src={item.coverUrl}
-                  variant="rounded"
-                  sx={{ width: 48, height: 48, mr: 2 }}
-                />
-
-                <ListItemText
-                  primary={item.name}
-                  secondary={item.sku}
-                  primaryTypographyProps={{ typography: 'body2' }}
-                  secondaryTypographyProps={{
-                    component: 'span',
-                    color: 'text.disabled',
-                    mt: 0.5,
-                  }}
-                />
-
-                <div>x{item.quantity} </div>
-
-                <Box sx={{ width: 110, textAlign: 'right' }}>{fCurrency(item.price)}</Box>
-              </Stack>
-            ))}
-          </Paper>
-        </Collapse>
-      </TableCell>
-    </TableRow>
-  );
-
   return (
     <>
       {renderPrimary}
-
-      {renderSecondary}
 
       <CustomPopover
         open={popover.open}
@@ -155,8 +125,9 @@ export function CompanyTableRow({ row, selected, onSelectRow, onViewRow, onDelet
 
           <MenuItem
             onClick={() => {
-              onViewRow();
+              onViewRow(row.company_id);
               popover.onClose();
+              // console.log(row.company_id);
             }}
           >
             <Iconify icon="solar:eye-bold" />
