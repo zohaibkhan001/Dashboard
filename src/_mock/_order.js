@@ -4,6 +4,13 @@ import { _mock } from './_mock';
 
 export const ORDER_STATUS_OPTIONS = [
   // { value: 'pending', label: 'Non-Active' },
+  { value: 'completed', label: 'Completed' },
+  { value: 'cancelled', label: 'Cancelled' },
+  { value: 'refunded', label: 'Refunded' },
+];
+
+export const COMPANY_STATUS_OPTIONS = [
+  // { value: 'pending', label: 'Non-Active' },
   // { value: 'completed', label: 'Completed' },
   // { value: 'cancelled', label: 'Cancelled' },
   // { value: 'refunded', label: 'Refunded' },

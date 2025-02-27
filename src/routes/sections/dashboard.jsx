@@ -25,10 +25,13 @@ const ProductListPage = lazy(() => import('src/pages/dashboard/product/list'));
 const ProductCreatePage = lazy(() => import('src/pages/dashboard/product/new'));
 const ProductEditPage = lazy(() => import('src/pages/dashboard/product/edit'));
 const GuestMealPage = lazy(() => import('src/pages/dashboard/product/guest'));
+// Company
+const CompanyListPage = lazy(() => import('src/pages/dashboard/company/list'));
+// const CompanyDetailsPage = lazy(() => import('src/pages/dashboard/company/details'));
+const CompanyCreatePage = lazy(() => import('src/pages/dashboard/company/new'));
 // Order
 const OrderListPage = lazy(() => import('src/pages/dashboard/order/list'));
 const OrderDetailsPage = lazy(() => import('src/pages/dashboard/order/details'));
-const OrderCreatePage = lazy(() => import('src/pages/dashboard/order/new'));
 // Invoice
 const InvoiceListPage = lazy(() => import('src/pages/dashboard/invoice/list'));
 const InvoiceDetailsPage = lazy(() => import('src/pages/dashboard/invoice/details'));
@@ -115,12 +118,20 @@ export const dashboardRoutes = [
         ],
       },
       {
+        path: 'company',
+        children: [
+          { element: <CompanyListPage />, index: true },
+          { path: 'list', element: <CompanyListPage /> },
+          // { path: ':id', element: <CompanyDetailsPage /> },
+          { path: 'new', element: <CompanyCreatePage /> },
+        ],
+      },
+      {
         path: 'order',
         children: [
           { element: <OrderListPage />, index: true },
           { path: 'list', element: <OrderListPage /> },
           { path: ':id', element: <OrderDetailsPage /> },
-          { path: 'new', element: <OrderCreatePage /> },
         ],
       },
       {

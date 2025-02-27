@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 
 import { CONFIG } from 'src/config-global';
 
-import { OrderCreateView } from 'src/sections/order/view';
+import { CompanyCreateView } from 'src/sections/company/view';
 
 // ----------------------------------------------------------------------
 
@@ -15,7 +15,7 @@ export default function Page() {
         <title> {metadata.title}</title>
       </Helmet>
 
-      <OrderCreateView />
+      <CompanyCreateView />
     </>
   );
 }

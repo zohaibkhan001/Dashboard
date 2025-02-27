@@ -23,7 +23,7 @@ export const NewProductSchema = zod.object({
 
 // ----------------------------------------------------------------------
 
-export function OrderNewEditForm({ currentProduct }) {
+export function CompanyNewEditForm({ currentProduct }) {
   const router = useRouter();
 
   const defaultValues = useMemo(

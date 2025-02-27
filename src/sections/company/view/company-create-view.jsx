@@ -4,24 +4,24 @@ import { DashboardContent } from 'src/layouts/dashboard';
 
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 
-import { OrderNewEditForm } from '../order-new-edit-form';
+import { CompanyNewEditForm } from '../company-new-edit-form';
 
 // ----------------------------------------------------------------------
 
-export function OrderCreateView() {
+export function CompanyCreateView() {
   return (
     <DashboardContent>
       <CustomBreadcrumbs
         heading="Create a new company"
         links={[
           { name: 'Dashboard', href: paths.dashboard.root },
-          { name: 'Company', href: paths.dashboard.order.root },
+          { name: 'Company', href: paths.dashboard.company.root },
           { name: 'New Company' },
         ]}
         sx={{ mb: { xs: 3, md: 5 } }}
       />
 
-      <OrderNewEditForm />
+      <CompanyNewEditForm />
     </DashboardContent>
   );
 }

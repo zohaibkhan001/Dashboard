@@ -49,19 +49,19 @@ export const navData = [
     subheader: 'Overview',
     items: [
       { title: 'App', path: paths.dashboard.root, icon: ICONS.dashboard },
-      { title: 'Companies', path: paths.dashboard.order.root, icon: ICONS.company },
+      { title: 'Companies', path: paths.dashboard.company.root, icon: ICONS.company },
       { title: 'Master Menu', path: paths.dashboard.product.root, icon: ICONS.menu },
-      { title: 'Orders', path: paths.dashboard.root, icon: ICONS.order },
-      { title: 'Analytics', path: paths.dashboard.general.analytics, icon: ICONS.analytics },
+      { title: 'Orders', path: paths.dashboard.order.root, icon: ICONS.order },
+      // { title: 'Analytics', path: paths.dashboard.general.analytics, icon: ICONS.analytics },
       { title: 'Users', path: paths.dashboard.user.list, icon: ICONS.user },
       { title: 'Blog', path: paths.dashboard.post.root, icon: ICONS.blog },
       { title: 'Roles', path: paths.dashboard.root, icon: ICONS.disabled },
       { title: 'Settings', path: paths.dashboard.root, icon: ICONS.lock },
-      {
-        title: 'Support',
-        path: paths.dashboard.mail,
-        icon: ICONS.mail,
-      },
+      // {
+      //   title: 'Support',
+      //   path: paths.dashboard.mail,
+      //   icon: ICONS.mail,
+      // },
     ],
   },
 ];
