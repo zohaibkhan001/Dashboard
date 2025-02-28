@@ -71,7 +71,7 @@ export function CompanyListView() {
   // console.log(token);
 
   const { companies, loading, error } = useSelector((state) => state.allCompanies);
-  console.log(companies);
+  // console.log(companies);
 
   const table = useTable({ defaultOrderBy: 'orderNumber' });
 
@@ -121,6 +121,8 @@ export function CompanyListView() {
   const handleDeleteRow = useCallback(
     (id) => {
       const deleteRow = tableData.filter((row) => row.id !== id);
+
+      console.log(id);
 
       toast.success('Delete success!');
 

@@ -67,7 +67,7 @@ export function CompanyTableRow({ row, selected, onSelectRow, onViewRow, onDelet
       >
         {/* <TableCell> */}
         {(() => {
-          console.log(row.domainName); // Debugging log
+          // console.log(row.domainName); // Debugging log
 
           try {
             let domains;

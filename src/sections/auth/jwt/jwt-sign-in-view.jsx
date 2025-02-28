@@ -27,7 +27,7 @@ import { toast } from 'react-toastify';
 
 // ----------------------------------------------------------------------
 
-export const SignInSchema = zod.object({
+const SignInSchema = zod.object({
   email: zod
     .string()
     .min(1, { message: 'Email is required!' })
