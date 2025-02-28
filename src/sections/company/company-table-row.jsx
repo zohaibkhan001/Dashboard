@@ -1,20 +1,16 @@
 import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
-import Avatar from '@mui/material/Avatar';
 import MenuList from '@mui/material/MenuList';
-import Collapse from '@mui/material/Collapse';
 import MenuItem from '@mui/material/MenuItem';
 import TableRow from '@mui/material/TableRow';
 import Checkbox from '@mui/material/Checkbox';
 import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
-import ListItemText from '@mui/material/ListItemText';
 
 import { useBoolean } from 'src/hooks/use-boolean';
-
-import { fCurrency } from 'src/utils/format-number';
+import { RouterLink } from 'src/routes/components';
+import { paths } from 'src/routes/paths';
 
 import { Iconify } from 'src/components/iconify';
 import { ConfirmDialog } from 'src/components/custom-dialog';
@@ -24,8 +20,6 @@ import { usePopover, CustomPopover } from 'src/components/custom-popover';
 
 export function CompanyTableRow({ row, selected, onSelectRow, onViewRow, onDeleteRow }) {
   const confirm = useBoolean();
-
-  const collapse = useBoolean();
 
   const popover = usePopover();
 
@@ -39,7 +33,11 @@ export function CompanyTableRow({ row, selected, onSelectRow, onViewRow, onDelet
         />
       </TableCell>
 
-      <TableCell>
+      <TableCell
+        style={{ cursor: 'pointer' }}
+        component={RouterLink}
+        href={paths.dashboard.general.analytics}
+      >
         <Stack spacing={2} direction="row" alignItems="center">
           <Stack
             sx={{
@@ -49,16 +47,24 @@ export function CompanyTableRow({ row, selected, onSelectRow, onViewRow, onDelet
             }}
           >
             <Box component="span">{row.companyName}</Box>
-            {/* <Box component="span" sx={{ color: 'text.disabled' }}>
-              {row.customer.email}
-            </Box> */}
           </Stack>
         </Stack>
       </TableCell>
 
-      <TableCell> {row.contactPerson} </TableCell>
+      <TableCell
+        style={{ cursor: 'pointer' }}
+        component={RouterLink}
+        href={paths.dashboard.general.analytics}
+      >
+        {row.contactPerson}
+      </TableCell>
 
-      <TableCell align="center">
+      <TableCell
+        align="center"
+        style={{ cursor: 'pointer' }}
+        component={RouterLink}
+        href={paths.dashboard.general.analytics}
+      >
         {/* <TableCell> */}
         {(() => {
           console.log(row.domainName); // Debugging log
@@ -85,12 +91,24 @@ export function CompanyTableRow({ row, selected, onSelectRow, onViewRow, onDelet
         })()}
       </TableCell>
 
-      <TableCell> {row.companyAddress} </TableCell>
+      <TableCell
+        style={{ cursor: 'pointer' }}
+        component={RouterLink}
+        href={paths.dashboard.general.analytics}
+      >
+        {row.companyAddress}
+      </TableCell>
 
-      <TableCell>{row.email}</TableCell>
+      <TableCell
+        style={{ cursor: 'pointer' }}
+        component={RouterLink}
+        href={paths.dashboard.general.analytics}
+      >
+        {row.email}
+      </TableCell>
 
       <TableCell align="right" sx={{ px: 1, whiteSpace: 'nowrap' }}>
-        <IconButton color={collapse.value ? 'inherit' : 'default'}>
+        <IconButton color="default">
           <Iconify icon="material-symbols:edit-rounded" />
         </IconButton>
 
