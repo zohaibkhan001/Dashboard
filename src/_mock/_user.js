@@ -1,5 +1,5 @@
 import { _mock } from './_mock';
-import { _walletBalance } from './assets';
+import { _mealItem, _ratings, _remarks, _walletBalance } from './assets';
 
 // ----------------------------------------------------------------------
 
@@ -140,6 +140,9 @@ export const _userList = [...Array(20)].map((_, index) => ({
   avatarUrl: _mock.image.avatar(index),
   phoneNumber: _mock.phoneNumber(index),
   walletBalance: _walletBalance[index],
+  remarks: _remarks[index],
+  ratings: _ratings[index],
+  mealItem: _mealItem[index],
   status:
     (index % 2 && 'pending') || (index % 3 && 'banned') || (index % 4 && 'rejected') || 'active',
 }));
