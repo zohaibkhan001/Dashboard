@@ -1867,10 +1867,10 @@
   resolved "https://registry.npmjs.org/@react-pdf/types/-/types-2.5.0.tgz"
   integrity sha512-XsVRkt0hQ60I4e3leAVt+aZR3KJCaJd179BfJHAv4F4x6Vq3yqkry8lcbUWKGKDw1j3/8sW4FsgGR41SFvsG9A==
 
-"@reduxjs/toolkit@^2.5.1":
-  version "2.5.1"
-  resolved "https://registry.npmjs.org/@reduxjs/toolkit/-/toolkit-2.5.1.tgz"
-  integrity sha512-UHhy3p0oUpdhnSxyDjaRDYaw8Xra75UiLbCiRozVPHjfDwNYkh0TsVm/1OmTW8Md+iDAJmYPWUKMvsMc2GtpNg==
+"@reduxjs/toolkit@^2.6.0":
+  version "2.6.0"
+  resolved "https://registry.npmjs.org/@reduxjs/toolkit/-/toolkit-2.6.0.tgz"
+  integrity sha512-mWJCYpewLRyTuuzRSEC/IwIBBkYg2dKtQas8mty5MaV2iXzcmicS3gW554FDeOvLnY3x13NIk8MB1e8wHO7rqQ==
   dependencies:
     immer "^10.0.3"
     redux "^5.0.1"
@@ -6421,10 +6421,10 @@ react-router@^6.23.1, react-router@6.23.1:
   dependencies:
     "@remix-run/router" "1.16.1"
 
-react-toastify@^11.0.3:
-  version "11.0.3"
-  resolved "https://registry.npmjs.org/react-toastify/-/react-toastify-11.0.3.tgz"
-  integrity sha512-cbPtHJPfc0sGqVwozBwaTrTu1ogB9+BLLjd4dDXd863qYLj7DGrQ2sg5RAChjFUB4yc3w8iXOtWcJqPK/6xqRQ==
+react-toastify@^11.0.5:
+  version "11.0.5"
+  resolved "https://registry.npmjs.org/react-toastify/-/react-toastify-11.0.5.tgz"
+  integrity sha512-EpqHBGvnSTtHYhCPLxML05NLY2ZX0JURbAdNYa6BUkk+amz4wbKBQvoKQAB0ardvSarUBuY4Q4s1sluAzZwkmA==
   dependencies:
     clsx "^2.1.1"
 

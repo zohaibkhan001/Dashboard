@@ -95,6 +95,7 @@ export function CompanyNewEditForm({ currentProduct }) {
       companyName: currentProduct?.name ?? '', // Avoid undefined
       gst: currentProduct?.gst ?? '',
       region: currentProduct?.region ?? '',
+
       city: currentProduct?.city ?? '',
       address: currentProduct?.address ?? '',
       zip: currentProduct?.zip ?? '',
