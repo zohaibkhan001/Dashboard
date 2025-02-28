@@ -6,12 +6,14 @@ import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import createAdminReducers from './slices/createAdminSlice';
 import superAdminAuthReducers from './slices/superadminAuthSlice';
 import allCompaniesReducers from './slices/companiesListSlice';
+import createCompanyReducers from './slices/createCompanySlice';
 
 // 🔹 Combine Reducers
 const rootReducer = combineReducers({
   createAdmin: createAdminReducers,
   superAdminAuth: superAdminAuthReducers,
   allCompanies: allCompaniesReducers,
+  createCompany: createCompanyReducers,
 });
 
 // 🔹 Persist Configuration
