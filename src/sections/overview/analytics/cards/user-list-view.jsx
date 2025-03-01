@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useSelector } from 'react-redux';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
