@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -36,6 +36,7 @@ import {
   TableSelectedAction,
   TablePaginationCustom,
 } from 'src/components/table';
+import { useSelector } from 'react-redux';
 
 import { OrderTableRow } from './order-table-row';
 import { OrderTableToolbar } from './order-table-toolbar';
@@ -44,16 +45,10 @@ import { OrderTableFiltersResult } from './order-table-filters-result';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'orderNumber', label: 'Order', width: 88 },
-  { id: 'name', label: 'Customer' },
-  { id: 'createdAt', label: 'Date', width: 140 },
-  {
-    id: 'totalQuantity',
-    label: 'Items',
-    width: 120,
-    align: 'center',
-  },
-  { id: 'totalAmount', label: 'Price', width: 140 },
+  { id: 'order_id', label: 'Order ID', width: 88 },
+  { id: 'customer_name', label: 'Customer' },
+  { id: 'order_date', label: 'Date', width: 140 },
+  { id: 'total_price', label: 'Price', width: 140 },
   { id: 'status', label: 'Status', width: 110 },
   { id: '', width: 88 },
 ];
@@ -63,11 +58,20 @@ const TABLE_HEAD = [
 export function OrderListView() {
   const table = useTable({ defaultOrderBy: 'orderNumber' });
 
+  const { orders, loading } = useSelector((state) => state.companyOrders);
+  console.log(orders);
+
   const router = useRouter();
 
   const confirm = useBoolean();
 
-  const [tableData, setTableData] = useState(_orders);
+  const [tableData, setTableData] = useState([]);
+
+  useEffect(() => {
+    if (orders.length > 0) {
+      setTableData(orders);
+    }
+  }, [orders]);
 
   const filters = useSetState({
     name: '',
@@ -129,13 +133,24 @@ export function OrderListView() {
 
   return (
     <>
-      <DashboardContent sx={{
-        padding: 0,
-        marginTop: '1rem',
-        marginBottom: '1rem',
-        overflowX: 'hidden',
-      }}>
-        <Card sx={{ width: { xs: '100%', sm: '100%', md: '100%', lg: '105%' }, padding: 0, marginLeft: '-1.5rem', marginRight: 0, marginBottom: 0, overflowX: 'hidden' }}>
+      <DashboardContent
+        sx={{
+          padding: 0,
+          marginTop: '1rem',
+          marginBottom: '1rem',
+          overflowX: 'hidden',
+        }}
+      >
+        <Card
+          sx={{
+            width: { xs: '100%', sm: '100%', md: '100%', lg: '105%' },
+            padding: 0,
+            marginLeft: '-1.5rem',
+            marginRight: 0,
+            marginBottom: 0,
+            overflowX: 'hidden',
+          }}
+        >
           <OrderTableToolbar
             filters={filters}
             onResetPage={table.onResetPage}
@@ -270,9 +285,9 @@ function applyFilter({ inputData, comparator, filters, dateError }) {
   if (name) {
     inputData = inputData.filter(
       (order) =>
-        order.orderNumber.toLowerCase().indexOf(name.toLowerCase()) !== -1 ||
-        order.customer.name.toLowerCase().indexOf(name.toLowerCase()) !== -1 ||
-        order.customer.email.toLowerCase().indexOf(name.toLowerCase()) !== -1
+        order.order_id.toString().includes(name) || // Search by Order ID
+        order.customer.name.toLowerCase().includes(name.toLowerCase()) || // Search by Customer Name
+        order.customer.email.toLowerCase().includes(name.toLowerCase()) // Search by Customer Email
     );
   }
 
@@ -280,10 +295,10 @@ function applyFilter({ inputData, comparator, filters, dateError }) {
     inputData = inputData.filter((order) => order.status === status);
   }
 
-  if (!dateError) {
-    if (startDate && endDate) {
-      inputData = inputData.filter((order) => fIsBetween(order.createdAt, startDate, endDate));
-    }
+  if (!dateError && startDate && endDate) {
+    inputData = inputData.filter(
+      (order) => fIsBetween(order.order_date, startDate, endDate) // Use `order_date` for date filtering
+    );
   }
 
   return inputData;

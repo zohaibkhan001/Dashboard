@@ -53,20 +53,20 @@ export function OrderTableToolbar({ filters, onResetPage, dateError }) {
         direction={{ xs: 'column', md: 'row' }}
         sx={{ p: 2.5, pr: { xs: 2.5, md: 1 } }}
       >
-        <FormControl sx={{ flexShrink: 0, width: { xs: 1, md: 200 } }}>
+        {/* <FormControl sx={{ flexShrink: 0, width: { xs: 1, md: 200 } }}>
             <InputLabel>Employee Orders</InputLabel>
             <Select>
               <option>Employee</option>
             </Select>
-          </FormControl>
+          </FormControl> */}
 
-          <Stack direction="row" alignItems="center" spacing={2} flexGrow={1} sx={{ width: 1 }}>
+        <Stack direction="row" alignItems="center" spacing={2} flexGrow={1} sx={{ width: 1 }}>
           <TextField
             fullWidth
             value={filters.state.name}
             onChange={handleFilterName}
             placeholder="Search customer or order number..."
-            sx={{ width: { xs: '100%', sm: '100%', md: '100%', lg: '100%' }, }}
+            sx={{ width: { xs: '100%', sm: '100%', md: '100%', lg: '100%' } }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -82,7 +82,7 @@ export function OrderTableToolbar({ filters, onResetPage, dateError }) {
           value={filters.state.startDate}
           onChange={handleFilterStartDate}
           slotProps={{ textField: { fullWidth: true } }}
-          sx={{ width: { xs: '30%', sm: '30%', md: '30%', lg: '30%' }, }}
+          sx={{ width: { xs: '30%', sm: '30%', md: '30%', lg: '30%' } }}
         />
 
         <DatePicker
@@ -103,10 +103,8 @@ export function OrderTableToolbar({ filters, onResetPage, dateError }) {
           //     bottom: { md: -40 },
           //   },
           // }}
-          sx={{ width: { xs: '30%', sm: '30%', md: '30%', lg: '30%' }, }}
+          sx={{ width: { xs: '30%', sm: '30%', md: '30%', lg: '30%' } }}
         />
-
-        
       </Stack>
 
       <CustomPopover

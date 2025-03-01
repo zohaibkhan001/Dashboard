@@ -33,6 +33,8 @@ import {
   TableSelectedAction,
   TablePaginationCustom,
 } from 'src/components/table';
+import { useSelector } from 'react-redux';
+import { LoadingScreen } from 'src/components/loading-screen';
 
 import { UserTableRow } from './user-table-row';
 import { UserTableToolbar } from './user-table-toolbar';
@@ -50,11 +52,13 @@ const TABLE_HEAD = [
 
 // ----------------------------------------------------------------------
 
-export function UserListView() {
+export function UserListView({ company_id }) {
   const table = useTable();
 
+  // console.log('Check', company_id);
+
   const { customers, loading } = useSelector((state) => state.companyCustomer);
-  console.log(customers);
+  // console.log(customers);
   const router = useRouter();
 
   const confirm = useBoolean();
@@ -84,6 +88,7 @@ export function UserListView() {
 
   const handleDeleteRow = useCallback(
     (id) => {
+      console.log(id);
       const deleteRow = tableData.filter((row) => row.id !== id);
 
       toast.success('Delete success!');
@@ -109,11 +114,14 @@ export function UserListView() {
   }, [dataFiltered.length, dataInPage.length, table, tableData]);
 
   const handleEditRow = useCallback(
-    (id) => {
-      router.push(paths.dashboard.user.edit(id));
+    (customer_id) => {
+      router.push(paths.dashboard.user.userEdit(customer_id));
     },
     [router]
   );
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <>
@@ -139,6 +147,7 @@ export function UserListView() {
             filters={filters}
             onResetPage={table.onResetPage}
             options={{ roles: _roles }}
+            company_id={company_id}
           />
 
           {canReset && (

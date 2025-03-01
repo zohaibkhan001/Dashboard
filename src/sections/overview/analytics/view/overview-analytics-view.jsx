@@ -16,8 +16,9 @@ import { Iconify } from 'src/components/iconify';
 
 import { AppWelcome } from 'src/sections/overview/app/app-welcome';
 import { useParams } from 'react-router';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { fetchCompanyCustomer } from 'src/utils/Redux/slices/companyCustomerSlice';
+import { fetchCompanyOrders } from 'src/utils/Redux/slices/companyOrderSlice';
 
 import { useMockedUser } from 'src/auth/hooks';
 
@@ -57,7 +58,15 @@ export function OverviewAnalyticsView() {
     }
   }, [dispatch, id]);
 
-  // console.log('check current');
+  const { customers } = useSelector((state) => state.companyCustomer);
+
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchCompanyOrders(id));
+    }
+  }, [dispatch, id]);
+
+  const { orders } = useSelector((state) => state.companyOrders);
 
   return (
     <DashboardContent maxWidth="xl">
@@ -262,8 +271,10 @@ export function OverviewAnalyticsView() {
             overflowX: 'hidden',
           }}
         >
-          {activeView === 'user' && (
+          {activeView === 'user' && customers?.length > 0 && (
             <UserListView
+              customers={customers} // Pass customers if needed
+              company_id={id}
               sx={{
                 padding: 0,
                 margin: 0,
@@ -272,7 +283,7 @@ export function OverviewAnalyticsView() {
             />
           )}
 
-          {activeView === 'order' && (
+          {activeView === 'order' && orders?.length > 0 && (
             <OrderListView
               sx={{
                 padding: 0,

@@ -7,3 +7,7 @@ export * from './user-cards-view';
 export * from './user-create-view';
 
 export * from './user-profile-view';
+
+export * from './user-company-edit-new';
+
+export * from './user-company-edit-form';

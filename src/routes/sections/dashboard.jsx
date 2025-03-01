@@ -38,6 +38,10 @@ const InvoiceDetailsPage = lazy(() => import('src/pages/dashboard/invoice/detail
 const InvoiceCreatePage = lazy(() => import('src/pages/dashboard/invoice/new'));
 const InvoiceEditPage = lazy(() => import('src/pages/dashboard/invoice/edit'));
 // User
+const UserCompanyNewEdit = lazy(() => import('src/pages/dashboard/user/companyCreate'));
+
+const UserCompanyEdit = lazy(() => import('src/pages/dashboard/user/companyUserEdit'));
+
 const UserProfilePage = lazy(() => import('src/pages/dashboard/user/profile'));
 const UserCardsPage = lazy(() => import('src/pages/dashboard/user/cards'));
 const UserListPage = lazy(() => import('src/pages/dashboard/user/list'));
@@ -98,6 +102,9 @@ export const dashboardRoutes = [
         path: 'user',
         children: [
           { element: <UserProfilePage />, index: true },
+          { path: 'user-edit/:customer_id', element: <UserCompanyEdit /> },
+
+          { path: 'company-new/:company_id', element: <UserCompanyNewEdit /> },
           { path: 'profile', element: <UserProfilePage /> },
           { path: 'cards', element: <UserCardsPage /> },
           { path: 'list', element: <UserListPage /> },

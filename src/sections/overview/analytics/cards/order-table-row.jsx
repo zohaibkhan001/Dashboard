@@ -44,7 +44,7 @@ export function OrderTableRow({ row, selected, onViewRow, onSelectRow, onDeleteR
 
       <TableCell>
         <Link color="inherit" onClick={onViewRow} underline="always" sx={{ cursor: 'pointer' }}>
-          {row.orderNumber}
+          {row.order_id}
         </Link>
       </TableCell>
 
@@ -69,26 +69,22 @@ export function OrderTableRow({ row, selected, onViewRow, onSelectRow, onDeleteR
 
       <TableCell>
         <ListItemText
-          primary={fDate(row.createdAt)}
-          secondary={fTime(row.createdAt)}
+          primary={fDate(row.order_date)} // Updated to use `order_date`
+          secondary={fTime(row.createdAt)} // Use `createdAt` for time
           primaryTypographyProps={{ typography: 'body2', noWrap: true }}
-          secondaryTypographyProps={{
-            mt: 0.5,
-            component: 'span',
-            typography: 'caption',
-          }}
+          secondaryTypographyProps={{ mt: 0.5, component: 'span', typography: 'caption' }}
         />
       </TableCell>
 
-      <TableCell align="center"> {row.totalQuantity} </TableCell>
+      {/* <TableCell align="center"> {row.totalQuantity} </TableCell> */}
 
-      <TableCell> {fCurrency(row.subtotal)} </TableCell>
+      <TableCell> {`₹${row.total_price}`} </TableCell>
 
       <TableCell>
         <Label
           variant="soft"
           color={
-            (row.status === 'completed' && 'success') ||
+            (row.status === 'delivered' && 'success') ||
             (row.status === 'pending' && 'warning') ||
             (row.status === 'cancelled' && 'error') ||
             'default'
@@ -124,40 +120,61 @@ export function OrderTableRow({ row, selected, onViewRow, onSelectRow, onDeleteR
           sx={{ bgcolor: 'background.neutral' }}
         >
           <Paper sx={{ m: 1.5 }}>
-            {row.items.map((item) => (
-              <Stack
-                key={item.id}
-                direction="row"
-                alignItems="center"
-                sx={{
-                  p: (theme) => theme.spacing(1.5, 2, 1.5, 1.5),
-                  '&:not(:last-of-type)': {
-                    borderBottom: (theme) => `solid 2px ${theme.vars.palette.background.neutral}`,
-                  },
-                }}
-              >
-                <Avatar
-                  src={item.coverUrl}
-                  variant="rounded"
-                  sx={{ width: 48, height: 48, mr: 2 }}
-                />
-
-                <ListItemText
-                  primary={item.name}
-                  secondary={item.sku}
-                  primaryTypographyProps={{ typography: 'body2' }}
-                  secondaryTypographyProps={{
-                    component: 'span',
-                    color: 'text.disabled',
-                    mt: 0.5,
+            {/* Combine all meal arrays and check if there's data */}
+            {[
+              ...(row.order_data?.quick_meals || []),
+              ...(row.order_data?.repeating_meals || []),
+              ...(row.order_data?.live_counter_meals || []),
+            ].length > 0 ? (
+              [
+                ...(row.order_data?.quick_meals || []),
+                ...(row.order_data?.repeating_meals || []),
+                ...(row.order_data?.live_counter_meals || []),
+              ].map((item) => (
+                <Stack
+                  key={`${item.meal_id}-${item.meal_name}`}
+                  direction="row"
+                  alignItems="center"
+                  sx={{
+                    p: (theme) => theme.spacing(1.5, 2, 1.5, 1.5),
+                    '&:not(:last-of-type)': {
+                      borderBottom: (theme) => `solid 2px ${theme.vars.palette.background.neutral}`,
+                    },
                   }}
-                />
+                >
+                  <Avatar
+                    src={JSON.parse(item.image).url}
+                    variant="rounded"
+                    sx={{ width: 48, height: 48, mr: 2 }}
+                  />
 
-                <div>x{item.quantity} </div>
+                  <ListItemText
+                    primary={item.meal_name}
+                    secondary={`Type: ${item.type}`}
+                    primaryTypographyProps={{ typography: 'body2' }}
+                    secondaryTypographyProps={{
+                      component: 'span',
+                      color: 'text.disabled',
+                      mt: 0.5,
+                    }}
+                  />
 
-                <Box sx={{ width: 110, textAlign: 'right' }}>{fCurrency(item.price)}</Box>
+                  <div>x{item.qty}</div>
+
+                  <Box sx={{ width: 110, textAlign: 'right' }}>
+                    {item.is_subsidised ? 'Subsidised' : 'Regular'}
+                  </Box>
+                </Stack>
+              ))
+            ) : (
+              <Stack
+                alignItems="center"
+                justifyContent="center"
+                sx={{ p: 2, textAlign: 'center', color: 'text.disabled' }}
+              >
+                No meals available
               </Stack>
-            ))}
+            )}
           </Paper>
         </Collapse>
       </TableCell>

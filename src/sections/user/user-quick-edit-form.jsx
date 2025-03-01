@@ -44,6 +44,8 @@ export const UserQuickEditSchema = zod.object({
 // ----------------------------------------------------------------------
 
 export function UserQuickEditForm({ currentUser, open, onClose }) {
+  // console.log('current Check');
+
   const defaultValues = useMemo(
     () => ({
       name: currentUser?.name || '',

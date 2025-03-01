@@ -15,7 +15,8 @@ import { usePopover, CustomPopover } from 'src/components/custom-popover';
 
 // ----------------------------------------------------------------------
 
-export function UserTableToolbar({ filters, options, onResetPage }) {
+export function UserTableToolbar({ filters, options, onResetPage, company_id }) {
+  // console.log('toolbar', company_id);
   const popover = usePopover();
 
   const handleFilterName = useCallback(
@@ -34,13 +35,12 @@ export function UserTableToolbar({ filters, options, onResetPage }) {
         direction={{ xs: 'column', md: 'row' }}
         sx={{ p: 2.5, pr: { xs: 2.5, md: 1 } }}
       >
-
         <Stack direction="row" alignItems="center" spacing={2} flexGrow={1} sx={{ width: 1 }}>
           <TextField
             value={filters.state.name}
             onChange={handleFilterName}
             placeholder="Search..."
-            sx={{ width: { xs: '100%', sm: '50%', md: '70%', lg: '69%' }, }}
+            sx={{ width: { xs: '100%', sm: '50%', md: '70%', lg: '69%' } }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -52,19 +52,18 @@ export function UserTableToolbar({ filters, options, onResetPage }) {
 
           <Button
             component={RouterLink}
-            href={paths.dashboard.user.new}
+            href={paths.dashboard.user.companyNew(company_id)}
             variant="contained"
             startIcon={<Iconify icon="mingcute:add-line" />}
           >
             New User
           </Button>
 
-
           <Button
             // component={RouterLink}
             // href={paths.dashboard.user.new}
             variant="contained"
-          // startIcon={<Iconify icon="mingcute:add-line" />}
+            // startIcon={<Iconify icon="mingcute:add-line" />}
           >
             Import User List
           </Button>

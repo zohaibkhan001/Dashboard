@@ -127,6 +127,8 @@ export const paths = {
       demo: {
         edit: `${ROOTS.DASHBOARD}/user/${MOCK_ID}/edit`,
       },
+      companyNew: (company_id) => `${ROOTS.DASHBOARD}/user/company-new/${company_id}`, // New path for user creation inside a company
+      userEdit: (customer_id) => `${ROOTS.DASHBOARD}/user/user-edit/${customer_id}`,
     },
     product: {
       root: `${ROOTS.DASHBOARD}/product`,
