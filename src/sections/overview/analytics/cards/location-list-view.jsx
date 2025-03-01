@@ -1,5 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useState, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -34,38 +33,31 @@ import {
   TablePaginationCustom,
 } from 'src/components/table';
 
-import { UserTableRow } from './user-table-row';
-import { UserTableToolbar } from './user-table-toolbar';
-import { UserTableFiltersResult } from './user-table-filters-result';
+import { LocationTableRow } from './location-table-row';
+import { LocationTableToolbar } from './location-table-toolbar';
+import { LocationTableFiltersResult } from './location-table-filters-result';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'name', label: 'Name', width: 200 },
-  { id: 'phoneNumber', label: 'Phone number', width: 200 },
-  { id: 'role', label: 'Role', width: 200 },
-  { id: 'wallet', label: 'Wallet Bal.', width: 200 },
+  { id: 'locationName', label: 'Location Name', width: 200 },
+  { id: 'cutOffTime', label: 'CutOff Time', width: 200 },
+  { id: 'locationEmail', label: 'Location Email', width: 200 },
+  { id: 'createdAt', label: 'Created At', width: 200 },
+  { id: 'updatedAt', label: 'Updated At', width: 200 },
   { id: '', width: 100 },
 ];
 
 // ----------------------------------------------------------------------
 
-export function UserListView() {
+export function LocationListView() {
   const table = useTable();
 
-  const { customers, loading } = useSelector((state) => state.companyCustomer);
-  console.log(customers);
   const router = useRouter();
 
   const confirm = useBoolean();
 
-  const [tableData, setTableData] = useState([]);
-
-  useEffect(() => {
-    if (customers.length > 0) {
-      setTableData(customers);
-    }
-  }, [customers]);
+  const [tableData, setTableData] = useState(_userList);
 
   const filters = useSetState({ name: '', role: [], status: 'all' });
 
@@ -117,32 +109,22 @@ export function UserListView() {
 
   return (
     <>
-      <DashboardContent
-        sx={{
-          padding: 0,
-          marginTop: '1rem',
-          marginBottom: '1rem',
-          overflowX: 'hidden',
-        }}
-      >
-        <Card
-          sx={{
-            width: { xs: '100%', sm: '100%', md: '100%', lg: '105%' },
-            padding: 0,
-            marginLeft: '-1.5rem',
-            marginRight: 0,
-            marginBottom: 0,
-            overflowX: 'hidden',
-          }}
-        >
-          <UserTableToolbar
+      <DashboardContent sx={{
+        padding: 0,
+        marginTop: '1rem',
+        marginBottom: '1rem',
+        overflowX: 'hidden',
+      }}>
+
+        <Card sx={{ width: { xs: '100%', sm: '100%', md: '100%', lg: '105%' }, padding: 0, marginLeft: '-1.5rem', marginRight: 0, marginBottom: 0, overflowX: 'hidden' }}>
+          <LocationTableToolbar
             filters={filters}
             onResetPage={table.onResetPage}
             options={{ roles: _roles }}
           />
 
           {canReset && (
-            <UserTableFiltersResult
+            <LocationTableFiltersResult
               filters={filters}
               totalResults={dataFiltered.length}
               onResetPage={table.onResetPage}
@@ -194,7 +176,7 @@ export function UserListView() {
                       table.page * table.rowsPerPage + table.rowsPerPage
                     )
                     .map((row) => (
-                      <UserTableRow
+                      <LocationTableRow
                         key={row.id}
                         row={row}
                         selected={table.selected.includes(row.id)}

@@ -31,6 +31,7 @@ import { AnalyticsTrafficBySite } from '../analytics-traffic-by-site';
 import { UserListView } from '../cards/user-list-view';
 import { OrderListView } from '../cards/order-list-view';
 import { ReviewListView } from '../cards/review-list-view';
+import { LocationListView } from '../cards/location-list-view';
 
 // ----------------------------------------------------------------------
 
@@ -290,6 +291,17 @@ export function OverviewAnalyticsView() {
               }}
             />
           )}
+        </Grid>
+
+        <Grid xs={12}
+          md={12}
+          lg={12}
+          sx={{
+            padding: 0,
+            margin: 0,
+            overflowX: 'hidden',
+          }}>
+          <LocationListView />
         </Grid>
 
         <Grid xs={12} md={6} lg={4}>

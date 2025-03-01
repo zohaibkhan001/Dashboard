@@ -39,6 +39,11 @@ import {
   _paymentMethod,
   _remarks,
   _mealItem,
+  _location,
+  _locationEmail,
+  _cutOffTime,
+  _createdAt,
+  _updatedAt,
 } from './assets';
 
 // ----------------------------------------------------------------------
@@ -62,6 +67,11 @@ export const _mock = {
   sentence: (index) => _sentences[index],
   description: (index) => _descriptions[index],
   paymentMethod: (index) => _paymentMethod[index],
+  location: (index) => _location[index],
+  locationEmail: (index) => _locationEmail[index],
+  cutOffTime: (index) => _cutOffTime[index],
+  createdAt: (index) => _createdAt[index],
+  updatedAt: (index) => _updatedAt[index],
   
   // Contact
   email: (index) => _emails[index],

@@ -1,5 +1,5 @@
 import { _mock } from './_mock';
-import { _mealItem, _ratings, _remarks, _walletBalance } from './assets';
+import { _createdAt, _cutOffTime, _location, _locationEmail, _mealItem, _ratings, _remarks, _updatedAt, _walletBalance } from './assets';
 
 // ----------------------------------------------------------------------
 
@@ -143,6 +143,11 @@ export const _userList = [...Array(20)].map((_, index) => ({
   remarks: _remarks[index],
   ratings: _ratings[index],
   mealItem: _mealItem[index],
+  location: _location[index],
+  locationEmail: _locationEmail[index],
+  cutOffTime: _cutOffTime[index],
+  createdAt: _createdAt[index],
+  updatedAt: _updatedAt[index],
   status:
     (index % 2 && 'pending') || (index % 3 && 'banned') || (index % 4 && 'rejected') || 'active',
 }));

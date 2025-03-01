@@ -402,6 +402,80 @@ export const _lastNames = [
   `Parisian`,
 ];
 
+
+export const _location = [
+  `Delhi`,
+  `Mumbai`,
+  `Bangalore`,
+  `Delhi`,
+  `Mumbai`,
+  `Bangalore`,
+  `Delhi`,
+  `Mumbai`,
+  `Bangalore`,
+  `Delhi`,
+  `Mumbai`,
+  `Bangalore`,
+  `Delhi`,
+  `Mumbai`,
+  `Bangalore`,
+  `Delhi`,
+  `Mumbai`,
+  `Bangalore`,
+  `Delhi`,
+  `Mumbai`,
+  `Bangalore`,
+  `Delhi`,
+  `Mumbai`,
+  `Bangalore`,
+  `Delhi`,
+  `Mumbai`,
+  `Bangalore`,
+  `Delhi`,
+  `Mumbai`,
+  `Bangalore`,
+  `Delhi`,
+  `Mumbai`,
+  `Bangalore`,
+];
+
+export const _locationEmail = [
+  `email@location.com`,
+  `email@location.com`,
+  `email@location.com`,
+  `email@location.com`,
+  `email@location.com`,
+  `email@location.com`,
+  `email@location.com`,
+  `email@location.com`,
+  `email@location.com`,
+  `email@location.com`,
+  `email@location.com`,
+  `email@location.com`,
+  `email@location.com`,
+  `email@location.com`,
+  `email@location.com`,
+  `email@location.com`,
+  `email@location.com`,
+  `email@location.com`,
+  `email@location.com`,
+  `email@location.com`,
+  `email@location.com`,
+  `email@location.com`,
+];
+
+export const _cutOffTime = [
+  '',
+];
+
+export const _createdAt = [
+  '',
+];
+
+export const _updatedAt = [
+  '',
+];
+
 // ----------------------------------------------------------------------
 
 export const _phoneNumbers = [
