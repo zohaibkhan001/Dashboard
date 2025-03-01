@@ -8,6 +8,8 @@ import superAdminAuthReducers from './slices/superadminAuthSlice';
 import allCompaniesReducers from './slices/companiesListSlice';
 import createCompanyReducers from './slices/createCompanySlice';
 import deleteCompanyReducers from './slices/deleteCompanySlice';
+import companyCustomerReducers from './slices/companyCustomerSlice';
+import fetchLocationsReducers from './slices/companyLocationSlice';
 
 // 🔹 Combine Reducers
 const rootReducer = combineReducers({
@@ -16,6 +18,8 @@ const rootReducer = combineReducers({
   allCompanies: allCompaniesReducers,
   createCompany: createCompanyReducers,
   deleteCompany: deleteCompanyReducers,
+  companyCustomer: companyCustomerReducers,
+  companyLocations: fetchLocationsReducers,
 });
 
 // 🔹 Persist Configuration

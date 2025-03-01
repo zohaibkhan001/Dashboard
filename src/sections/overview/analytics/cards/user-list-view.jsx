@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -36,13 +36,13 @@ import {
 import { UserTableRow } from './user-table-row';
 import { UserTableToolbar } from './user-table-toolbar';
 import { UserTableFiltersResult } from './user-table-filters-result';
+import { useSelector } from 'react-redux';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
   { id: 'name', label: 'Name', width: 200 },
   { id: 'phoneNumber', label: 'Phone number', width: 200 },
-  { id: 'company', label: 'Company', width: 200 },
   { id: 'role', label: 'Role', width: 200 },
   { id: 'wallet', label: 'Wallet Bal.', width: 200 },
   { id: '', width: 100 },
@@ -53,11 +53,19 @@ const TABLE_HEAD = [
 export function UserListView() {
   const table = useTable();
 
+  const { customers, loading } = useSelector((state) => state.companyCustomer);
+  console.log(customers);
   const router = useRouter();
 
   const confirm = useBoolean();
 
-  const [tableData, setTableData] = useState(_userList);
+  const [tableData, setTableData] = useState([]);
+
+  useEffect(() => {
+    if (customers.length > 0) {
+      setTableData(customers);
+    }
+  }, [customers]);
 
   const filters = useSetState({ name: '', role: [], status: 'all' });
 
@@ -109,14 +117,24 @@ export function UserListView() {
 
   return (
     <>
-      <DashboardContent sx={{
-        padding: 0,
-        marginTop: '1rem',
-        marginBottom: '1rem',
-        overflowX: 'hidden',
-      }}>
-
-        <Card sx={{ width: { xs: '100%', sm: '100%', md: '100%', lg: '105%' }, padding: 0, marginLeft: '-1.5rem', marginRight: 0, marginBottom: 0, overflowX: 'hidden' }}>
+      <DashboardContent
+        sx={{
+          padding: 0,
+          marginTop: '1rem',
+          marginBottom: '1rem',
+          overflowX: 'hidden',
+        }}
+      >
+        <Card
+          sx={{
+            width: { xs: '100%', sm: '100%', md: '100%', lg: '105%' },
+            padding: 0,
+            marginLeft: '-1.5rem',
+            marginRight: 0,
+            marginBottom: 0,
+            overflowX: 'hidden',
+          }}
+        >
           <UserTableToolbar
             filters={filters}
             onResetPage={table.onResetPage}

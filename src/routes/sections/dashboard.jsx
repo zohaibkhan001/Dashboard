@@ -89,7 +89,7 @@ export const dashboardRoutes = [
     children: [
       { element: <IndexPage />, index: true },
       // { path: 'ecommerce', element: <OverviewEcommercePage /> },
-      { path: 'analytics', element: <OverviewAnalyticsPage /> },
+      // { path: 'analytics', element: <OverviewAnalyticsPage /> },
       // { path: 'banking', element: <OverviewBankingPage /> },
       // { path: 'booking', element: <OverviewBookingPage /> },
       { path: 'file', element: <OverviewFilePage /> },
@@ -122,7 +122,7 @@ export const dashboardRoutes = [
         children: [
           { element: <CompanyListPage />, index: true },
           { path: 'list', element: <CompanyListPage /> },
-          // { path: ':id', element: <CompanyDetailsPage /> },
+          { path: ':id', element: <OverviewAnalyticsPage /> }, // ✅ Using OverviewAnalyticsPage for company details
           { path: 'new', element: <CompanyCreatePage /> },
         ],
       },

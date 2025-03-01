@@ -22,8 +22,6 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { _company, COMPANY_STATUS_OPTIONS } from 'src/_mock';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteCompany } from 'src/utils/Redux/slices/deleteCompanySlice';
-
 import { fetchCompanies } from 'src/utils/Redux/slices/companiesListSlice';
 
 import { Label } from 'src/components/label';
@@ -72,7 +70,7 @@ export function CompanyListView() {
 
   // console.log(token);
 
-  const { companies, loading } = useSelector((state) => state.allCompanies);
+  const { companies, loading, error } = useSelector((state) => state.allCompanies);
   // console.log(companies);
 
   const table = useTable({ defaultOrderBy: 'orderNumber' });
@@ -121,29 +119,16 @@ export function CompanyListView() {
   const notFound = (!dataFiltered.length && canReset) || !dataFiltered.length;
 
   const handleDeleteRow = useCallback(
-    async (id) => {
-      try {
-        await dispatch(deleteCompany(id)).unwrap(); // ✅ Dispatch delete action
-        toast.success('Delete success!');
+    (id) => {
+      const deleteRow = tableData.filter((row) => row.id !== id);
 
-        // ✅ Remove deleted row from UI
-        const deleteRow = tableData.filter((row) => row.id !== id);
-        setTableData(deleteRow);
+      toast.success('Delete success!');
 
-        table.onUpdatePageDeleteRow(dataInPage.length);
+      setTableData(deleteRow);
 
-        // ✅ Close the confirm dialog after successful delete
-        confirm.onFalse();
-
-        // ✅ Refresh the page after 3 seconds
-        setTimeout(() => {
-          window.location.reload();
-        }, 3000);
-      } catch (error) {
-        toast.error(error.message || 'Failed to delete company');
-      }
+      table.onUpdatePageDeleteRow(dataInPage.length);
     },
-    [dataInPage.length, table, tableData, dispatch, confirm]
+    [dataInPage.length, table, tableData]
   );
 
   const handleDeleteRows = useCallback(() => {

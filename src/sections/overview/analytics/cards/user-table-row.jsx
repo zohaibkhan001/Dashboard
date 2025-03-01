@@ -30,7 +30,7 @@ export function UserTableRow({ row, selected, onEditRow, onSelectRow, onDeleteRo
 
   return (
     <>
-      <TableRow hover selected={selected} aria-checked={selected} tabIndex={-1} >
+      <TableRow hover selected={selected} aria-checked={selected} tabIndex={-1}>
         <TableCell padding="checkbox">
           <Checkbox id={row.id} checked={selected} onClick={onSelectRow} />
         </TableCell>
@@ -50,13 +50,11 @@ export function UserTableRow({ row, selected, onEditRow, onSelectRow, onDeleteRo
           </Stack>
         </TableCell>
 
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{row.phoneNumber}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{row.phone}</TableCell>
 
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{row.company}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{row.designation}</TableCell>
 
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{row.role}</TableCell>
-
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{row.walletBalance}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{row.wallet_balance}</TableCell>
 
         <TableCell>
           <Stack direction="row" alignItems="center">

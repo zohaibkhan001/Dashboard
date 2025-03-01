@@ -36,7 +36,7 @@ export function CompanyTableRow({ row, selected, onSelectRow, onViewRow, onDelet
       <TableCell
         style={{ cursor: 'pointer' }}
         component={RouterLink}
-        href={paths.dashboard.general.analytics}
+        href={paths.dashboard.company.details(row.company_id)} // ✅ Correct Path
       >
         <Stack spacing={2} direction="row" alignItems="center">
           <Stack
@@ -54,7 +54,7 @@ export function CompanyTableRow({ row, selected, onSelectRow, onViewRow, onDelet
       <TableCell
         style={{ cursor: 'pointer' }}
         component={RouterLink}
-        href={paths.dashboard.general.analytics}
+        href={paths.dashboard.company.details(row.company_id)} // ✅ Correct Path
       >
         {row.contactPerson}
       </TableCell>
@@ -63,7 +63,7 @@ export function CompanyTableRow({ row, selected, onSelectRow, onViewRow, onDelet
         align="center"
         style={{ cursor: 'pointer' }}
         component={RouterLink}
-        href={paths.dashboard.general.analytics}
+        href={paths.dashboard.company.details(row.company_id)} // ✅ Correct Path
       >
         {/* <TableCell> */}
         {(() => {
@@ -94,7 +94,7 @@ export function CompanyTableRow({ row, selected, onSelectRow, onViewRow, onDelet
       <TableCell
         style={{ cursor: 'pointer' }}
         component={RouterLink}
-        href={paths.dashboard.general.analytics}
+        href={paths.dashboard.company.details(row.company_id)} // ✅ Correct Path
       >
         {row.companyAddress}
       </TableCell>
@@ -102,7 +102,7 @@ export function CompanyTableRow({ row, selected, onSelectRow, onViewRow, onDelet
       <TableCell
         style={{ cursor: 'pointer' }}
         component={RouterLink}
-        href={paths.dashboard.general.analytics}
+        href={paths.dashboard.company.details(row.company_id)} // ✅ Correct Path
       >
         {row.email}
       </TableCell>

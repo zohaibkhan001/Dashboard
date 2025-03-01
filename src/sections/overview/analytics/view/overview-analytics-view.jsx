@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -10,14 +10,14 @@ import CardHeader from '@mui/material/CardHeader';
 import { CONFIG } from 'src/config-global';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { SeoIllustration } from 'src/assets/illustrations';
-import {
-  _analyticTasks,
-  _analyticTraffic,
-} from 'src/_mock';
+import { _analyticTasks, _analyticTraffic } from 'src/_mock';
 
 import { Iconify } from 'src/components/iconify';
 
 import { AppWelcome } from 'src/sections/overview/app/app-welcome';
+import { useParams } from 'react-router';
+import { useDispatch } from 'react-redux';
+import { fetchCompanyCustomer } from 'src/utils/Redux/slices/companyCustomerSlice';
 
 import { useMockedUser } from 'src/auth/hooks';
 
@@ -37,6 +37,10 @@ import { ReviewListView } from '../cards/review-list-view';
 export function OverviewAnalyticsView() {
   const { user } = useMockedUser();
 
+  const { id } = useParams();
+  // console.log(id);
+  const dispatch = useDispatch();
+
   const [open, setOpen] = useState(false);
   const [openCompanyControls, setOpenCompanyControls] = useState(false);
 
@@ -46,14 +50,38 @@ export function OverviewAnalyticsView() {
     setActiveView(view);
   };
 
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchCompanyCustomer(id));
+    }
+  }, [dispatch, id]);
+
+  // console.log('check current');
+
   return (
     <DashboardContent maxWidth="xl">
-      <div style={{ display: 'flex', flexDirection: 'row', width: '100%', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          width: '100%',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
         <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>
           Aarogyatech 👋
         </Typography>
 
-        <div style={{ display: 'flex', width: '40%', gap: '1rem', alignItems: 'center', justifyContent: 'flex-end' }}>
+        <div
+          style={{
+            display: 'flex',
+            width: '40%',
+            gap: '1rem',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+          }}
+        >
           <Button
             size="small"
             color="inherit"
@@ -95,7 +123,7 @@ export function OverviewAnalyticsView() {
             New Location
           </Button>
 
-          <NewLocationDialog open={open} onClose={() => setOpen(false)} />
+          <NewLocationDialog open={open} onClose={() => setOpen(false)} id={id} />
 
           <Button
             size="small"
@@ -117,9 +145,10 @@ export function OverviewAnalyticsView() {
             Company Controls
           </Button>
 
-          <CompanyControls open={openCompanyControls} onClose={() => setOpenCompanyControls(false)} />
-
-
+          <CompanyControls
+            open={openCompanyControls}
+            onClose={() => setOpenCompanyControls(false)}
+          />
         </div>
       </div>
 
@@ -133,7 +162,12 @@ export function OverviewAnalyticsView() {
             }
             chart={{}}
             onClick={() => handleViewChange('user')}
-            sx={{ cursor: 'pointer', borderColor: activeView === 'user' ? 'orange' : 'none', borderWidth: activeView === 'user' ? '1px' : '0px', borderStyle: 'solid', }}
+            sx={{
+              cursor: 'pointer',
+              borderColor: activeView === 'user' ? 'orange' : 'none',
+              borderWidth: activeView === 'user' ? '1px' : '0px',
+              borderStyle: 'solid',
+            }}
           />
         </Grid>
 
@@ -147,7 +181,12 @@ export function OverviewAnalyticsView() {
             }
             chart={{}}
             onClick={() => handleViewChange('order')}
-            sx={{ cursor: 'pointer', borderColor: activeView === 'order' ? 'orange' : 'none', borderWidth: activeView === 'order' ? '1px' : '0px', borderStyle: 'solid', }}
+            sx={{
+              cursor: 'pointer',
+              borderColor: activeView === 'order' ? 'orange' : 'none',
+              borderWidth: activeView === 'order' ? '1px' : '0px',
+              borderStyle: 'solid',
+            }}
           />
         </Grid>
 
@@ -164,11 +203,14 @@ export function OverviewAnalyticsView() {
             }
             chart={{}}
             onClick={() => handleViewChange('review')}
-            sx={{ cursor: 'pointer', borderColor: activeView === 'review' ? 'orange' : 'none', borderWidth: activeView === 'review' ? '1px' : '0px', borderStyle: 'solid', }}
+            sx={{
+              cursor: 'pointer',
+              borderColor: activeView === 'review' ? 'orange' : 'none',
+              borderWidth: activeView === 'review' ? '1px' : '0px',
+              borderStyle: 'solid',
+            }}
           />
         </Grid>
-
-
 
         <Grid xs={12} sm={6} md={3}>
           <AnalyticsWidgetSummary
@@ -250,7 +292,6 @@ export function OverviewAnalyticsView() {
           )}
         </Grid>
 
-
         <Grid xs={12} md={6} lg={4}>
           <AnalyticsCurrentVisits
             title="Current visits"
@@ -301,7 +342,16 @@ export function OverviewAnalyticsView() {
             >
               Add New
             </Button>
-            <section style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', alignItems: 'center', marginTop: '2rem' }}>
+            <section
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1rem',
+                width: '100%',
+                alignItems: 'center',
+                marginTop: '2rem',
+              }}
+            >
               <AppWelcome
                 title={`Welcome back 👋 \n ${user?.displayName}`}
                 img={<SeoIllustration hideBackground />}
@@ -312,15 +362,17 @@ export function OverviewAnalyticsView() {
                 title={`Welcome back 👋 \n ${user?.displayName}`}
                 img={<SeoIllustration hideBackground />}
                 style={{ width: '90%' }}
-              /></section>
+              />
+            </section>
           </Card>
-
-
         </Grid>
 
         <Grid xs={12} md={6} lg={4}>
           <Card sx={{ height: '64vh' }}>
-            <CardHeader title="Company Banners" titleTypographyProps={{ variant: 'subtitle2', sx: { fontSize: '14px' } }} />
+            <CardHeader
+              title="Company Banners"
+              titleTypographyProps={{ variant: 'subtitle2', sx: { fontSize: '14px' } }}
+            />
             <Button
               size="small"
               color="inherit"
@@ -341,11 +393,37 @@ export function OverviewAnalyticsView() {
             >
               Add New
             </Button>
-            <section style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', alignItems: 'center', marginTop: '2.5rem' }}>
+            <section
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1rem',
+                width: '100%',
+                alignItems: 'center',
+                marginTop: '2.5rem',
+              }}
+            >
+              <div
+                style={{
+                  backgroundColor: '#F89C8B',
+                  width: '90%',
+                  height: '20vh',
+                  borderRadius: '1rem',
+                }}
+              >
+                <SeoIllustration hideBackground sx={{ width: '65%', marginLeft: '3rem' }} />
+              </div>
 
-              <div style={{ backgroundColor: '#F89C8B', width: '90%', height: '20vh', borderRadius: '1rem' }}><SeoIllustration hideBackground sx={{ width: '65%', marginLeft: '3rem' }} /></div>
-
-              <div style={{ backgroundColor: '#F2C84C', width: '90%', height: '20vh', borderRadius: '1rem' }}><SeoIllustration hideBackground sx={{ width: '65%', marginLeft: '3rem' }} /></div>
+              <div
+                style={{
+                  backgroundColor: '#F2C84C',
+                  width: '90%',
+                  height: '20vh',
+                  borderRadius: '1rem',
+                }}
+              >
+                <SeoIllustration hideBackground sx={{ width: '65%', marginLeft: '3rem' }} />
+              </div>
             </section>
           </Card>
         </Grid>
