@@ -37,6 +37,8 @@ import {
   _countryNames,
   _walletBalance,
   _paymentMethod,
+  _remarks,
+  _mealItem,
 } from './assets';
 
 // ----------------------------------------------------------------------
@@ -86,6 +88,10 @@ export const _mock = {
     nativeM: (index) => _nativeM[index],
     nativeL: (index) => _nativeL[index],
   },
+  // Review
+  remarks : (index) => _remarks[index],
+  ratings : (index) => _ratings[index],
+  mealItem : (index) => _mealItem[index],
   // Image
   image: {
     cover: (index) => `${assetURL}/assets/images/cover/cover-${index + 1}.webp`,

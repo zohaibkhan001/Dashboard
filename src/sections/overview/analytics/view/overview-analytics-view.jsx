@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Unstable_Grid2';
@@ -27,19 +28,23 @@ import { AnalyticsCurrentVisits } from '../analytics-current-visits';
 import { AnalyticsWebsiteVisits } from '../analytics-website-visits';
 import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
 import { AnalyticsTrafficBySite } from '../analytics-traffic-by-site';
-
-
-
-
+import { UserListView } from '../cards/user-list-view';
+import { OrderListView } from '../cards/order-list-view';
+import { ReviewListView } from '../cards/review-list-view';
 
 // ----------------------------------------------------------------------
 
 export function OverviewAnalyticsView() {
   const { user } = useMockedUser();
 
-
   const [open, setOpen] = useState(false);
   const [openCompanyControls, setOpenCompanyControls] = useState(false);
+
+  const [activeView, setActiveView] = useState('user'); // Default view is 'user'
+
+  const handleViewChange = (view) => {
+    setActiveView(view);
+  };
 
   return (
     <DashboardContent maxWidth="xl">
@@ -127,6 +132,8 @@ export function OverviewAnalyticsView() {
               <img alt="icon" src={`${CONFIG.site.basePath}/assets/icons/glass/ic-glass-bag.svg`} />
             }
             chart={{}}
+            onClick={() => handleViewChange('user')}
+            sx={{ cursor: 'pointer', borderColor: activeView === 'user' ? 'orange' : 'none', borderWidth: activeView === 'user' ? '1px' : '0px', borderStyle: 'solid', }}
           />
         </Grid>
 
@@ -139,6 +146,8 @@ export function OverviewAnalyticsView() {
               <img alt="icon" src={`${CONFIG.site.basePath}/assets/icons/glass/ic-glass-buy.svg`} />
             }
             chart={{}}
+            onClick={() => handleViewChange('order')}
+            sx={{ cursor: 'pointer', borderColor: activeView === 'order' ? 'orange' : 'none', borderWidth: activeView === 'order' ? '1px' : '0px', borderStyle: 'solid', }}
           />
         </Grid>
 
@@ -154,6 +163,8 @@ export function OverviewAnalyticsView() {
               />
             }
             chart={{}}
+            onClick={() => handleViewChange('review')}
+            sx={{ cursor: 'pointer', borderColor: activeView === 'review' ? 'orange' : 'none', borderWidth: activeView === 'review' ? '1px' : '0px', borderStyle: 'solid', }}
           />
         </Grid>
 
@@ -173,6 +184,72 @@ export function OverviewAnalyticsView() {
             chart={{}}
           />
         </Grid>
+
+        {/* <Grid xs={12} md={12} lg={12} sx={{
+          padding: 0,
+          margin: 0,
+          overflowX: 'hidden',
+        }}>
+          <UserListView sx={{
+            padding: 0,
+            margin: 0,
+            overflowX: 'hidden',
+          }} />
+        </Grid> */}
+
+        {/* <Grid xs={12} md={12} lg={12} sx={{
+          padding: 0,
+          margin: 0,
+          overflowX: 'hidden',
+        }}>
+          <OrderListView sx={{
+            padding: 0,
+            margin: 0,
+            overflowX: 'hidden',
+          }} />
+        </Grid> */}
+
+        <Grid
+          xs={12}
+          md={12}
+          lg={12}
+          sx={{
+            padding: 0,
+            margin: 0,
+            overflowX: 'hidden',
+          }}
+        >
+          {activeView === 'user' && (
+            <UserListView
+              sx={{
+                padding: 0,
+                margin: 0,
+                overflowX: 'hidden',
+              }}
+            />
+          )}
+
+          {activeView === 'order' && (
+            <OrderListView
+              sx={{
+                padding: 0,
+                margin: 0,
+                overflowX: 'hidden',
+              }}
+            />
+          )}
+
+          {activeView === 'review' && (
+            <ReviewListView
+              sx={{
+                padding: 0,
+                margin: 0,
+                overflowX: 'hidden',
+              }}
+            />
+          )}
+        </Grid>
+
 
         <Grid xs={12} md={6} lg={4}>
           <AnalyticsCurrentVisits
