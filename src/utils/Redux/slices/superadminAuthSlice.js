@@ -13,7 +13,7 @@ export const superAdminLogin = createAsyncThunk(
       if (error.response?.status === 401) {
         return rejectWithValue('Invalid credentials');
       }
-      return rejectWithValue(error.response?.data?.msg || 'Invalid Credentials');
+      return rejectWithValue(error.msg || 'Invalid Credentials');
     }
   }
 );

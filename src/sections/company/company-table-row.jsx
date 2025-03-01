@@ -158,9 +158,16 @@ export function CompanyTableRow({ row, selected, onSelectRow, onViewRow, onDelet
         open={confirm.value}
         onClose={confirm.onFalse}
         title="Delete"
-        content="Are you sure want to delete?"
+        content="Are you sure want to delete the selected company?"
         action={
-          <Button variant="contained" color="error" onClick={onDeleteRow}>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={async () => {
+              await onDeleteRow(row.company_id);
+              confirm.onFalse(); // ✅ Ensure the dialog closes after async deletion
+            }}
+          >
             Delete
           </Button>
         }

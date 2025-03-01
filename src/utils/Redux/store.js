@@ -7,6 +7,7 @@ import createAdminReducers from './slices/createAdminSlice';
 import superAdminAuthReducers from './slices/superadminAuthSlice';
 import allCompaniesReducers from './slices/companiesListSlice';
 import createCompanyReducers from './slices/createCompanySlice';
+import deleteCompanyReducers from './slices/deleteCompanySlice';
 
 // 🔹 Combine Reducers
 const rootReducer = combineReducers({
@@ -14,6 +15,7 @@ const rootReducer = combineReducers({
   superAdminAuth: superAdminAuthReducers,
   allCompanies: allCompaniesReducers,
   createCompany: createCompanyReducers,
+  deleteCompany: deleteCompanyReducers,
 });
 
 // 🔹 Persist Configuration
