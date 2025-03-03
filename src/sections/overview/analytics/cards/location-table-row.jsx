@@ -112,7 +112,11 @@ export function LocationTableRow({ row, selected, onEditRow, onSelectRow, onDele
           </MenuItem>
         </MenuList>
 
-        <LocationEditDialog open={open} onClose={() => setOpen(false)} />
+        <LocationEditDialog
+          open={open}
+          onClose={() => setOpen(false)}
+          location_id={row.location_id}
+        />
       </CustomPopover>
 
       <ConfirmDialog
@@ -125,7 +129,7 @@ export function LocationTableRow({ row, selected, onEditRow, onSelectRow, onDele
             variant="contained"
             color="error"
             onClick={async () => {
-              await onDeleteRow(row.customer_id);
+              await onDeleteRow(row.location_id);
               confirm.onFalse(); // ✅ Ensure the dialog closes after async deletion
             }}
           >

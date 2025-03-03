@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux'; // ✅ Import useSelector for Redux
 import api from 'src/utils/api';
 import Button from '@mui/material/Button';
@@ -11,13 +11,15 @@ import { toast } from 'sonner';
 import { LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
-import { form } from 'src/theme/core/components/form';
+// import { form } from 'src/theme/core/components/form';
 
 // ----------------------------------------------------------------------
 
-export function LocationEditDialog({ open, onClose, title = 'Edit Location', id }) {
+export function LocationEditDialog({ open, onClose, title = 'Edit Location', location_id }) {
   // ✅ Fetch token from Redux (superAdminAuth)
   const authToken = useSelector((state) => state.superAdminAuth.token);
+
+  console.log('check current:', location_id);
 
   const [formData, setFormData] = useState({
     locationName: '',
@@ -43,7 +45,7 @@ export function LocationEditDialog({ open, onClose, title = 'Edit Location', id 
 
   // Handle form submission
   const handleAddLocation = async () => {
-    if (!id) {
+    if (!location_id) {
       toast.error('Company ID is missing. Please select a company.');
       return;
     }
@@ -65,7 +67,7 @@ export function LocationEditDialog({ open, onClose, title = 'Edit Location', id 
         `/superAdmin/create_location`, // ✅ Sending only required fields
         {
           locationName: formData.locationName,
-          company_id: id, // ✅ Required field
+          company_id: location_id, // ✅ Required field
           locationEmail: formData.email,
           locationCutoffTime: formData.mealTime,
         },
@@ -80,7 +82,7 @@ export function LocationEditDialog({ open, onClose, title = 'Edit Location', id 
       console.log('API Response:', response.data); // ✅ Log the response
 
       toast.success('Location added successfully!', {
-        description: `Location: ${formData.locationName}, Company ID: ${id}`,
+        description: `Location: ${formData.locationName}, Company ID: ${location_id}`,
       });
 
       // Reset form after success
@@ -102,6 +104,44 @@ export function LocationEditDialog({ open, onClose, title = 'Edit Location', id 
       setLoading(false);
     }
   };
+
+  const fetchLocationData = useCallback(async () => {
+    if (!authToken) {
+      toast.error('Authorization token is missing. Please log in again.');
+      return;
+    }
+
+    try {
+      const response = await api.get(`/superAdmin/list_locations/${location_id}`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      if (response.data.success && response.data.data.length > 0) {
+        const locationData = response.data.data[0];
+
+        setFormData({
+          locationName: locationData.locationName || '',
+          mealTime: locationData.locationCutoffTime
+            ? dayjs(locationData.locationCutoffTime, 'HH:mm')
+            : null,
+          email: locationData.locationEmail || '',
+        });
+      } else {
+        toast.error('Failed to fetch location data.');
+      }
+    } catch (error) {
+      console.error('Error fetching location data:', error);
+      toast.error(error.msg);
+    }
+  }, [authToken, location_id]); // ✅ Now fetchLocationData is memoized
+
+  useEffect(() => {
+    if (open && location_id) {
+      fetchLocationData(); // ✅ Calls the memoized function
+    }
+  }, [open, location_id, fetchLocationData]); // ✅ fetchLocationData is now a dependency
 
   return (
     <Dialog fullWidth maxWidth="sm" open={open} onClose={onClose}>
