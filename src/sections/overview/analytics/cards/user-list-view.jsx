@@ -16,6 +16,7 @@ import { useSetState } from 'src/hooks/use-set-state';
 
 import { _roles, _userList } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
+import api from 'src/utils/api';
 
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
@@ -84,19 +85,35 @@ export function UserListView({ company_id }) {
     !!filters.state.name || filters.state.role.length > 0 || filters.state.status !== 'all';
 
   const notFound = (!dataFiltered.length && canReset) || !dataFiltered.length;
+  const { token } = useSelector((state) => state.superAdminAuth);
 
   const handleDeleteRow = useCallback(
-    (id) => {
-      console.log(id);
-      const deleteRow = tableData.filter((row) => row.id !== id);
+    async (customer_id) => {
+      try {
+        if (!token) {
+          toast.error('Authentication token missing. Please log in again.');
+          return;
+        }
 
-      toast.success('Delete success!');
+        // Call API to delete the customer profile
+        await api.delete(`/superAdmin/delete_customer_profile/${customer_id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-      setTableData(deleteRow);
+        // Remove deleted user from table
+        const deleteRow = tableData.filter((row) => row.customer_id !== customer_id);
+        setTableData(deleteRow);
 
-      table.onUpdatePageDeleteRow(dataInPage.length);
+        toast.success('User deleted successfully!');
+        table.onUpdatePageDeleteRow(dataInPage.length);
+        confirm.onFalse();
+      } catch (error) {
+        confirm.onFalse();
+        toast.error(error.msg || 'Error deleting user');
+        console.error(error);
+      }
     },
-    [dataInPage.length, table, tableData]
+    [dataInPage.length, table, tableData, token, confirm]
   );
 
   const handleDeleteRows = useCallback(() => {
@@ -207,8 +224,8 @@ export function UserListView({ company_id }) {
                         row={row}
                         selected={table.selected.includes(row.id)}
                         onSelectRow={() => table.onSelectRow(row.id)}
-                        onDeleteRow={() => handleDeleteRow(row.id)}
-                        onEditRow={() => handleEditRow(row.id)}
+                        onDeleteRow={() => handleDeleteRow(row.customer_id)}
+                        onEditRow={() => handleEditRow(row.customer_id)}
                       />
                     ))}
 

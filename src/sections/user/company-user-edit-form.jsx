@@ -1,5 +1,5 @@
 import { z as zod } from 'zod';
-import { useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useParams } from 'react-router-dom';
@@ -14,41 +14,45 @@ import TextField from '@mui/material/TextField';
 import { useRouter } from 'src/routes/hooks';
 import { toast } from 'src/components/snackbar';
 import { Form, Field } from 'src/components/hook-form';
+import api from 'src/utils/api';
+import { useSelector } from 'react-redux';
 
 // ----------------------------------------------------------------------
 
-export const NewUserSchema = zod.object({
+export const UserSchema = zod.object({
   name: zod.string().min(1, { message: 'Name is required!' }),
   email: zod
     .string()
     .min(1, { message: 'Email is required!' })
     .email({ message: 'Enter a valid email address!' }),
-  phone: zod.string().optional(), // Phone can be empty
-  customer_id: zod.number({ required_error: 'Company ID is required!' }),
+  phone: zod
+    .string()
+    // .regex(/^\d{10}$/, { message: 'Phone number must be exactly 10 digits!' })
+    .optional(),
+  customer_id: zod.number({ required_error: 'Customer ID is required!' }),
   designation: zod.string().min(1, { message: 'Designation is required!' }),
 });
 
 // ----------------------------------------------------------------------
 
 export function UserCompanyEditForm() {
-  const { customer_id } = useParams(); // Extract company_id from the URL
+  const { customer_id } = useParams();
   const router = useRouter();
+  const { token } = useSelector((state) => state.superAdminAuth);
 
-  const defaultValues = useMemo(
-    () => ({
-      name: 'Ankit',
-      email: 'email',
-      phone: '',
-      customer_id: customer_id ? Number(customer_id) : '', // Pre-fill from URL
-      designation: '',
-    }),
-    [customer_id]
-  );
+  const [loadingData, setLoadingData] = useState(true); // ✅ Separate loading state for fetching
+  const [loadingSubmit, setLoadingSubmit] = useState(false); // ✅ Separate loading state for submitting
 
   const methods = useForm({
     mode: 'onSubmit',
-    resolver: zodResolver(NewUserSchema),
-    defaultValues,
+    resolver: zodResolver(UserSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      phone: '',
+      customer_id: Number(customer_id) || '',
+      designation: '',
+    },
   });
 
   const {
@@ -57,30 +61,74 @@ export function UserCompanyEditForm() {
     formState: { isSubmitting },
   } = methods;
 
+  useEffect(() => {
+    async function fetchCustomer() {
+      try {
+        if (!token) {
+          toast.error('Authentication token missing. Please log in again.');
+          return;
+        }
+
+        const response = await api.get(`/superAdmin/fetch_particular_customer/${customer_id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (response.status === 200) {
+          const customerDetails = response.data.data[0]; // ✅ Extract first object from array
+          console.log(customerDetails);
+          reset(customerDetails); // ✅ Dynamically update form fields
+        } else {
+          toast.error('Failed to load customer details.');
+        }
+      } catch (error) {
+        toast.error(error.response?.data?.message || 'Error fetching customer data.');
+      } finally {
+        setLoadingData(false); // ✅ Stop loading state after fetching
+      }
+    }
+
+    if (customer_id) {
+      fetchCustomer();
+    }
+  }, [customer_id, token, reset]); // ✅ Add reset to dependencies
+
   const onSubmit = handleSubmit(async (data) => {
     try {
-      const response = await fetch('/api/user', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: data.name,
-          email: data.email,
-          phone: data.phone || '',
-          customer_id: Number(customer_id), // Ensure correct format
-          designation: data.designation,
-        }),
+      if (!token) {
+        toast.error('Authentication token missing. Please log in again.');
+        return;
+      }
+
+      setLoadingSubmit(true); // ✅ Show loading state for submit button
+
+      const payload = {
+        customer_id: Number(customer_id),
+        name: data.name,
+        phone: data.phone,
+        designation: data.designation,
+        email: data.email,
+      };
+
+      const response = await api.put(`/superAdmin/update_customer_profile`, payload, {
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (!response.ok) throw new Error('Failed to create user');
-
-      reset();
-      toast.success('User created successfully!');
-      router.push('/dashboard/user/list'); // Redirect to user list
+      if (response.status === 200) {
+        toast.success('User updated successfully!');
+        router.back();
+      } else {
+        throw new Error('Failed to update user.');
+      }
     } catch (error) {
-      toast.error('Error creating user');
-      console.error(error);
+      toast.error(error.msg || 'Error updating user.');
+    } finally {
+      setLoadingSubmit(false); // ✅ Stop loading state for submit button
     }
   });
+
+  if (loadingData) {
+    return <p>Loading user data...</p>; // ✅ Show loading only when fetching
+  }
 
   return (
     <Box sx={{ width: '100%', bgcolor: 'background.paper', p: 3 }}>
@@ -101,14 +149,14 @@ export function UserCompanyEditForm() {
                 <Field.Text name="email" label="Email Address" />
                 <Field.Text name="phone" label="Phone Number" />
 
-                {/* Pre-filled and disabled Company ID field */}
+                {/* Pre-filled and disabled Customer ID field */}
                 <TextField label="Customer ID" value={customer_id} disabled fullWidth />
 
                 <Field.Text name="designation" label="Designation" />
               </Box>
 
               <Stack alignItems="flex-end" sx={{ mt: 3 }}>
-                <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
+                <LoadingButton type="submit" variant="contained" loading={loadingSubmit}>
                   Save Changes
                 </LoadingButton>
               </Stack>
