@@ -21,6 +21,8 @@ import { fetchCompanyCustomer } from 'src/utils/Redux/slices/companyCustomerSlic
 import { fetchCompanyOrders } from 'src/utils/Redux/slices/companyOrderSlice';
 
 import { useMockedUser } from 'src/auth/hooks';
+import { fetchLocations } from 'src/utils/Redux/slices/companyLocationSlice';
+import { LoadingScreen } from 'src/components/loading-screen';
 
 import { AnalyticsTasks } from '../analytics-tasks';
 import { CompanyControls } from '../company-controls';
@@ -52,21 +54,26 @@ export function OverviewAnalyticsView() {
     setActiveView(view);
   };
 
+  const { customers } = useSelector((state) => state.companyCustomer);
+  const { orders } = useSelector((state) => state.companyOrders);
+  const { locations } = useSelector((state) => state.companyLocations);
+
+  const customerLoading = useSelector((state) => state.companyCustomer.loading);
+  const locationsLoading = useSelector((state) => state.companyLocations.loading);
+  const ordersLoading = useSelector((state) => state.companyOrders.loading);
+  // console.log(locations);
+
   useEffect(() => {
     if (id) {
       dispatch(fetchCompanyCustomer(id));
-    }
-  }, [dispatch, id]);
-
-  const { customers } = useSelector((state) => state.companyCustomer);
-
-  useEffect(() => {
-    if (id) {
+      dispatch(fetchLocations(id));
       dispatch(fetchCompanyOrders(id));
     }
   }, [dispatch, id]);
 
-  const { orders } = useSelector((state) => state.companyOrders);
+  if (customerLoading || locationsLoading || ordersLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <DashboardContent maxWidth="xl">
@@ -304,15 +311,17 @@ export function OverviewAnalyticsView() {
           )}
         </Grid>
 
-        <Grid xs={12}
+        <Grid
+          xs={12}
           md={12}
           lg={12}
           sx={{
             padding: 0,
-            margin: 0,
+            marginTop: 0,
             overflowX: 'hidden',
-          }}>
-          <LocationListView />
+          }}
+        >
+          <LocationListView locations={locations} />
         </Grid>
 
         <Grid xs={12} md={6} lg={4}>

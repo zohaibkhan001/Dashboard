@@ -17,7 +17,7 @@ export const fetchLocations = createAsyncThunk(
 
       return response.data?.data || []; // Extracting "data" array
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Failed to fetch locations');
+      return rejectWithValue(error.msg || 'Failed to fetch locations');
     }
   }
 );

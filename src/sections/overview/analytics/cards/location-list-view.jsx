@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -13,6 +13,8 @@ import { useRouter } from 'src/routes/hooks';
 
 import { useBoolean } from 'src/hooks/use-boolean';
 import { useSetState } from 'src/hooks/use-set-state';
+import api from 'src/utils/api';
+import { useSelector } from 'react-redux';
 
 import { _roles, _userList } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
@@ -50,19 +52,37 @@ const TABLE_HEAD = [
 
 // ----------------------------------------------------------------------
 
-export function LocationListView() {
+export function LocationListView({ locations }) {
   const table = useTable();
 
   const router = useRouter();
 
   const confirm = useBoolean();
 
-  const [tableData, setTableData] = useState(_userList);
+  const [tableData, setTableData] = useState(locations || []);
+
+  const { token } = useSelector((state) => state.superAdminAuth);
+
+  useEffect(() => {
+    if (locations) {
+      // ✅ Transform API response to match table structure
+      const formattedLocations = locations.map((loc) => ({
+        id: loc.location_id, // ✅ Convert location_id -> id
+        locationName: loc.locationName,
+        cutOffTime: loc.locationCutoffTime || 'N/A', // ✅ Handle empty values
+        locationEmail: loc.locationEmail || 'N/A',
+        createdAt: new Date(loc.createdAt).toLocaleString(), // ✅ Format date
+        updatedAt: new Date(loc.updatedAt).toLocaleString(), // ✅ Format date
+      }));
+
+      setTableData(formattedLocations);
+    }
+  }, [locations]);
 
   const filters = useSetState({ name: '', role: [], status: 'all' });
 
   const dataFiltered = applyFilter({
-    inputData: tableData,
+    inputData: locations || [],
     comparator: getComparator(table.order, table.orderBy),
     filters: filters.state,
   });
@@ -75,16 +95,33 @@ export function LocationListView() {
   const notFound = (!dataFiltered.length && canReset) || !dataFiltered.length;
 
   const handleDeleteRow = useCallback(
-    (id) => {
-      const deleteRow = tableData.filter((row) => row.id !== id);
+    async (id) => {
+      try {
+        const response = await api.delete(`/superAdmin/delete_location/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-      toast.success('Delete success!');
+        if (response.status === 200) {
+          toast.success(response.data.msg);
 
-      setTableData(deleteRow);
-
-      table.onUpdatePageDeleteRow(dataInPage.length);
+          // ✅ Remove deleted row from table
+          const updatedTableData = tableData.filter((row) => row.location_id !== id);
+          setTableData(updatedTableData);
+          setTimeout(() => {
+            router.refresh();
+          }, 2000);
+          table.onUpdatePageDeleteRow(dataInPage.length);
+        } else {
+          toast.error('Failed to delete location.');
+        }
+      } catch (error) {
+        console.error('Error deleting location:', error);
+        toast.error(error.msg);
+      }
     },
-    [dataInPage.length, table, tableData]
+    [dataInPage.length, table, tableData, token, router]
   );
 
   const handleDeleteRows = useCallback(() => {
@@ -109,14 +146,24 @@ export function LocationListView() {
 
   return (
     <>
-      <DashboardContent sx={{
-        padding: 0,
-        marginTop: '1rem',
-        marginBottom: '1rem',
-        overflowX: 'hidden',
-      }}>
-
-        <Card sx={{ width: { xs: '100%', sm: '100%', md: '100%', lg: '105%' }, padding: 0, marginLeft: '-1.5rem', marginRight: 0, marginBottom: 0, overflowX: 'hidden' }}>
+      <DashboardContent
+        sx={{
+          padding: 0,
+          marginTop: '1rem',
+          marginBottom: '1rem',
+          overflowX: 'hidden',
+        }}
+      >
+        <Card
+          sx={{
+            width: { xs: '100%', sm: '100%', md: '100%', lg: '105%' },
+            padding: 0,
+            marginLeft: '-1.5rem',
+            marginRight: 0,
+            marginBottom: 0,
+            overflowX: 'hidden',
+          }}
+        >
           <LocationTableToolbar
             filters={filters}
             onResetPage={table.onResetPage}
@@ -181,7 +228,7 @@ export function LocationListView() {
                         row={row}
                         selected={table.selected.includes(row.id)}
                         onSelectRow={() => table.onSelectRow(row.id)}
-                        onDeleteRow={() => handleDeleteRow(row.id)}
+                        onDeleteRow={() => handleDeleteRow(row.location_id)}
                         onEditRow={() => handleEditRow(row.id)}
                       />
                     ))}
@@ -236,7 +283,7 @@ export function LocationListView() {
 }
 
 function applyFilter({ inputData, comparator, filters }) {
-  const { name, status, role } = filters;
+  const { name } = filters;
 
   const stabilizedThis = inputData.map((el, index) => [el, index]);
 
@@ -250,16 +297,8 @@ function applyFilter({ inputData, comparator, filters }) {
 
   if (name) {
     inputData = inputData.filter(
-      (user) => user.name.toLowerCase().indexOf(name.toLowerCase()) !== -1
+      (location) => location.locationName.toLowerCase().indexOf(name.toLowerCase()) !== -1
     );
-  }
-
-  if (status !== 'all') {
-    inputData = inputData.filter((user) => user.status === status);
-  }
-
-  if (role.length) {
-    inputData = inputData.filter((user) => role.includes(user.role));
   }
 
   return inputData;

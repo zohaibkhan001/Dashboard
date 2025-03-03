@@ -32,13 +32,14 @@ export function LocationTableRow({ row, selected, onEditRow, onSelectRow, onDele
 
   const quickEdit = useBoolean();
 
-   const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
+  // console.log('check location', row.location_id);
   return (
     <>
-      <TableRow hover selected={selected} aria-checked={selected} tabIndex={-1} >
+      <TableRow hover selected={selected} aria-checked={selected} tabIndex={-1}>
         <TableCell padding="checkbox">
-          <Checkbox id={row.id} checked={selected} onClick={onSelectRow} />
+          <Checkbox id={row.location_id} checked={selected} onClick={onSelectRow} />
         </TableCell>
 
         <TableCell>
@@ -47,7 +48,7 @@ export function LocationTableRow({ row, selected, onEditRow, onSelectRow, onDele
 
             <Stack sx={{ typography: 'body2', flex: '1 1 auto', alignItems: 'flex-start' }}>
               <Link color="inherit" onClick={onEditRow} sx={{ cursor: 'pointer' }}>
-                {row.location}
+                {row.locationName}
               </Link>
               {/* <Box component="span" sx={{ color: 'text.disabled' }}>
                 {row.email}
@@ -56,13 +57,16 @@ export function LocationTableRow({ row, selected, onEditRow, onSelectRow, onDele
           </Stack>
         </TableCell>
 
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{row.cutOffTime}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{row.locationCutoffTime || 'N/A'}</TableCell>
 
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{row.locationEmail}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{row.locationEmail || 'N/A '}</TableCell>
 
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{row.createdAt}</TableCell>
-
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{row.updatedAt}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>
+          {new Date(row.createdAt).toLocaleString()}
+        </TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>
+          {new Date(row.updatedAt).toLocaleString()}
+        </TableCell>
 
         <TableCell>
           <Stack direction="row" alignItems="center">
@@ -102,24 +106,29 @@ export function LocationTableRow({ row, selected, onEditRow, onSelectRow, onDele
             Delete
           </MenuItem>
 
-          <MenuItem
-            onClick={() => setOpen(true)}
-          >
+          <MenuItem onClick={() => setOpen(true)}>
             <Iconify icon="solar:pen-bold" />
             Edit
           </MenuItem>
         </MenuList>
 
-        <LocationEditDialog open={open} onClose={() => setOpen(false)}  />
+        <LocationEditDialog open={open} onClose={() => setOpen(false)} />
       </CustomPopover>
 
       <ConfirmDialog
         open={confirm.value}
         onClose={confirm.onFalse}
         title="Delete"
-        content="Are you sure want to delete?"
+        content="Are you sure want to delete this location?"
         action={
-          <Button variant="contained" color="error" onClick={onDeleteRow}>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={async () => {
+              await onDeleteRow(row.customer_id);
+              confirm.onFalse(); // ✅ Ensure the dialog closes after async deletion
+            }}
+          >
             Delete
           </Button>
         }

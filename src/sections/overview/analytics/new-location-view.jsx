@@ -12,12 +12,16 @@ import { LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import { form } from 'src/theme/core/components/form';
+import { Router } from 'react-router';
+import { useRouter } from 'src/routes/hooks';
 
 // ----------------------------------------------------------------------
 
 export function NewLocationDialog({ open, onClose, title = 'Add New Location', id }) {
   // ✅ Fetch token from Redux (superAdminAuth)
   const authToken = useSelector((state) => state.superAdminAuth.token);
+
+  const router = useRouter();
 
   const [formData, setFormData] = useState({
     locationName: '',
@@ -92,6 +96,10 @@ export function NewLocationDialog({ open, onClose, title = 'Add New Location', i
 
       // Close the dialog
       onClose();
+
+      setTimeout(() => {
+        router.refresh();
+      }, 2000);
     } catch (error) {
       console.error('API Error:', error.response ? error.response.data : error.message);
 
