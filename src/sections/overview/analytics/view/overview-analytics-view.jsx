@@ -284,7 +284,7 @@ export function OverviewAnalyticsView() {
             overflowX: 'hidden',
           }}
         >
-          {activeView === 'user' && customers?.length > 0 && (
+          {activeView === 'user' && customers && (
             <UserListView
               customers={customers} // Pass customers if needed
               company_id={id}
@@ -296,7 +296,7 @@ export function OverviewAnalyticsView() {
             />
           )}
 
-          {activeView === 'order' && orders?.length > 0 && (
+          {activeView === 'order' && orders && (
             <OrderListView
               sx={{
                 padding: 0,

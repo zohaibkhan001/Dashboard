@@ -162,7 +162,7 @@ export function OrderTableRow({ row, selected, onViewRow, onSelectRow, onDeleteR
                   <div>x{item.qty}</div>
 
                   <Box sx={{ width: 110, textAlign: 'right' }}>
-                    {item.is_subsidised ? 'Subsidised' : 'Regular'}
+                    {item.is_subsidised ? 'Subsidised' : 'Non-subsidized'}
                   </Box>
                 </Stack>
               ))
