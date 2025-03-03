@@ -14,6 +14,10 @@ import { _analyticTasks, _analyticTraffic } from 'src/_mock';
 
 import { Iconify } from 'src/components/iconify';
 
+import { paths } from 'src/routes/paths';
+import { useRouter } from 'src/routes/hooks';
+import { RouterLink } from 'src/routes/components';
+
 import { AppWelcome } from 'src/sections/overview/app/app-welcome';
 import { useParams } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
@@ -100,6 +104,8 @@ export function OverviewAnalyticsView() {
           }}
         >
           <Button
+            component={RouterLink}
+            href={paths.dashboard.kanban}
             size="small"
             color="inherit"
             startIcon={<Iconify icon="mingcute:add-line" width={12} sx={{ ml: -0.5 }} />}
