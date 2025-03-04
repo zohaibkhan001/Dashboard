@@ -8,9 +8,22 @@ import { Iconify } from '../../iconify';
 // ----------------------------------------------------------------------
 
 export function SingleFilePreview({ file }) {
-  const fileName = typeof file === 'string' ? file : file.name;
+  if (!file) {
+    return null; // Prevents rendering when no file is selected
+  }
 
-  const previewUrl = typeof file === 'string' ? file : URL.createObjectURL(file);
+  let previewUrl;
+  let fileName;
+
+  if (typeof file === 'string') {
+    previewUrl = file; // Use URL directly if it's a string
+    fileName = file;
+  } else if (file instanceof Blob) {
+    previewUrl = URL.createObjectURL(file); // Generate preview for Blob/File
+    fileName = file.name;
+  } else {
+    return null; // If file type is invalid, return nothing
+  }
 
   return (
     <Box
