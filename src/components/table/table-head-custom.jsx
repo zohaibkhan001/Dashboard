@@ -30,6 +30,7 @@ export function TableHeadCustom({
   rowCount = 0,
   numSelected = 0,
   onSelectAllRows,
+  centered = false, // To center table header labels conditionally
 }) {
   return (
     <TableHead sx={sx}>
@@ -51,7 +52,7 @@ export function TableHeadCustom({
         {headLabel.map((headCell) => (
           <TableCell
             key={headCell.id}
-            align={headCell.align || 'left'}
+            align={centered ? 'center' :headCell.align || 'left'} // if centered is passed in <TableHeadCustom>, label alignment will be centered otherwise left
             sortDirection={orderBy === headCell.id ? order : false}
             sx={{ width: headCell.width, minWidth: headCell.minWidth }}
           >
