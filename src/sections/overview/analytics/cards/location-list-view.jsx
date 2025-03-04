@@ -43,11 +43,11 @@ import { LocationTableFiltersResult } from './location-table-filters-result';
 
 const TABLE_HEAD = [
   { id: 'locationName', label: 'Location Name', width: 200 },
-  { id: 'cutOffTime', label: 'CutOff Time', width: 200 },
+  { id: 'locationMealTime', label: 'Meal Time', width: 200 },
   { id: 'locationEmail', label: 'Location Email', width: 200 },
   { id: 'createdAt', label: 'Created At', width: 200 },
   { id: 'updatedAt', label: 'Updated At', width: 200 },
-  { id: '', width: 100 },
+  { id: '', width: 50 },
 ];
 
 // ----------------------------------------------------------------------
@@ -71,7 +71,7 @@ export function LocationListView({ locations, company_id }) {
       const formattedLocations = locations.map((loc) => ({
         id: loc.location_id, // ✅ Convert location_id -> id
         locationName: loc.locationName,
-        cutOffTime: loc.locationCutoffTime || 'N/A', // ✅ Handle empty values
+        locationMealTime: loc.locationMealtime || 'N/A', // ✅ Handle empty values
         locationEmail: loc.locationEmail || 'N/A',
         createdAt: new Date(loc.createdAt).toLocaleString(), // ✅ Format date
         updatedAt: new Date(loc.updatedAt).toLocaleString(), // ✅ Format date

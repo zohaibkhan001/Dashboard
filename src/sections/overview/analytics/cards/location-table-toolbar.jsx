@@ -35,13 +35,12 @@ export function LocationTableToolbar({ filters, options, onResetPage }) {
         direction={{ xs: 'column', md: 'row' }}
         sx={{ p: 2.5, pr: { xs: 2.5, md: 1 } }}
       >
-
         <Stack direction="row" alignItems="center" spacing={2} flexGrow={1} sx={{ width: 1 }}>
           <TextField
             value={filters.state.name}
             onChange={handleFilterName}
             placeholder="Search..."
-            sx={{ width: { xs: '100%', sm: '100%', md: '100%', lg: '100%' }, }}
+            sx={{ width: { xs: '100%', sm: '100%', md: '100%', lg: '100%' } }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">

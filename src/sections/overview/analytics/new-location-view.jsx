@@ -14,6 +14,8 @@ import dayjs from 'dayjs';
 import { form } from 'src/theme/core/components/form';
 import { Router } from 'react-router';
 import { useRouter } from 'src/routes/hooks';
+import { Box, Chip, FormControl, IconButton, InputLabel, MenuItem, Select } from '@mui/material';
+import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
@@ -21,11 +23,13 @@ export function NewLocationDialog({ open, onClose, title = 'Add New Location', i
   // ✅ Fetch token from Redux (superAdminAuth)
   const authToken = useSelector((state) => state.superAdminAuth.token);
 
+  const mealOptions = ['Breakfast', 'Lunch', 'Snacks', 'Dinner', 'Midnight Snacks']; // ✅ Define meal options
+
   const router = useRouter();
 
   const [formData, setFormData] = useState({
     locationName: '',
-    mealTime: null, // ✅ Still taking input but won't send
+    selectedMeals: [], // ✅ Now an array to store multiple selections
     email: '',
   });
 
@@ -37,13 +41,22 @@ export function NewLocationDialog({ open, onClose, title = 'Add New Location', i
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle time selection
-  const handleTimeChange = (newValue) => {
+  const handleMealChange = (event) => {
+    const selectedValues = event.target.value;
     setFormData((prev) => ({
       ...prev,
-      mealTime: newValue ? dayjs(newValue).format('HH:mm') : '',
+      selectedMeals:
+        typeof selectedValues === 'string' ? selectedValues.split(',') : selectedValues,
     }));
   };
+
+  // Handle time selection
+  // const handleTimeChange = (newValue) => {
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     mealTime: newValue ? dayjs(newValue).format('HH:mm') : '',
+  //   }));
+  // };
 
   // Handle form submission
   const handleAddLocation = async () => {
@@ -71,7 +84,7 @@ export function NewLocationDialog({ open, onClose, title = 'Add New Location', i
           locationName: formData.locationName,
           company_id: id, // ✅ Required field
           locationEmail: formData.email,
-          locationCutoffTime: formData.mealTime,
+          locationMealTime: formData.selectedMeals, // ✅ Now sending an array
         },
         {
           headers: {
@@ -82,21 +95,23 @@ export function NewLocationDialog({ open, onClose, title = 'Add New Location', i
       );
 
       console.log('API Response:', response.data); // ✅ Log the response
+      if (response.data?.msg === 'Location created successfully') {
+        // ✅ Check the message string
+        // ✅ Check success field from API response
+        toast.success('Location added successfully!', {
+          description: `Location: ${formData.locationName}, Company ID: ${id}`,
+        });
 
-      toast.success('Location added successfully!', {
-        description: `Location: ${formData.locationName}, Company ID: ${id}`,
-      });
+        // Reset form after success
+        setFormData({
+          locationName: '',
+          selectedMeals: [], // ✅ Now an array to store multiple selections
+          email: '',
+        });
 
-      // Reset form after success
-      setFormData({
-        locationName: '',
-        mealTime: null,
-        email: '',
-      });
-
-      // Close the dialog
-      onClose();
-
+        // Close the dialog
+        onClose();
+      }
       setTimeout(() => {
         router.refresh();
       }, 2000);
@@ -109,6 +124,14 @@ export function NewLocationDialog({ open, onClose, title = 'Add New Location', i
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRemoveMeal = (event, mealToRemove) => {
+    event.stopPropagation(); // ✅ Prevent dropdown toggle
+    setFormData((prev) => ({
+      ...prev,
+      selectedMeals: prev.selectedMeals.filter((meal) => meal !== mealToRemove),
+    }));
   };
 
   return (
@@ -127,14 +150,42 @@ export function NewLocationDialog({ open, onClose, title = 'Add New Location', i
           />
 
           {/* ✅ Still taking input for Meal Time but NOT sending */}
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <TimePicker
-              label="Meal Time"
-              value={formData.mealTime ? dayjs(formData.mealTime, 'HH:mm') : null}
-              onChange={handleTimeChange}
-              sx={{ width: '100%' }}
-            />
-          </LocalizationProvider>
+          {/* ✅ Display selected items ABOVE the dropdown */}
+          {/* <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 1 }}>
+            {(formData.selectedMeals || []).map((meal) => (
+              <Box
+                key={meal}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  backgroundColor: '#e0e0e0',
+                  padding: '5px 10px',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                }}
+              >
+                {meal}
+                <IconButton
+                  size="small"
+                  onClick={(event) => handleRemoveMeal(event, meal)}
+                  sx={{ ml: 1, padding: '2px' }}
+                >
+                  <Iconify icon="eva:close-fill" />
+                </IconButton>
+              </Box>
+            ))}
+          </Box> */}
+
+          <FormControl fullWidth>
+            <InputLabel>Meal Time</InputLabel>
+            <Select multiple value={formData.selectedMeals || []} onChange={handleMealChange}>
+              {mealOptions.map((meal) => (
+                <MenuItem key={meal} value={meal}>
+                  {meal}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
           {/* ✅ Still taking input for Email but NOT sending */}
           <TextField

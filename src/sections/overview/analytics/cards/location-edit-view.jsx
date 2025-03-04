@@ -12,6 +12,7 @@ import { LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import { useParams, useRouter } from 'src/routes/hooks';
+import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 // import { form } from 'src/theme/core/components/form';
 
 // ----------------------------------------------------------------------
@@ -33,7 +34,7 @@ export function LocationEditDialog({
 
   const [formData, setFormData] = useState({
     locationName: '',
-    mealTime: null, // ✅ Still taking input but won't send
+    locationMealTime: [], // New state (Array)
     email: '',
   });
 
@@ -79,7 +80,7 @@ export function LocationEditDialog({
           locationName: formData.locationName,
           company_id, // ✅ Ensure correct company association
           locationEmail: formData.email,
-          locationCutoffTime: formData.mealTime,
+          locationMealTime: formData.locationMealTime, // ✅ Send as an array
         },
         {
           headers: {
@@ -129,9 +130,9 @@ export function LocationEditDialog({
 
         setFormData({
           locationName: locationData.locationName || '',
-          mealTime: locationData.locationCutoffTime
-            ? dayjs(locationData.locationCutoffTime, 'HH:mm')
-            : null,
+          locationMealTime: locationData.locationMealTime
+            ? JSON.parse(locationData.locationMealTime)
+            : [],
           email: locationData.locationEmail || '',
         });
       } else {
@@ -163,17 +164,21 @@ export function LocationEditDialog({
             onChange={handleChange}
             required
           />
-
           {/* ✅ Still taking input for Meal Time but NOT sending */}
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <TimePicker
-              label="Meal Time"
-              value={formData.mealTime ? dayjs(formData.mealTime, 'HH:mm') : null}
-              onChange={handleTimeChange}
-              sx={{ width: '100%' }}
-            />
-          </LocalizationProvider>
-
+          <FormControl fullWidth>
+            <InputLabel>Meal Time</InputLabel>
+            <Select
+              multiple
+              value={formData.locationMealTime || []}
+              onChange={(e) => setFormData({ ...formData, locationMealTime: e.target.value })}
+            >
+              {['Breakfast', 'Lunch', 'Snacks', 'Dinner', 'Midnight Snacks'].map((meal) => (
+                <MenuItem key={meal} value={meal}>
+                  {meal}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           {/* ✅ Still taking input for Email but NOT sending */}
           <TextField
             sx={{ width: '100%' }}
