@@ -11,15 +11,25 @@ import { toast } from 'sonner';
 import { LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
+import { useParams, useRouter } from 'src/routes/hooks';
 // import { form } from 'src/theme/core/components/form';
 
 // ----------------------------------------------------------------------
 
-export function LocationEditDialog({ open, onClose, title = 'Edit Location', location_id }) {
+export function LocationEditDialog({
+  open,
+  onClose,
+  title = 'Edit Location',
+  location_id,
+  company_id,
+}) {
   // ✅ Fetch token from Redux (superAdminAuth)
   const authToken = useSelector((state) => state.superAdminAuth.token);
 
-  console.log('check current:', location_id);
+  const router = useRouter();
+  // console.log(company_id);
+
+  // console.log('check current:', location_id);
 
   const [formData, setFormData] = useState({
     locationName: '',
@@ -44,9 +54,9 @@ export function LocationEditDialog({ open, onClose, title = 'Edit Location', loc
   };
 
   // Handle form submission
-  const handleAddLocation = async () => {
+  const handleEditLocation = async () => {
     if (!location_id) {
-      toast.error('Company ID is missing. Please select a company.');
+      toast.error('Location ID is missing. Please select a valid location.');
       return;
     }
 
@@ -63,42 +73,38 @@ export function LocationEditDialog({ open, onClose, title = 'Edit Location', loc
     setLoading(true);
 
     try {
-      const response = await api.post(
-        `/superAdmin/create_location`, // ✅ Sending only required fields
+      const response = await api.put(
+        `/superAdmin/update_location/${location_id}`, // ✅ Update API endpoint
         {
           locationName: formData.locationName,
-          company_id: location_id, // ✅ Required field
+          company_id, // ✅ Ensure correct company association
           locationEmail: formData.email,
           locationCutoffTime: formData.mealTime,
         },
         {
           headers: {
-            Authorization: `Bearer ${authToken}`, // ✅ Use token from Redux
+            Authorization: `Bearer ${authToken}`,
             'Content-Type': 'application/json',
           },
         }
       );
 
-      console.log('API Response:', response.data); // ✅ Log the response
+      // console.log('API Response:', response.data); // ✅ Log the response
 
-      toast.success('Location added successfully!', {
-        description: `Location: ${formData.locationName}, Company ID: ${location_id}`,
+      toast.success('Location updated successfully!', {
+        description: `Location: ${formData.locationName}, Company ID: ${company_id}`,
       });
 
-      // Reset form after success
-      setFormData({
-        locationName: '',
-        mealTime: null,
-        email: '',
-      });
-
-      // Close the dialog
+      // ✅ Close the dialog after successful edit
       onClose();
+      setTimeout(() => {
+        router.refresh();
+      }, 2000);
     } catch (error) {
       console.error('API Error:', error.response ? error.response.data : error.message);
 
-      toast.error('Failed to add location!', {
-        description: error.response?.data?.message || 'Something went wrong. Try again!',
+      toast.error('Failed to update location!', {
+        description: error.msg || 'Something went wrong. Try again!',
       });
     } finally {
       setLoading(false);
@@ -112,7 +118,7 @@ export function LocationEditDialog({ open, onClose, title = 'Edit Location', loc
     }
 
     try {
-      const response = await api.get(`/superAdmin/list_locations/${location_id}`, {
+      const response = await api.get(`/superAdmin/get_locations/${location_id}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -184,10 +190,10 @@ export function LocationEditDialog({ open, onClose, title = 'Edit Location', loc
         <Button
           variant="contained"
           sx={{ width: '100%' }}
-          onClick={handleAddLocation}
+          onClick={handleEditLocation}
           disabled={loading}
         >
-          {loading ? 'Adding...' : 'Add Location'}
+          {loading ? 'Updating...' : 'Update Location'}
         </Button>
       </DialogActions>
     </Dialog>

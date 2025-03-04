@@ -327,7 +327,7 @@ export function OverviewAnalyticsView() {
             overflowX: 'hidden',
           }}
         >
-          <LocationListView locations={locations} />
+          <LocationListView locations={locations} company_id={id} />
         </Grid>
 
         <Grid xs={12} md={6} lg={4}>

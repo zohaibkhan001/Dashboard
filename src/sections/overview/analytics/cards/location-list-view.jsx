@@ -52,7 +52,7 @@ const TABLE_HEAD = [
 
 // ----------------------------------------------------------------------
 
-export function LocationListView({ locations }) {
+export function LocationListView({ locations, company_id }) {
   const table = useTable();
 
   const router = useRouter();
@@ -62,6 +62,8 @@ export function LocationListView({ locations }) {
   const [tableData, setTableData] = useState(locations || []);
 
   const { token } = useSelector((state) => state.superAdminAuth);
+
+  // console.log(locations);
 
   useEffect(() => {
     if (locations) {
@@ -230,6 +232,7 @@ export function LocationListView({ locations }) {
                         onSelectRow={() => table.onSelectRow(row.id)}
                         onDeleteRow={() => handleDeleteRow(row.location_id)}
                         onEditRow={() => handleEditRow(row.id)}
+                        company_id={company_id}
                       />
                     ))}
 

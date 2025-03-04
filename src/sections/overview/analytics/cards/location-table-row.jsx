@@ -25,7 +25,14 @@ import { LocationEditDialog } from './location-edit-view';
 
 // ----------------------------------------------------------------------
 
-export function LocationTableRow({ row, selected, onEditRow, onSelectRow, onDeleteRow }) {
+export function LocationTableRow({
+  row,
+  selected,
+  onEditRow,
+  onSelectRow,
+  onDeleteRow,
+  company_id,
+}) {
   const confirm = useBoolean();
 
   const popover = usePopover();
@@ -33,6 +40,8 @@ export function LocationTableRow({ row, selected, onEditRow, onSelectRow, onDele
   const quickEdit = useBoolean();
 
   const [open, setOpen] = useState(false);
+
+  // console.log(company_id);
 
   // console.log('check location', row.location_id);
   return (
@@ -116,6 +125,7 @@ export function LocationTableRow({ row, selected, onEditRow, onSelectRow, onDele
           open={open}
           onClose={() => setOpen(false)}
           location_id={row.location_id}
+          company_id={company_id}
         />
       </CustomPopover>
 
