@@ -3,6 +3,7 @@ import { useState, useCallback } from 'react';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
 import Tabs from '@mui/material/Tabs';
+import { Stack } from '@mui/material';
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
 import Button from '@mui/material/Button';
@@ -41,8 +42,10 @@ import {
 } from 'src/components/table';
 
 import { CategoryTableRow } from '../category-table-row';
-import { CategoryTableToolbar } from '../category-table-toolbar';
+// import { CategoryTableToolbar } from '../category-table-toolbar';
 import { CategoryTableFiltersResult } from '../category-table-filters-result';
+
+import { FileManagerNewFolderDialog } from '../product-new-category-dialog';
 
 // ----------------------------------------------------------------------
 
@@ -123,6 +126,8 @@ export function ProductCategoryListView() {
     [router]
   );
 
+  const upload = useBoolean();
+
   return (
     <>
       <DashboardContent>
@@ -133,52 +138,30 @@ export function ProductCategoryListView() {
             { name: 'Product', href: paths.dashboard.order.root },
             { name: 'Categories' },
           ]}
-          sx={{ mb: { xs: 3, md: 5 } }}
+          action={
+            <Stack direction="row" spacing={2}>
+              <Button
+                onClick={upload.onTrue}
+                variant="contained"
+                startIcon={<Iconify icon="mingcute:add-line" />}
+              >
+                New Categories
+              </Button>
+              
+
+              </Stack>
+              }
+              sx={{ mb: { xs: 3, md: 5 } }}
         />
 
-        <Card>
-          {/* <Tabs
-            value={filters.state.status}
-            onChange={handleFilterStatus}
-            sx={{
-              px: 2.5,
-              boxShadow: (theme) =>
-                `inset 0 -2px 0 0 ${varAlpha(theme.vars.palette.grey['500Channel'], 0.08)}`,
-            }}
-          >
-            {STATUS_OPTIONS.map((tab) => (
-              <Tab
-                key={tab.value}
-                iconPosition="end"
-                value={tab.value}
-                label={tab.label}
-                icon={
-                  <Label
-                    variant={
-                      ((tab.value === 'all' || tab.value === filters.state.status) && 'filled') ||
-                      'soft'
-                    }
-                    color={
-                      (tab.value === 'completed' && 'success') ||
-                      (tab.value === 'pending' && 'warning') ||
-                      (tab.value === 'cancelled' && 'error') ||
-                      'default'
-                    }
-                  >
-                    {['completed', 'pending', 'cancelled', 'refunded'].includes(tab.value)
-                      ? tableData.filter((user) => user.status === tab.value).length
-                      : tableData.length}
-                  </Label>
-                }
-              />
-            ))}
-          </Tabs> */}
+<FileManagerNewFolderDialog open={upload.value} onClose={upload.onFalse} />
 
-          <CategoryTableToolbar
+        <Card>
+
+          {/* <CategoryTableToolbar
             filters={filters}
             onResetPage={table.onResetPage}
-            // dateError={dateError}
-          />
+          /> */}
 
           {canReset && (
             <CategoryTableFiltersResult
