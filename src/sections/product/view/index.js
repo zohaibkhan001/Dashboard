@@ -12,6 +12,8 @@ export * from './product-daily-create-view';
 
 export * from './product-live-create-view';
 
+export * from './product-category-view';
+
 export * from './product-details-view';
 
 export * from './product-shop-details-view';

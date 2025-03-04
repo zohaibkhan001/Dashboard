@@ -249,13 +249,13 @@ export function ProductListView() {
                 Add Guest Menu
               </Button>
 
-              <Button
+              {/* <Button
                 onClick={upload.onTrue}
                 variant="contained"
                 startIcon={<Iconify icon="mingcute:add-line" />}
               >
                 New Categories
-              </Button>
+              </Button> */}
 
               <Button
                 // component={RouterLink}

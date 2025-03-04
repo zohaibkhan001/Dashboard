@@ -136,6 +136,7 @@ export const paths = {
       daily: `${ROOTS.DASHBOARD}/product/daily`,
       live: `${ROOTS.DASHBOARD}/product/live`,
       guest: `${ROOTS.DASHBOARD}/product/guest`,
+      category: `${ROOTS.DASHBOARD}/product/category`,
       details: (id) => `${ROOTS.DASHBOARD}/product/${id}`,
       edit: (id) => `${ROOTS.DASHBOARD}/product/${id}/edit`,
       demo: {
