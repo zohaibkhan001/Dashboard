@@ -4,24 +4,24 @@ import { DashboardContent } from 'src/layouts/dashboard';
 
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 
-import { ProductNewEditForm } from '../product-new-edit-form';
+import { ProductDailyEditForm } from '../product-daily-edit-form';
 
 // ----------------------------------------------------------------------
 
-export function ProductCreateView() {
+export function ProductDailyCreateView() {
   return (
     <DashboardContent>
       <CustomBreadcrumbs
-        heading="Create New Upgraded Meal"
+        heading="Create New Daily Meal"
         links={[
           { name: 'Dashboard', href: paths.dashboard.root },
           { name: 'Menu', href: paths.dashboard.product.root },
-          { name: 'New Upgraded Meal' },
+          { name: 'New Daily Meal' },
         ]}
         sx={{ mb: { xs: 3, md: 5 } }}
       />
 
-      <ProductNewEditForm />
+      <ProductDailyEditForm />
     </DashboardContent>
   );
 }

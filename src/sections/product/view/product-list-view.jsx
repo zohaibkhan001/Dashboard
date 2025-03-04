@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
+import { Menu, MenuItem, Box } from '@mui/material';
 import {
   DataGrid,
   gridClasses,
@@ -215,6 +216,18 @@ export function ProductListView() {
       .filter((column) => !HIDE_COLUMNS_TOGGLABLE.includes(column.field))
       .map((column) => column.field);
 
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <>
       <DashboardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
@@ -228,30 +241,39 @@ export function ProductListView() {
           action={
             <Stack direction="row" spacing={2}>
               <Button
-              variant="contained"
-              startIcon={<Iconify icon="mingcute:add-line" />}
-              component={RouterLink}
-              href={paths.dashboard.product.guest}
-            >
-              Add Guest Menu
-            </Button>
+                variant="contained"
+                startIcon={<Iconify icon="mingcute:add-line" />}
+                component={RouterLink}
+                href={paths.dashboard.product.guest}
+              >
+                Add Guest Menu
+              </Button>
 
-            <Button
-              onClick={upload.onTrue}
-              variant="contained"
-              startIcon={<Iconify icon="mingcute:add-line" />}
-            >
-              New Categories
-            </Button>
+              <Button
+                onClick={upload.onTrue}
+                variant="contained"
+                startIcon={<Iconify icon="mingcute:add-line" />}
+              >
+                New Categories
+              </Button>
 
-            <Button
-              component={RouterLink}
-              href={paths.dashboard.product.new}
-              variant="contained"
-              startIcon={<Iconify icon="mingcute:add-line" />}
-            >
-              New product
-            </Button>
+              <Button
+                // component={RouterLink}
+                // href={paths.dashboard.product.new}
+                variant="contained"
+                startIcon={<Iconify icon="mingcute:add-line" />}
+                onClick={handleClick}
+                endIcon={<Iconify icon="lets-icons:arrow-drop-down-big" />}
+              >
+                New product
+              </Button>
+              <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+                <Box sx={{width: '10.5vw'}}>
+                <MenuItem component={RouterLink} href={paths.dashboard.product.new}>Upgraded Meal</MenuItem>
+                <MenuItem component={RouterLink} href={paths.dashboard.product.daily}>Daily Meal</MenuItem>
+                <MenuItem component={RouterLink} href={paths.dashboard.product.live}>Live Counter</MenuItem>
+                </Box>
+              </Menu>
             </Stack>
 
           }

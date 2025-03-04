@@ -11,7 +11,7 @@ import CardHeader from '@mui/material/CardHeader';
 import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import {Radio, Button, Collapse, RadioGroup ,CardContent } from '@mui/material';
+import { Radio, Button, Collapse, RadioGroup, CardContent } from '@mui/material';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
@@ -48,7 +48,7 @@ export const NewProductSchema = zod.object({
 
 // ----------------------------------------------------------------------
 
-export function ProductNewEditForm({ currentProduct }) {
+export function ProductLiveEditForm({ currentProduct }) {
 
   const router = useRouter();
 
@@ -144,13 +144,13 @@ export function ProductNewEditForm({ currentProduct }) {
       <Stack spacing={3} sx={{ p: 3 }}>
         <Field.Text name="name" label="Meal Name" />
 
-          <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
+        <section style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem' }}>
           <Field.Text name="category" label="Category" />
           <Field.Select native name="type" label="Type" InputLabelProps={{ shrink: true }}>
             <option>Veg</option>
             <option>Non Veg</option>
           </Field.Select>
-          </section>
+        </section>
 
         <Field.Text name="subDescription" label="Description" multiline rows={4} />
 
@@ -171,24 +171,23 @@ export function ProductNewEditForm({ currentProduct }) {
   );
 
   const renderProperties = (
-    
-    <Card>
-      <Stack spacing={3}>
 
-      <Card>
-          <CardHeader title="Details"/>
+    <Card>
+      <Stack spacing={3} sx={{ p: 3 }}>
+        <Card>
+          <CardHeader title="Details" />
           <Stack spacing={3} sx={{ p: 3 }}>
-            <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
+            <section style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem' }}>
               <Field.Text name="priceRS" label="Price in Rupees" />
               <Field.Text name="fat" label="Fat" />
             </section>
 
-            <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
+            <section style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem' }}>
               <Field.Text name="protein" label="Protein" />
               <Field.Text name="calorie" label="Calorie" />
             </section>
             <Field.Text name="subDescription" label="Description" multiline rows={2} />
-            </Stack>
+          </Stack>
         </Card>
       </Stack>
     </Card>

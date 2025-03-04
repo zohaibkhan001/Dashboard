@@ -23,6 +23,8 @@ const OverviewFilePage = lazy(() => import('src/pages/dashboard/file'));
 const ProductDetailsPage = lazy(() => import('src/pages/dashboard/product/details'));
 const ProductListPage = lazy(() => import('src/pages/dashboard/product/list'));
 const ProductCreatePage = lazy(() => import('src/pages/dashboard/product/new'));
+const ProductDailyCreatePage = lazy(() => import('src/pages/dashboard/product/daily'));
+const ProductLiveCreatePage = lazy(() => import('src/pages/dashboard/product/live'));
 const ProductEditPage = lazy(() => import('src/pages/dashboard/product/edit'));
 const GuestMealPage = lazy(() => import('src/pages/dashboard/product/guest'));
 // Company
@@ -120,6 +122,8 @@ export const dashboardRoutes = [
           { path: 'list', element: <ProductListPage /> },
           { path: ':id', element: <ProductDetailsPage /> },
           { path: 'new', element: <ProductCreatePage /> },
+          { path: 'daily', element: <ProductDailyCreatePage /> },
+          { path: 'live', element: <ProductLiveCreatePage /> },
           { path: ':id/edit', element: <ProductEditPage /> },
           { path: 'guest', element: <GuestMealPage /> },
         ],
