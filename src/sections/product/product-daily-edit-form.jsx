@@ -11,14 +11,12 @@ import CardHeader from '@mui/material/CardHeader';
 import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import {Radio, Button, Collapse, RadioGroup ,CardContent } from '@mui/material';
+import { Radio, Button, Collapse, RadioGroup, CardContent } from '@mui/material';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 
-import {
-  PRODUCT_CATEGORY_GROUP_OPTIONS,
-} from 'src/_mock';
+import { PRODUCT_CATEGORY_GROUP_OPTIONS } from 'src/_mock';
 
 import { toast } from 'src/components/snackbar';
 import { Form, Field, schemaHelper } from 'src/components/hook-form';
@@ -49,11 +47,10 @@ export const NewProductSchema = zod.object({
 // ----------------------------------------------------------------------
 
 export function ProductDailyEditForm({ currentProduct }) {
-
   const [openCard, setOpenCard] = useState(null);
-  
+
   const handleCardClick = (cardName) => {
-    setOpenCard(openCard === cardName ? null : cardName); 
+    setOpenCard(openCard === cardName ? null : cardName);
   };
 
   const router = useRouter();
@@ -143,20 +140,24 @@ export function ProductDailyEditForm({ currentProduct }) {
 
   const renderDetails = (
     <Card>
-      <CardHeader title="Meal Details" subheader="Title, short description, image..." sx={{ mb: 3 }} />
+      <CardHeader
+        title="Meal Details"
+        subheader="Title, short description, image..."
+        sx={{ mb: 3 }}
+      />
 
       <Divider />
 
       <Stack spacing={3} sx={{ p: 3 }}>
         <Field.Text name="name" label="Meal Name" />
 
-          <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
+        <section style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem' }}>
           <Field.Text name="category" label="Category" />
           <Field.Select native name="type" label="Type" InputLabelProps={{ shrink: true }}>
             <option>Veg</option>
             <option>Non Veg</option>
           </Field.Select>
-          </section>
+        </section>
 
         <Field.Text name="subDescription" label="Description" multiline rows={4} />
 
@@ -176,161 +177,59 @@ export function ProductDailyEditForm({ currentProduct }) {
     </Card>
   );
 
+  const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
   const renderProperties = (
-    
     <Card>
       <Stack spacing={3}>
-      <Card style={{border:'none', boxShadow: 'none', outline: 'none', backgroundColor: 'transparent'}}> 
-        <CardHeader title="Details"/>
-        <Stack spacing={3} sx={{ p: 3 }}>
-        <Card onClick={() => handleCardClick('monday')} sx={{ cursor: 'pointer' }}>
-      <CardHeader title="Monday" sx={{ padding: '1rem'}}  />
-      <Collapse in={openCard === 'monday'}>
-        <CardContent>
-        <Stack spacing={3} sx={{ p: 3 }}>
-            <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
-              <Field.Text name="priceRS" label="Price in Rupees" />
-              <Field.Text name="fat" label="Fat" />
-            </section>
+        <Card
+          style={{
+            border: 'none',
+            boxShadow: 'none',
+            outline: 'none',
+            backgroundColor: 'transparent',
+          }}
+        >
+          <CardHeader title="Details" />
+          <Stack spacing={3} sx={{ p: 3 }}>
+            {daysOfWeek.map((day) => (
+              <Card
+                key={day}
+                onClick={() => handleCardClick(day.toLowerCase())}
+                sx={{ cursor: 'pointer' }}
+              >
+                <CardHeader title={day} sx={{ padding: '1rem' }} />
+                <Collapse in={openCard === day.toLowerCase()}>
+                  <CardContent>
+                    <Stack spacing={3} sx={{ p: 3 }}>
+                      <section
+                        style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem' }}
+                      >
+                        <Field.Text name="priceRS" label="Price in Rupees" />
+                        <Field.Text name="fat" label="Fat" />
+                      </section>
 
-            <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
-              <Field.Text name="protein" label="Protein" />
-              <Field.Text name="calorie" label="Calorie" />
-            </section>
-            <Field.Text name="subDescription" label="Description" multiline rows={2} />
-            </Stack>
-        </CardContent>
-      </Collapse>
-    </Card>
+                      <section
+                        style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem' }}
+                      >
+                        <Field.Text name="protein" label="Protein" />
+                        <Field.Text name="calorie" label="Calorie" />
+                      </section>
 
-    <Card onClick={() => handleCardClick('tuesday')} sx={{ cursor: 'pointer' }}>
-      <CardHeader title="Tuesday" sx={{ padding: '1rem'}}  />
-      <Collapse in={openCard === 'tuesday'}>
-        <CardContent>
-        <Stack spacing={3} sx={{ p: 3 }}>
-            <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
-              <Field.Text name="priceRS" label="Price in Rupees" />
-              <Field.Text name="fat" label="Fat" />
-            </section>
-
-            <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
-              <Field.Text name="protein" label="Protein" />
-              <Field.Text name="calorie" label="Calorie" />
-            </section>
-            <Field.Text name="subDescription" label="Description" multiline rows={2} />
-            </Stack>
-        </CardContent>
-      </Collapse>
-    </Card>
-
-    <Card onClick={() => handleCardClick('wednesday')} sx={{ cursor: 'pointer' }}>
-      <CardHeader title="Wednesday" sx={{ padding: '1rem'}}  />
-      <Collapse in={openCard === 'wednesday'}>
-        <CardContent>
-        <Stack spacing={3} sx={{ p: 3 }}>
-            <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
-              <Field.Text name="priceRS" label="Price in Rupees" />
-              <Field.Text name="fat" label="Fat" />
-            </section>
-
-            <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
-              <Field.Text name="protein" label="Protein" />
-              <Field.Text name="calorie" label="Calorie" />
-            </section>
-            <Field.Text name="subDescription" label="Description" multiline rows={2} />
-            </Stack>
-        </CardContent>
-      </Collapse>
-    </Card>
-
-    <Card onClick={() => handleCardClick('thursday')} sx={{ cursor: 'pointer' }}>
-      <CardHeader title="Thursday" sx={{ padding: '1rem'}}  />
-      <Collapse in={openCard === 'thursday'}>
-        <CardContent>
-        <Stack spacing={3} sx={{ p: 3 }}>
-            <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
-              <Field.Text name="priceRS" label="Price in Rupees" />
-              <Field.Text name="fat" label="Fat" />
-            </section>
-
-            <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
-              <Field.Text name="protein" label="Protein" />
-              <Field.Text name="calorie" label="Calorie" />
-            </section>
-            <Field.Text name="subDescription" label="Description" multiline rows={2} />
-            </Stack>
-        </CardContent>
-      </Collapse>
-    </Card>
-
-    <Card onClick={() => handleCardClick('friday')} sx={{ cursor: 'pointer' }}>
-      <CardHeader title="Friday" sx={{ padding: '1rem'}}  />
-      <Collapse in={openCard === 'friday'}>
-        <CardContent>
-        <Stack spacing={3} sx={{ p: 3 }}>
-            <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
-              <Field.Text name="priceRS" label="Price in Rupees" />
-              <Field.Text name="fat" label="Fat" />
-            </section>
-
-            <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
-              <Field.Text name="protein" label="Protein" />
-              <Field.Text name="calorie" label="Calorie" />
-            </section>
-            <Field.Text name="subDescription" label="Description" multiline rows={2} />
-            </Stack>
-        </CardContent>
-      </Collapse>
-    </Card>
-
-    <Card onClick={() => handleCardClick('saturday')} sx={{ cursor: 'pointer' }}>
-      <CardHeader title="Saturday" sx={{ padding: '1rem'}}  />
-      <Collapse in={openCard === 'saturday'}>
-        <CardContent>
-        <Stack spacing={3} sx={{ p: 3 }}>
-            <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
-              <Field.Text name="priceRS" label="Price in Rupees" />
-              <Field.Text name="fat" label="Fat" />
-            </section>
-
-            <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
-              <Field.Text name="protein" label="Protein" />
-              <Field.Text name="calorie" label="Calorie" />
-            </section>
-            <Field.Text name="subDescription" label="Description" multiline rows={2} />
-            </Stack>
-        </CardContent>
-      </Collapse>
-    </Card>
-
-    <Card onClick={() => handleCardClick('sunday')} sx={{ cursor: 'pointer' }}>
-      <CardHeader title="Sunday" sx={{ padding: '1rem'}}  />
-      <Collapse in={openCard === 'sunday'}>
-        <CardContent>
-        <Stack spacing={3} sx={{ p: 3 }}>
-            <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
-              <Field.Text name="priceRS" label="Price in Rupees" />
-              <Field.Text name="fat" label="Fat" />
-            </section>
-
-            <section style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
-              <Field.Text name="protein" label="Protein" />
-              <Field.Text name="calorie" label="Calorie" />
-            </section>
-            <Field.Text name="subDescription" label="Description" multiline rows={2} />
-            </Stack>
-        </CardContent>
-      </Collapse>
-    </Card>
+                      <Field.Text name="subDescription" label="Description" multiline rows={2} />
+                    </Stack>
+                  </CardContent>
+                </Collapse>
+              </Card>
+            ))}
           </Stack>
-      </Card>
+        </Card>
       </Stack>
     </Card>
   );
 
   const renderActions = (
     <Stack spacing={3} direction="row" justifyContent="flex-end" flexWrap="wrap">
-
       <LoadingButton type="submit" variant="contained" size="large" loading={isSubmitting}>
         {!currentProduct ? 'Create product' : 'Save changes'}
       </LoadingButton>

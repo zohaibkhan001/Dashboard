@@ -64,7 +64,7 @@ export function UserCompanyNewEditForm() {
         {
           name: data.name,
           email: data.email,
-          phone: data.phone || '',
+          phone: data.phone ? (data.phone.startsWith('+91') ? data.phone : `+91${data.phone}`) : '',
           company_id: Number(company_id), // Ensure correct format
           designation: data.designation,
         },

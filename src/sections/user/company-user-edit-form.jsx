@@ -104,7 +104,7 @@ export function UserCompanyEditForm() {
       const payload = {
         customer_id: Number(customer_id),
         name: data.name,
-        phone: data.phone,
+        phone: data.phone ? (data.phone.startsWith('+91') ? data.phone : `+91${data.phone}`) : '',
         designation: data.designation,
         email: data.email,
       };
