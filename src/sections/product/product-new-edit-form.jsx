@@ -78,8 +78,6 @@ export function ProductNewEditForm({ currentProduct }) {
   const router = useRouter();
   const [uploadLoading, setUploadLoading] = useState(false);
 
-  const [includeTaxes, setIncludeTaxes] = useState(false);
-
   const defaultValues = useMemo(
     () => ({
       mealName: currentProduct?.mealName || '',

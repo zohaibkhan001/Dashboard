@@ -12,6 +12,7 @@ import companyCustomerReducers from './slices/companyCustomerSlice';
 import fetchLocationsReducers from './slices/companyLocationSlice';
 import companyOrderReducers from './slices/companyOrderSlice';
 import categoriesReducers from './slices/categoriesSlice';
+import locationsReducers from './slices/locationsSlice';
 
 // 🔹 Combine Reducers
 const rootReducer = combineReducers({
@@ -24,6 +25,7 @@ const rootReducer = combineReducers({
   companyLocations: fetchLocationsReducers,
   companyOrders: companyOrderReducers,
   categories: categoriesReducers,
+  allLocations: locationsReducers,
 });
 
 // 🔹 Persist Configuration

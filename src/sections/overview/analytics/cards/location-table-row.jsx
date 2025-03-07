@@ -81,28 +81,9 @@ export function LocationTableRow({
         </TableCell>
 
         <TableCell sx={{ whiteSpace: 'nowrap' }}>{row.locationEmail || 'N/A '}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{row.locationOpeningTime || 'N/A '}</TableCell>
 
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>
-          {new Date(row.createdAt).toLocaleString(undefined, {
-            year: '2-digit',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false,
-          })}
-        </TableCell>
-
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>
-          {new Date(row.updatedAt).toLocaleString(undefined, {
-            year: '2-digit',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false,
-          })}
-        </TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{row.locationCutoffTime || 'N/A '}</TableCell>
 
         <TableCell>
           <Stack direction="row" alignItems="center">

@@ -69,7 +69,7 @@ export function ProductLiveEditForm({ currentProduct }) {
   const { categories, loading } = useSelector((state) => state.categories);
   const location = useLocation();
 
-  console.log(categories);
+  // console.log(categories);
 
   useEffect(() => {
     dispatch(fetchCategories());

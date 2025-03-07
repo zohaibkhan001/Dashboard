@@ -45,8 +45,8 @@ const TABLE_HEAD = [
   { id: 'locationName', label: 'Location Name', width: 200 },
   { id: 'locationMealTime', label: 'Meal Time', width: 200 },
   { id: 'locationEmail', label: 'Location Email', width: 200 },
-  { id: 'createdAt', label: 'Created At', width: 200 },
-  { id: 'updatedAt', label: 'Updated At', width: 200 },
+  { id: 'locationOpeningTime', label: 'Opening Time', width: 200 },
+  { id: 'locationCutoffTime', label: 'Cutoff Time', width: 200 },
   { id: '', width: 50 },
 ];
 
@@ -73,8 +73,8 @@ export function LocationListView({ locations, company_id }) {
         locationName: loc.locationName,
         locationMealTime: loc.locationMealtime || 'N/A', // ✅ Handle empty values
         locationEmail: loc.locationEmail || 'N/A',
-        createdAt: new Date(loc.createdAt).toLocaleString(), // ✅ Format date
-        updatedAt: new Date(loc.updatedAt).toLocaleString(), // ✅ Format date
+        locationOpeningTime: loc.locationOpeningTime || 'N/A', // ✅ Format date
+        locationCutoffTime: loc.locationCutoffTime || 'N/A', // ✅ Format date
       }));
 
       setTableData(formattedLocations);
