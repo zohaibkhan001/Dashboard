@@ -36,6 +36,8 @@ export function LocationEditDialog({
     locationName: '',
     locationMealTime: [], // New state (Array)
     email: '',
+    locationCutoffTime: '',
+    locationOpeningTime: '',
   });
 
   const [loading, setLoading] = useState(false);
@@ -47,10 +49,10 @@ export function LocationEditDialog({
   };
 
   // Handle time selection
-  const handleTimeChange = (newValue) => {
+  const handleTimeChange = (field, newValue) => {
     setFormData((prev) => ({
       ...prev,
-      mealTime: newValue ? dayjs(newValue).format('HH:mm') : '',
+      [field]: newValue ? dayjs(newValue).format('HH:mm') : '',
     }));
   };
 
@@ -80,7 +82,9 @@ export function LocationEditDialog({
           locationName: formData.locationName,
           company_id, // ✅ Ensure correct company association
           locationEmail: formData.email,
-          locationMealTime: formData.locationMealTime, // ✅ Send as an array
+          locationMealTime: formData.locationMealTime,
+          locationCutoffTime: formData.locationCutoffTime,
+          locationOpeningTime: formData.locationOpeningTime,
         },
         {
           headers: {
@@ -134,6 +138,8 @@ export function LocationEditDialog({
             ? JSON.parse(locationData.locationMealTime)
             : [],
           email: locationData.locationEmail || '',
+          locationCutoffTime: locationData.locationCutoffTime || '',
+          locationOpeningTime: locationData.locationOpeningTime || '',
         });
       } else {
         toast.error('Failed to fetch location data.');
@@ -179,7 +185,6 @@ export function LocationEditDialog({
               ))}
             </Select>
           </FormControl>
-          {/* ✅ Still taking input for Email but NOT sending */}
           <TextField
             sx={{ width: '100%' }}
             label="Email"
@@ -188,6 +193,29 @@ export function LocationEditDialog({
             value={formData.email}
             onChange={handleChange}
           />
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <TimePicker
+              label="Opening Time"
+              value={
+                formData.locationOpeningTime ? dayjs(formData.locationOpeningTime, 'HH:mm') : null
+              }
+              onChange={(newValue) => handleTimeChange('locationOpeningTime', newValue)}
+              ampm={false} // ✅ Forces 24-hour format
+              sx={{ width: '100%' }}
+            />
+          </LocalizationProvider>
+
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <TimePicker
+              label="Cutoff Time"
+              value={
+                formData.locationCutoffTime ? dayjs(formData.locationCutoffTime, 'HH:mm') : null
+              }
+              onChange={(newValue) => handleTimeChange('locationCutoffTime', newValue)}
+              ampm={false} // ✅ Forces 24-hour format
+              sx={{ width: '100%' }}
+            />
+          </LocalizationProvider>
         </div>
       </DialogContent>
 

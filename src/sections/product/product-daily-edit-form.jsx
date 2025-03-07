@@ -1,5 +1,5 @@
 import { z as zod } from 'zod';
-import { useForm } from 'react-hook-form';
+import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMemo, useState, useEffect, useCallback } from 'react';
 
@@ -10,75 +10,102 @@ import Divider from '@mui/material/Divider';
 import CardHeader from '@mui/material/CardHeader';
 import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import { Radio, Button, Collapse, RadioGroup, CardContent } from '@mui/material';
+import { Button, Collapse, CardContent, Box, IconButton } from '@mui/material';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 
-import { PRODUCT_CATEGORY_GROUP_OPTIONS } from 'src/_mock';
+import api from 'src/utils/api';
 
 import { toast } from 'src/components/snackbar';
-import { Form, Field, schemaHelper } from 'src/components/hook-form';
+import { Form, Field } from 'src/components/hook-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchCategories } from 'src/utils/Redux/slices/categoriesSlice';
+import { useLocation } from 'react-router';
+import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
 export const NewProductSchema = zod.object({
-  name: zod.string().min(1, { message: 'Name is required!' }),
-  description: schemaHelper.editor({ message: { required_error: 'Description is required!' } }),
-  images: schemaHelper.files({ message: { required_error: 'Images is required!' } }),
-  code: zod.string().min(1, { message: 'Product code is required!' }),
-  sku: zod.string().min(1, { message: 'Product sku is required!' }),
-  quantity: zod.number().min(1, { message: 'Quantity is required!' }),
-  colors: zod.string().array().nonempty({ message: 'Choose at least one option!' }),
-  sizes: zod.string().array().nonempty({ message: 'Choose at least one option!' }),
-  tags: zod.string().array().min(2, { message: 'Must have at least 2 items!' }),
-  gender: zod.string().array().nonempty({ message: 'Choose at least one option!' }),
-  price: zod.number().min(1, { message: 'Price should not be $0.00' }),
-  // Not required
-  category: zod.string(),
-  priceSale: zod.number(),
-  subDescription: zod.string(),
-  taxes: zod.number(),
-  saleLabel: zod.object({ enabled: zod.boolean(), content: zod.string() }),
-  newLabel: zod.object({ enabled: zod.boolean(), content: zod.string() }),
+  mealName: zod.string().min(1, { message: 'Meal Name is required!' }),
+  category_id: zod.number().min(1, { message: 'Category is required!' }),
+  type: zod.enum(['veg', 'non-veg'], { message: 'Type must be "veg" or "non-veg"' }),
+  description: zod.string().min(1, { message: 'Description is required!' }),
+
+  // Validate image structure
+  images: zod.object({
+    url: zod.string().url({ message: 'Valid Image URL required!' }),
+    alt: zod.string().min(1, { message: 'Alt text is required!' }),
+  }),
+
+  weekDetails: zod.array(
+    zod.object({
+      day: zod.string(),
+      price: zod.number().optional(), // ✅ Make these fields optional
+      fat: zod.number().optional(),
+      calorie: zod.number().optional(),
+      protein: zod.number().optional(),
+      items: zod.array(zod.string()).optional(), // ✅ Items can be empty
+    })
+  ),
+  is_subsidised: zod.boolean(),
 });
 
 // ----------------------------------------------------------------------
 
 export function ProductDailyEditForm({ currentProduct }) {
   const [openCard, setOpenCard] = useState(null);
+  const [uploadLoading, setUploadLoading] = useState(false);
 
-  const handleCardClick = (cardName) => {
-    setOpenCard(openCard === cardName ? null : cardName);
+  const { token } = useSelector((state) => state.superAdminAuth);
+  // console.log(token);
+
+  const location = useLocation();
+  const dispatch = useDispatch();
+  const { categories, loading } = useSelector((state) => state.categories);
+
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [location.key, dispatch]);
+
+  const handleCardClick = (index) => {
+    setOpenCard((prev) => (prev === index ? null : index)); // ✅ Toggle using index
   };
 
   const router = useRouter();
 
-  const [includeTaxes, setIncludeTaxes] = useState(false);
+  const daysOfWeek = useMemo(
+    () => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+    []
+  );
 
   const defaultValues = useMemo(
     () => ({
-      name: currentProduct?.name || '',
-      description: currentProduct?.description || '',
-      subDescription: currentProduct?.subDescription || '',
-      images: currentProduct?.images || [],
-      //
-      code: currentProduct?.code || '',
-      sku: currentProduct?.sku || '',
-      price: currentProduct?.price || 0,
-      quantity: currentProduct?.quantity || 0,
-      priceSale: currentProduct?.priceSale || 0,
-      tags: currentProduct?.tags || [],
-      taxes: currentProduct?.taxes || 0,
-      gender: currentProduct?.gender || [],
-      category: currentProduct?.category || PRODUCT_CATEGORY_GROUP_OPTIONS[0].classify[1],
-      colors: currentProduct?.colors || [],
-      sizes: currentProduct?.sizes || [],
-      newLabel: currentProduct?.newLabel || { enabled: false, content: '' },
-      saleLabel: currentProduct?.saleLabel || { enabled: false, content: '' },
+      mealName: currentProduct?.name || '',
+      category_id: currentProduct?.category_id || 1, // Ensure this is an ID
+      type: currentProduct?.type || 'veg', // Default to 'veg' if not provided
+      description: currentProduct?.subDescription || '',
+
+      // Adjust Image format
+      images: {
+        url: currentProduct?.image?.url || '',
+        alt: currentProduct?.mealName || 'meal', // Automatically set alt to mealName
+      },
+      is_subsidised: currentProduct?.is_subsidised ?? false,
+
+      weekDetails: daysOfWeek.map((day) => ({
+        day: day.toLowerCase(),
+        price: currentProduct?.weekDetails?.find((d) => d.day === day.toLowerCase())?.price || 0,
+        fat: currentProduct?.weekDetails?.find((d) => d.day === day.toLowerCase())?.fat || 0,
+        calorie:
+          currentProduct?.weekDetails?.find((d) => d.day === day.toLowerCase())?.calorie || 0,
+        protein:
+          currentProduct?.weekDetails?.find((d) => d.day === day.toLowerCase())?.protein || 0,
+        items: currentProduct?.weekDetails?.find((d) => d.day === day.toLowerCase())?.items || [],
+      })),
     }),
-    [currentProduct]
+
+    [currentProduct, daysOfWeek]
   );
 
   const methods = useForm({
@@ -102,41 +129,126 @@ export function ProductDailyEditForm({ currentProduct }) {
     }
   }, [currentProduct, defaultValues, reset]);
 
-  useEffect(() => {
-    if (includeTaxes) {
-      setValue('taxes', 0);
-    } else {
-      setValue('taxes', currentProduct?.taxes || 0);
+  const validateAndSubmit = () => {
+    const imageUrl = values.images?.url;
+
+    if (!imageUrl) {
+      toast.error('Please upload an image before submitting!');
+      return;
     }
-  }, [currentProduct?.taxes, includeTaxes, setValue]);
+
+    // If image is present, call handleSubmit
+    handleSubmit(onSubmit)();
+  };
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      reset();
-      toast.success(currentProduct ? 'Update success!' : 'Create success!');
-      router.push(paths.dashboard.product.root);
-      console.info('DATA', data);
+      // ✅ Filter out empty days
+      const filteredWeekDetails = data.weekDetails.filter(
+        (day) =>
+          day.price || day.fat || day.calorie || day.protein || (day.items && day.items.length > 0)
+      );
+
+      // ✅ Prepare final payload
+      const formattedData = {
+        mealName: data.mealName,
+        category_id: data.category_id,
+        type: data.type,
+        description: data.description,
+        image: {
+          url: data.images.url,
+          alt: data.images.alt,
+        },
+        weekDetails: filteredWeekDetails, // ✅ Only non-empty days are sent
+        is_subsidised: data.is_subsidised, // ✅ Added is_subsidised field
+      };
+
+      // ✅ Include token in headers
+      const headers = {
+        Authorization: `Bearer ${token}`, // ✅ Add token here
+      };
+
+      // ✅ Send data to API with token
+      const response = await api.post('/superAdmin/add_repeating_meal', formattedData, { headers });
+
+      if (response.data.success) {
+        toast.success(currentProduct ? 'Meal updated successfully!' : 'Meal created successfully!');
+        reset();
+        router.push(paths.dashboard.product.root);
+      } else {
+        toast.error(response.data.message || 'Failed to create meal');
+      }
+
+      console.info('API RESPONSE:', response.data);
     } catch (error) {
-      console.error(error);
+      console.error('Error creating meal:', error);
+      toast.error(error.msg || 'Something went wrong');
     }
   });
 
-  const handleRemoveFile = useCallback(
-    (inputFile) => {
-      const filtered = values.images && values.images?.filter((file) => file !== inputFile);
-      setValue('images', filtered);
-    },
-    [setValue, values.images]
-  );
+  const handleRemoveImage = () => {
+    setValue('images.url', '', { shouldValidate: true });
+  };
 
-  const handleRemoveAllFiles = useCallback(() => {
-    setValue('images', [], { shouldValidate: true });
-  }, [setValue]);
+  const handleImageUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
 
-  const handleChangeIncludeTaxes = useCallback((event) => {
-    setIncludeTaxes(event.target.checked);
-  }, []);
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+
+    if (!allowedTypes.includes(file.type)) {
+      alert('Please upload a valid image file (JPEG, PNG, GIF, or WEBP).');
+      return;
+    }
+
+    if (file.size > maxSize) {
+      alert('File size exceeds 5MB limit. Please upload a smaller image.');
+      return;
+    }
+
+    setUploadLoading(true);
+    const formDataImage = new FormData();
+    formDataImage.append('file', file);
+
+    try {
+      const response = await api.post('/upload_file', formDataImage, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      if (response.data.success) {
+        setValue('images.url', response.data.url, { shouldValidate: true }); // ✅ Replace existing image
+        console.log(response.data);
+        toast.success('Image uploaded successfully!Proceed with adding meal');
+      } else {
+        alert('Image upload failed!');
+      }
+    } catch (error) {
+      console.error('Image upload error:', error);
+      alert(error.message);
+    } finally {
+      setUploadLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    setValue('image.alt', values.mealName);
+  }, [values.mealName, setValue]);
+
+  const { control } = methods; // Extract control from react-hook-form
+
+  // ✅ Fix: Use useMemo to store useFieldArray instances
+  // ✅ Call useFieldArray at the top level
+  const weekDetailsArray = useFieldArray({
+    control: methods.control,
+    name: 'weekDetails',
+  });
+
+  // ✅ Now map over `weekDetailsArray.fields` instead of using `daysOfWeek`
+  const weekDetailsFields = weekDetailsArray.fields.map((field, index) => ({
+    day: field.day, // Assuming `field.day` exists
+    index, // Store index for field reference
+  }));
 
   const renderDetails = (
     <Card>
@@ -149,35 +261,97 @@ export function ProductDailyEditForm({ currentProduct }) {
       <Divider />
 
       <Stack spacing={3} sx={{ p: 3 }}>
-        <Field.Text name="name" label="Meal Name" />
+        <Field.Text name="mealName" label="Meal Name" />
 
         <section style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem' }}>
-          <Field.Text name="category" label="Category" />
-          <Field.Select native name="type" label="Type" InputLabelProps={{ shrink: true }}>
-            <option>Veg</option>
-            <option>Non Veg</option>
+          <Field.Select
+            native
+            name="category_id"
+            label="Category"
+            InputLabelProps={{ shrink: true }}
+            onChange={(e) =>
+              setValue('category_id', Number(e.target.value), { shouldValidate: true })
+            }
+          >
+            {/* <option value="">Select Category</option> */}
+            {categories.map((category) => (
+              <option key={category.category_id} value={category.category_id}>
+                {category.name}
+              </option>
+            ))}
+          </Field.Select>
+          <Field.Select
+            native
+            name="type"
+            label="Type"
+            InputLabelProps={{ shrink: true }}
+            onChange={(e) => setValue('type', e.target.value, { shouldValidate: true })} // ✅ Ensure correct value
+          >
+            <option value="veg">Veg</option>
+            <option value="non-veg">Non-Veg</option>
           </Field.Select>
         </section>
 
-        <Field.Text name="subDescription" label="Description" multiline rows={4} />
+        <Field.Text name="description" label="Description" multiline rows={4} />
+        <Field.Select
+          native
+          name="is_subsidised"
+          label="Is Subsidised?"
+          InputLabelProps={{ shrink: true }}
+          onChange={(e) => setValue('is_subsidised', e.target.value === 'true')} // ✅ Convert to boolean
+        >
+          <option value="true">Yes</option>
+          <option value="false">No</option>
+        </Field.Select>
 
         <Stack spacing={1.5}>
           <Typography variant="subtitle2">Images</Typography>
-          <Field.Upload
-            multiple
-            thumbnail
-            name="images"
-            maxSize={3145728}
-            onRemove={handleRemoveFile}
-            onRemoveAll={handleRemoveAllFiles}
-            onUpload={() => console.info('ON UPLOAD')}
-          />
+
+          {/* Display Uploaded Image */}
+          {values.images?.url && (
+            <Box
+              sx={{
+                position: 'relative',
+                width: '100px',
+                height: '100px',
+                borderRadius: '8px',
+                overflow: 'hidden',
+                border: '1px solid #ccc',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <img
+                src={values.images.url}
+                alt="meal"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+              <IconButton
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  right: 0,
+                  backgroundColor: 'rgba(255, 255, 255, 0.6)',
+                  '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.9)' },
+                }}
+                size="small"
+                onClick={handleRemoveImage}
+              >
+                <Iconify icon="ic:baseline-close" width={12} sx={{ ml: -0.5 }} />
+              </IconButton>
+            </Box>
+          )}
+
+          {/* Upload Button */}
+          <Button variant="contained" component="label">
+            {uploadLoading ? 'Uploading...' : 'Uplaod Image'}
+            <input type="file" hidden onChange={handleImageUpload} />
+          </Button>
         </Stack>
       </Stack>
     </Card>
   );
-
-  const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
   const renderProperties = (
     <Card>
@@ -192,31 +366,78 @@ export function ProductDailyEditForm({ currentProduct }) {
         >
           <CardHeader title="Details" />
           <Stack spacing={3} sx={{ p: 3 }}>
-            {daysOfWeek.map((day) => (
-              <Card
-                key={day}
-                onClick={() => handleCardClick(day.toLowerCase())}
-                sx={{ cursor: 'pointer' }}
-              >
-                <CardHeader title={day} sx={{ padding: '1rem' }} />
-                <Collapse in={openCard === day.toLowerCase()}>
+            {weekDetailsFields.map(({ day, index }) => (
+              <Card key={index} sx={{ cursor: 'pointer' }}>
+                {/* ✅ Move `handleCardClick` only to CardHeader */}
+                <CardHeader
+                  title={day}
+                  sx={{ padding: '1rem', cursor: 'pointer' }}
+                  onClick={() => handleCardClick(index)} // ✅ Use `index` instead of day.toLowerCase()
+                />
+                <Collapse in={openCard === index}>
+                  {' '}
+                  {/* ✅ Compare with `index` instead of day.toLowerCase() */}
                   <CardContent>
                     <Stack spacing={3} sx={{ p: 3 }}>
                       <section
                         style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem' }}
                       >
-                        <Field.Text name="priceRS" label="Price in Rupees" />
-                        <Field.Text name="fat" label="Fat" />
+                        <Field.Text
+                          name={`weekDetails.${index}.price`}
+                          label="Price in Rupees"
+                          type="number"
+                        />
+                        <Field.Text name={`weekDetails.${index}.fat`} label="Fat" type="number" />
                       </section>
 
                       <section
                         style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem' }}
                       >
-                        <Field.Text name="protein" label="Protein" />
-                        <Field.Text name="calorie" label="Calorie" />
+                        <Field.Text
+                          name={`weekDetails.${index}.protein`}
+                          label="Protein"
+                          type="number"
+                        />
+                        <Field.Text
+                          name={`weekDetails.${index}.calorie`}
+                          label="Calorie"
+                          type="number"
+                        />
                       </section>
 
-                      <Field.Text name="subDescription" label="Description" multiline rows={2} />
+                      {/* Dynamic Meal Items List */}
+                      <Stack spacing={2}>
+                        <Typography variant="subtitle2">Meal Items</Typography>
+                        {values.weekDetails?.[index]?.items?.map((item, itemIndex) => (
+                          <Stack key={itemIndex} direction="row" spacing={1} alignItems="center">
+                            <Field.Text
+                              name={`weekDetails.${index}.items.${itemIndex}`}
+                              label={`Item ${itemIndex + 1}`}
+                            />
+                            <Button
+                              onClick={() =>
+                                setValue(
+                                  `weekDetails.${index}.items`,
+                                  values.weekDetails[index].items.filter((_, i) => i !== itemIndex)
+                                )
+                              }
+                            >
+                              Remove
+                            </Button>
+                          </Stack>
+                        ))}
+                        <Button
+                          // sx={{ color: 'white', background: 'black' }}
+                          onClick={() =>
+                            setValue(`weekDetails.${index}.items`, [
+                              ...values.weekDetails[index].items,
+                              '',
+                            ])
+                          }
+                        >
+                          Add Item
+                        </Button>
+                      </Stack>
                     </Stack>
                   </CardContent>
                 </Collapse>
@@ -230,14 +451,20 @@ export function ProductDailyEditForm({ currentProduct }) {
 
   const renderActions = (
     <Stack spacing={3} direction="row" justifyContent="flex-end" flexWrap="wrap">
-      <LoadingButton type="submit" variant="contained" size="large" loading={isSubmitting}>
+      <LoadingButton
+        type="button"
+        variant="contained"
+        size="large"
+        onClick={validateAndSubmit}
+        loading={isSubmitting}
+      >
         {!currentProduct ? 'Create product' : 'Save changes'}
       </LoadingButton>
     </Stack>
   );
 
   return (
-    <Form methods={methods} onSubmit={onSubmit}>
+    <Form methods={methods}>
       <Stack spacing={{ xs: 3, md: 5 }} sx={{ mx: 'auto', maxWidth: { xs: 720, xl: 880 } }}>
         {renderDetails}
 

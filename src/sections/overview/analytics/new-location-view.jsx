@@ -29,8 +29,10 @@ export function NewLocationDialog({ open, onClose, title = 'Add New Location', i
 
   const [formData, setFormData] = useState({
     locationName: '',
-    selectedMeals: [], // ✅ Now an array to store multiple selections
+    selectedMeals: [], // ✅ Keep as an array
     email: '',
+    locationCutoffTime: '',
+    locationOpeningTime: '',
   });
 
   const [loading, setLoading] = useState(false);
@@ -47,6 +49,13 @@ export function NewLocationDialog({ open, onClose, title = 'Add New Location', i
       ...prev,
       selectedMeals:
         typeof selectedValues === 'string' ? selectedValues.split(',') : selectedValues,
+    }));
+  };
+
+  const handleTimeChange = (field, newValue) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: newValue ? dayjs(newValue).format('HH:mm') : '',
     }));
   };
 
@@ -82,9 +91,11 @@ export function NewLocationDialog({ open, onClose, title = 'Add New Location', i
         `/superAdmin/create_location`, // ✅ Sending only required fields
         {
           locationName: formData.locationName,
-          company_id: id, // ✅ Required field
+          company_id: id,
           locationEmail: formData.email,
-          locationMealTime: formData.selectedMeals, // ✅ Now sending an array
+          locationMealTime: formData.selectedMeals,
+          locationCutoffTime: formData.locationCutoffTime,
+          locationOpeningTime: formData.locationOpeningTime,
         },
         {
           headers: {
@@ -107,6 +118,8 @@ export function NewLocationDialog({ open, onClose, title = 'Add New Location', i
           locationName: '',
           selectedMeals: [], // ✅ Now an array to store multiple selections
           email: '',
+          locationCutoffTime: '',
+          locationOpeningTime: '',
         });
 
         // Close the dialog
@@ -196,6 +209,30 @@ export function NewLocationDialog({ open, onClose, title = 'Add New Location', i
             value={formData.email}
             onChange={handleChange}
           />
+
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <TimePicker
+              label="Opening Time"
+              value={
+                formData.locationOpeningTime ? dayjs(formData.locationOpeningTime, 'HH:mm') : null
+              }
+              onChange={(newValue) => handleTimeChange('locationOpeningTime', newValue)}
+              ampm={false} // ✅ Forces 24-hour format
+              sx={{ width: '100%' }}
+            />
+          </LocalizationProvider>
+
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <TimePicker
+              label="Cutoff Time"
+              value={
+                formData.locationCutoffTime ? dayjs(formData.locationCutoffTime, 'HH:mm') : null
+              }
+              onChange={(newValue) => handleTimeChange('locationCutoffTime', newValue)}
+              ampm={false} // ✅ Forces 24-hour format
+              sx={{ width: '100%' }}
+            />
+          </LocalizationProvider>
         </div>
       </DialogContent>
 
