@@ -27,6 +27,7 @@ const ProductDailyCreatePage = lazy(() => import('src/pages/dashboard/product/da
 const ProductLiveCreatePage = lazy(() => import('src/pages/dashboard/product/live'));
 const ProductEditPage = lazy(() => import('src/pages/dashboard/product/edit'));
 const GuestMealPage = lazy(() => import('src/pages/dashboard/product/guest'));
+const ProductOptionsPage = lazy(() => import('src/pages/dashboard/product/options'));
 const ProductCategoryPage = lazy(() => import('src/pages/dashboard/product/category'));
 // Company
 const CompanyListPage = lazy(() => import('src/pages/dashboard/company/list'));
@@ -123,6 +124,7 @@ export const dashboardRoutes = [
           { path: 'list', element: <ProductListPage /> },
           { path: ':id', element: <ProductDetailsPage /> },
           { path: 'new', element: <ProductCreatePage /> },
+          { path: 'options', element: <ProductOptionsPage /> },
           { path: 'daily', element: <ProductDailyCreatePage /> },
           { path: 'live', element: <ProductLiveCreatePage /> },
           { path: ':id/edit', element: <ProductEditPage /> },

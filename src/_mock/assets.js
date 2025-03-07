@@ -261,6 +261,14 @@ export const _rating = [
   '5',
 ]
 
+export const _mealTime = [
+  `Breakfast`,
+  `Lunch`,
+  `Snacks`,
+  `Dinner`,
+  `Midnight Snacks`
+]
+
 export const _remarks = [
   `Delicious`,
   `Tasteful`,
