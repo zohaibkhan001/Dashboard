@@ -44,6 +44,7 @@ import {
   _cutOffTime,
   _createdAt,
   _updatedAt,
+  _mealTime,
 } from './assets';
 
 // ----------------------------------------------------------------------
@@ -102,6 +103,7 @@ export const _mock = {
   remarks : (index) => _remarks[index],
   ratings : (index) => _ratings[index],
   mealItem : (index) => _mealItem[index],
+  mealTime : (index) => _mealTime[index],
   // Image
   image: {
     cover: (index) => `${assetURL}/assets/images/cover/cover-${index + 1}.webp`,

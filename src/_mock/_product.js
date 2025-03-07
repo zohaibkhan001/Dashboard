@@ -1,3 +1,5 @@
+import { _mock } from './_mock';
+
 export const PRODUCT_GENDER_OPTIONS = [
   { label: 'Men', value: 'Men' },
   { label: 'Women', value: 'Women' },
@@ -24,6 +26,23 @@ export const PRODUCT_COLOR_OPTIONS = [
   '#000000',
   '#FFFFFF',
 ];
+
+export const _companiesData = [...Array(20)].map((_, index) => ({
+  id: _mock.id(index),
+  name: _mock.companyNames(index),
+}));
+
+export const _locationData = [...Array(20)].map((_, index) => ({
+  id: _mock.id(index),
+  name: _mock.location(index),
+}));
+
+export const _mealTimeData = [...Array(5)].map((_, index) => ({
+  id: _mock.id(index),
+  name: _mock.mealTime(index),
+}));
+
+
 
 export const PRODUCT_COLOR_NAME_OPTIONS = [
   { value: '#FF4842', label: 'Red' },

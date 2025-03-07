@@ -17,3 +17,5 @@ export * from './product-category-view';
 export * from './product-details-view';
 
 export * from './product-shop-details-view';
+
+export * from './product-options-view';
