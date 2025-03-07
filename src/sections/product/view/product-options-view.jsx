@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -9,6 +9,10 @@ import Typography from '@mui/material/Typography';
 import { LocalizationProvider, StaticDatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
+import { useParams } from 'react-router';
+
+import { fetchCompanies } from 'src/utils/Redux/slices/companiesListSlice';
+import { fetchAllLocations } from 'src/utils/Redux/slices/locationsSlice';
 
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 import { DashboardContent } from 'src/layouts/dashboard';
@@ -18,9 +22,19 @@ import { paths } from 'src/routes/paths';
 import { ProductOptions } from '../product-options';
 
 export function ProductOptionsView() {
+  const dispatch = useDispatch();
   // Fetch companies and locations from Redux
   const { companies } = useSelector((state) => state.allCompanies);
   const { locations } = useSelector((state) => state.allLocations);
+
+  useEffect(() => {
+    dispatch(fetchCompanies());
+    dispatch(fetchAllLocations());
+  }, [dispatch]);
+
+  const { meal_id, meal_type } = useParams();
+  // console.log(meal_id); // Output: 1
+  // console.log(meal_type); // Output: 'liveCounter'
 
   // console.log(companies);
   // console.log(locations);
@@ -54,6 +68,18 @@ export function ProductOptionsView() {
   // Handle location selection
   const handleLocationSelection = (updatedLocations) => {
     setSelectedLocations(updatedLocations);
+  };
+
+  const handleSaveClick = () => {
+    const formattedData = {
+      location_id: selectedLocations, // Array of selected location IDs
+      meal_id: Number(meal_id), // Convert meal_id to a number
+      meal_type, // Directly use the meal type from params
+      meal_time: selectedMealTimes,
+      specific_date: selectedDate.format('YYYY-MM-DD'), // Format the date properly
+    };
+
+    console.log(formattedData);
   };
 
   return (
@@ -135,12 +161,7 @@ export function ProductOptionsView() {
             variant="contained"
             startIcon={<Iconify icon="typcn:tick" />}
             sx={{ width: '8em', marginRight: '2em' }}
-            onClick={() => {
-              console.log('Selected Companies:', selectedCompanies);
-              console.log('Selected Locations:', selectedLocations);
-              console.log('Selected Meal Times:', selectedMealTimes);
-              console.log('Selected Date:', selectedDate.format('YYYY-MM-DD'));
-            }}
+            onClick={handleSaveClick} // Updated here
           >
             Save
           </Button>

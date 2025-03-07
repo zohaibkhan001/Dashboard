@@ -5,6 +5,7 @@ import Divider from '@mui/material/Divider';
 import Checkbox from '@mui/material/Checkbox';
 import CardHeader from '@mui/material/CardHeader';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import { useRouter } from 'src/routes/hooks';
 
 import { Scrollbar } from 'src/components/scrollbar';
 
@@ -20,6 +21,10 @@ export function ProductOptions({
 }) {
   // Debugging: Ensure list has data
   // console.log(`Rendering ${title}:`, list);
+
+  const { query } = useRouter();
+  // console.log(query.meal_id); // Output: 1
+  // console.log(query.meal_type);
 
   // Handle checkbox toggle
   const handleClickComplete = (optionId) => {

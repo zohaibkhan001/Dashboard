@@ -122,9 +122,9 @@ export const dashboardRoutes = [
         children: [
           { element: <ProductListPage />, index: true },
           { path: 'list', element: <ProductListPage /> },
-          { path: ':id', element: <ProductDetailsPage /> },
+          // { path: ':id', element: <ProductDetailsPage /> },
           { path: 'new', element: <ProductCreatePage /> },
-          { path: 'options', element: <ProductOptionsPage /> },
+          { path: 'options/:meal_id/:meal_type', element: <ProductOptionsPage /> },
           { path: 'daily', element: <ProductDailyCreatePage /> },
           { path: 'live', element: <ProductLiveCreatePage /> },
           { path: ':id/edit', element: <ProductEditPage /> },
