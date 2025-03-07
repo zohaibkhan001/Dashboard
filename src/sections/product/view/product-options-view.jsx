@@ -7,6 +7,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Unstable_Grid2';
 import Card from '@mui/material/Card';
+import { Typography } from '@mui/material';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 
 import { DashboardContent } from 'src/layouts/dashboard';
@@ -50,7 +51,10 @@ export function ProductOptionsView() {
             <ProductOptions title="Meal Time" list={_mealTimeData} />
           </Grid>
           <Grid xs={12} md={7} lg={7}>
-          <Card sx={{ p: 1.75, bgcolor: '#FFFFFF', borderRadius: 2 }}>
+            <Card sx={{ p: 0, bgcolor: '#FFFFFF', borderRadius: 2 }}>
+              <Typography variant="h5" sx={{ marginBottom: '-0.9em', ml: 4, mt: 2 }}>
+                Date
+              </Typography>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <StaticDatePicker
                   displayStaticWrapperAs="desktop"
