@@ -101,7 +101,7 @@ export function ProductDailyEditForm({ currentProduct }) {
           currentProduct?.weekDetails?.find((d) => d.day === day.toLowerCase())?.calorie || 0,
         protein:
           currentProduct?.weekDetails?.find((d) => d.day === day.toLowerCase())?.protein || 0,
-        items: currentProduct?.weekDetails?.find((d) => d.day === day.toLowerCase())?.items || [],
+        items: currentProduct?.weekDetails?.find((d) => d.day === day.toLowerCase())?.items || [''],
       })),
     }),
 
@@ -144,12 +144,16 @@ export function ProductDailyEditForm({ currentProduct }) {
   const onSubmit = handleSubmit(async (data) => {
     try {
       // ✅ Filter out empty days
-      const filteredWeekDetails = data.weekDetails.filter(
-        (day) =>
-          day.price || day.fat || day.calorie || day.protein || (day.items && day.items.length > 0)
-      );
+      const filteredWeekDetails = data.weekDetails.filter((day) => {
+        const hasValidItem = day.items && day.items.some((item) => item.trim() !== ''); // ✅ Ensure item is non-empty
+        return day.price || day.fat || day.calorie || day.protein || hasValidItem;
+      });
 
-      // ✅ Prepare final payload
+      // const filteredWeekDetails = data.weekDetails.filter(
+      //   (day) =>
+      //     day.price || day.fat || day.calorie || day.protein || (day.items && day.items.length > 0)
+      // );
+
       const formattedData = {
         mealName: data.mealName,
         category_id: data.category_id,
@@ -159,22 +163,27 @@ export function ProductDailyEditForm({ currentProduct }) {
           url: data.images.url,
           alt: data.images.alt,
         },
-        weekDetails: filteredWeekDetails, // ✅ Only non-empty days are sent
-        is_subsidised: data.is_subsidised, // ✅ Added is_subsidised field
+        weekDetails: filteredWeekDetails,
+        is_subsidised: data.is_subsidised,
       };
 
-      // ✅ Include token in headers
+      console.log(formattedData);
       const headers = {
-        Authorization: `Bearer ${token}`, // ✅ Add token here
+        Authorization: `Bearer ${token}`,
       };
 
-      // ✅ Send data to API with token
       const response = await api.post('/superAdmin/add_repeating_meal', formattedData, { headers });
 
       if (response.data.success) {
         toast.success(currentProduct ? 'Meal updated successfully!' : 'Meal created successfully!');
         reset();
-        router.push(paths.dashboard.product.root);
+
+        console.log(response.data);
+        const meal_id = response.data?.data?.meal_id;
+
+        setTimeout(() => {
+          router.push(`${paths.dashboard.product.options}/${meal_id}/repeating`);
+        }, 2000);
       } else {
         toast.error(response.data.message || 'Failed to create meal');
       }
@@ -407,14 +416,15 @@ export function ProductDailyEditForm({ currentProduct }) {
 
                       {/* Dynamic Meal Items List */}
                       <Stack spacing={2}>
-                        <Typography variant="subtitle2">Meal Items</Typography>
+                        {/* <Typography variant="subtitle2">Description</Typography> */}
                         {values.weekDetails?.[index]?.items?.map((item, itemIndex) => (
                           <Stack key={itemIndex} direction="row" spacing={1} alignItems="center">
                             <Field.Text
-                              name={`weekDetails.${index}.items.${itemIndex}`}
-                              label={`Item ${itemIndex + 1}`}
+                              name={`weekDetails.${index}.items.0`}
+                              // label={`Item ${itemIndex + 1}`}
+                              label="Description"
                             />
-                            <Button
+                            {/* <Button
                               onClick={() =>
                                 setValue(
                                   `weekDetails.${index}.items`,
@@ -423,10 +433,10 @@ export function ProductDailyEditForm({ currentProduct }) {
                               }
                             >
                               Remove
-                            </Button>
+                            </Button> */}
                           </Stack>
                         ))}
-                        <Button
+                        {/* <Button
                           // sx={{ color: 'white', background: 'black' }}
                           onClick={() =>
                             setValue(`weekDetails.${index}.items`, [
@@ -435,8 +445,8 @@ export function ProductDailyEditForm({ currentProduct }) {
                             ])
                           }
                         >
-                          Add Item
-                        </Button>
+                          Add Description
+                        </Button> */}
                       </Stack>
                     </Stack>
                   </CardContent>

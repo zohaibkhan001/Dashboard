@@ -13,6 +13,12 @@ import { useParams } from 'react-router';
 
 import { fetchCompanies } from 'src/utils/Redux/slices/companiesListSlice';
 import { fetchAllLocations } from 'src/utils/Redux/slices/locationsSlice';
+import { toast } from 'sonner';
+import api from 'src/utils/api';
+import { useRouter } from 'src/routes/hooks';
+import { LoadingButton } from '@mui/lab';
+import { Stack } from '@mui/material';
+import { Scrollbar } from 'src/components/scrollbar';
 
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 import { DashboardContent } from 'src/layouts/dashboard';
@@ -23,9 +29,13 @@ import { ProductOptions } from '../product-options';
 
 export function ProductOptionsView() {
   const dispatch = useDispatch();
+  const router = useRouter();
   // Fetch companies and locations from Redux
   const { companies } = useSelector((state) => state.allCompanies);
   const { locations } = useSelector((state) => state.allLocations);
+  const { token } = useSelector((state) => state.superAdminAuth);
+
+  // console.log(token);
 
   useEffect(() => {
     dispatch(fetchCompanies());
@@ -33,17 +43,21 @@ export function ProductOptionsView() {
   }, [dispatch]);
 
   const { meal_id, meal_type } = useParams();
+
   // console.log(meal_id); // Output: 1
   // console.log(meal_type); // Output: 'liveCounter'
 
   // console.log(companies);
   // console.log(locations);
 
+  const [loading, setLoading] = useState(false);
+
   // Track selected companies and locations
   const [selectedCompanies, setSelectedCompanies] = useState([]);
   const [selectedLocations, setSelectedLocations] = useState([]);
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const [selectedMealTimes, setSelectedMealTimes] = useState([]);
+  const [selectedWeekNumber, setSelectedWeekNumber] = useState(dayjs().week());
 
   // Handle company selection
   const handleCompanySelection = (updatedCompanies) => {
@@ -60,6 +74,10 @@ export function ProductOptionsView() {
     setSelectedLocations(updatedLocations);
   };
 
+  const handleWeekSelection = (weekNumber) => {
+    setSelectedWeekNumber(weekNumber);
+  };
+
   // Filter locations based on selected companies
   const filteredLocations = locations.filter((location) =>
     selectedCompanies.includes(location.company_id)
@@ -69,23 +87,73 @@ export function ProductOptionsView() {
   const handleLocationSelection = (updatedLocations) => {
     setSelectedLocations(updatedLocations);
   };
+  //
+  // useEffect(() => {
+  //   console.log(selectedWeekNumber);
+  // }, [selectedWeekNumber]);
 
-  const handleSaveClick = () => {
-    const formattedData = {
+  const handleSaveClick = async () => {
+    const payload = {
       location_id: selectedLocations, // Array of selected location IDs
       meal_id: Number(meal_id), // Convert meal_id to a number
       meal_type, // Directly use the meal type from params
       meal_time: selectedMealTimes,
-      specific_date: selectedDate.format('YYYY-MM-DD'), // Format the date properly
+      ...(meal_type === 'repeating'
+        ? { week_number: selectedWeekNumber } // Use week_number for repeating meals
+        : { specific_date: selectedDate.format('YYYY-MM-DD') }), // Use specific_date otherwise
     };
 
-    console.log(formattedData);
+    // console.log(formattedData);
+    setLoading(true);
+
+    try {
+      const response = await api.post('/superAdmin/add_to_location_menu', payload, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Include token in headers
+        },
+      });
+
+      if (response.status === 200) {
+        toast.success('Meal added to selected company locations!');
+        // console.log('API Response:', response.data);
+
+        setTimeout(() => {
+          router.push(paths.dashboard.product.root);
+        }, 2000);
+      } else {
+        toast.error('Failed to add meal');
+        console.error('Error:', response.data);
+      }
+    } catch (error) {
+      toast.error(error.msg);
+      console.error(error.msg, error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // const handleSaveClick = () => {
+  //   const payload = {
+  //     location_id: selectedLocations, // Array of selected location IDs
+  //     meal_id: Number(meal_id), // Convert meal_id to a number
+  //     meal_type, // Directly use the meal type from params
+  //     meal_time: selectedMealTimes,
+  //     ...(meal_type === 'repeating'
+  //       ? { week_number: selectedWeekNumber } // Use week_number for repeating meals
+  //       : { specific_date: selectedDate.format('YYYY-MM-DD') }), // Use specific_date otherwise
+  //   };
+
+  //   console.log(payload);
+  // };
+
+  const handleCancelClick = () => {
+    router.push(paths.dashboard.product.root);
   };
 
   return (
     <DashboardContent maxWidth="xl">
       <CustomBreadcrumbs
-        heading="Additional Options"
+        heading="Add meal to companies in bulk"
         links={[
           { name: 'Dashboard', href: paths.dashboard.root },
           { name: 'Menu', href: paths.dashboard.product.root },
@@ -141,29 +209,84 @@ export function ProductOptionsView() {
           </Grid>
           <Grid xs={12} md={7} lg={7}>
             <Card sx={{ p: 0, bgcolor: '#FFFFFF', borderRadius: 2 }}>
-              <Typography variant="h5" sx={{ marginBottom: '-0.9em', ml: 4, mt: 2 }}>
-                Date
+              <Typography variant="h5" sx={{ marginBottom: '0.5em', ml: 4, mt: 2 }}>
+                {meal_type === 'repeating' ? 'Select Week Number' : 'Date'}
               </Typography>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
+
+              {meal_type === 'repeating' ? (
+                <Scrollbar sx={{ maxHeight: 310, overflowY: 'auto', p: 2 }}>
+                  <Stack direction="column">
+                    {[...Array(52)].map((_, index) => {
+                      const weekNumber = index + 1;
+                      const currentWeek = dayjs().week(); // Get the current week number
+
+                      if (weekNumber < currentWeek) return null;
+
+                      const weekStart = dayjs()
+                        .week(weekNumber)
+                        .startOf('week')
+                        .add(1, 'day')
+                        .format('MMM D');
+                      const weekEnd = dayjs()
+                        .week(weekNumber)
+                        .endOf('week')
+                        .add(1, 'day')
+                        .format('MMM D');
+
+                      return (
+                        <Button
+                          key={weekNumber}
+                          variant={selectedWeekNumber === weekNumber ? 'contained' : 'outlined'}
+                          onClick={() => handleWeekSelection(weekNumber)}
+                          sx={{ mb: 1 }}
+                        >
+                          Week {weekNumber} ({weekStart} - {weekEnd})
+                        </Button>
+                      );
+                    })}
+                  </Stack>
+                </Scrollbar>
+              ) : (
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <StaticDatePicker
+                    displayStaticWrapperAs="desktop"
+                    value={selectedDate}
+                    onChange={(newValue) => newValue && setSelectedDate(newValue)}
+                  />
+                </LocalizationProvider>
+              )}
+
+              {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <StaticDatePicker
                   displayStaticWrapperAs="desktop"
                   value={selectedDate}
                   onChange={(newValue) => newValue && setSelectedDate(newValue)}
                 />
-              </LocalizationProvider>
+              </LocalizationProvider> */}
             </Card>
           </Grid>
         </Grid>
 
         {/* Save Button */}
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1em' }}>
-          <Button
+          <LoadingButton
+            type="button"
             variant="contained"
             startIcon={<Iconify icon="typcn:tick" />}
-            sx={{ width: '8em', marginRight: '2em' }}
-            onClick={handleSaveClick} // Updated here
+            size="large"
+            onClick={handleSaveClick}
+            loading={loading}
           >
-            Save
+            Add Meal
+          </LoadingButton>
+
+          <Button
+            variant="contained"
+            // startIcon={<Iconify icon="typcn:cross" />}
+            sx={{ width: '8em', marginRight: '2em', ml: '2em' }}
+            onClick={handleCancelClick}
+          >
+            Cancel
           </Button>
         </Box>
       </Grid>

@@ -6,7 +6,7 @@ import { ProductOptionsView } from 'src/sections/product/view';
 
 // ----------------------------------------------------------------------
 
-const metadata = { title: `Bulk Meal Addition | Dashboard - ${CONFIG.site.name}` };
+const metadata = { title: `Bulk Meal Add | Dashboard - ${CONFIG.site.name}` };
 
 export default function Page() {
   return (

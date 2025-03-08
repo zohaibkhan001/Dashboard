@@ -135,55 +135,64 @@ export function ProductLiveEditForm({ currentProduct }) {
     handleSubmit(onSubmit)();
   };
 
-  // const onSubmit = handleSubmit(async (data) => {
-  //   try {
-  //     const mealData = {
-  //       mealName: data.mealName,
-  //       category_id: data.category_id,
-  //       type: data.type,
-  //       description: data.description,
-  //       image: {
-  //         url: data.images.url, // ✅ Ensuring the correct format
-  //         alt: data.mealName, // ✅ Automatically setting the alt to meal name
-  //       },
-  //       price: data.price,
-  //       fat: data.fat,
-  //       calorie: data.calorie,
-  //       protein: data.protein,
-  //       is_subsidised: data.is_subsidised, // ✅ Added is_subsidised field
-  //     };
-
-  //     const response = await api.post('/superAdmin/add_live_counter_meal', mealData, {
-  //       headers: { Authorization: `Bearer ${token}` },
-  //     });
-
-  //     if (response.status === 200) {
-  //       toast.success(currentProduct ? 'Meal updated successfully!' : 'Meal added successfully!');
-  //       reset();
-  //       router.push(paths.dashboard.product.root);
-  //     } else {
-  //       toast.error('Something went wrong. Please try again.');
-  //     }
-  //   } catch (error) {
-  //     toast.error(error.msg || 'Failed to add meal. Please try again.');
-  //   }
-  // });
-
   const onSubmit = handleSubmit(async (data) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      reset();
-      toast.success(currentProduct ? 'Update success!' : 'Create success!');
+      const mealData = {
+        mealName: data.mealName,
+        category_id: data.category_id,
+        type: data.type,
+        description: data.description,
+        image: {
+          url: data.images.url, // ✅ Ensuring the correct format
+          alt: data.mealName, // ✅ Automatically setting the alt to meal name
+        },
+        price: data.price,
+        fat: data.fat,
+        calorie: data.calorie,
+        protein: data.protein,
+        is_subsidised: data.is_subsidised, // ✅ Added is_subsidised field
+      };
 
-      setTimeout(() => {
-        router.push(`${paths.dashboard.product.options}/1/liveCounter`);
-      }, 2000);
+      const response = await api.post('/superAdmin/add_live_counter_meal', mealData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-      console.info('DATA', data);
+      if (response.status === 200) {
+        toast.success(currentProduct ? 'Meal updated successfully!' : 'Meal added successfully!');
+        reset();
+
+        // console.log(response.data);
+
+        const meal_id = response.data?.data?.meal_id;
+
+        setTimeout(() => {
+          router.push(`${paths.dashboard.product.options}/${meal_id}/liveCounter`);
+        }, 2000);
+
+        // router.push(paths.dashboard.product.root);
+      } else {
+        toast.error('Something went wrong. Please try again.');
+      }
     } catch (error) {
-      console.error(error);
+      toast.error(error.msg || 'Failed to add meal. Please try again.');
     }
   });
+
+  // const onSubmit = handleSubmit(async (data) => {
+  //   try {
+  //     await new Promise((resolve) => setTimeout(resolve, 500));
+  //     reset();
+  //     toast.success(currentProduct ? 'Update success!' : 'Create success!');
+
+  //     setTimeout(() => {
+  //       router.push(`${paths.dashboard.product.options}/1/liveCounter`);
+  //     }, 2000);
+
+  //     console.info('DATA', data);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // });
 
   // const handleRemoveFile = useCallback(
   //   (inputFile) => {
