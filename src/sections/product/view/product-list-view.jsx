@@ -31,17 +31,15 @@ import { Iconify } from 'src/components/iconify';
 import { EmptyContent } from 'src/components/empty-content';
 import { ConfirmDialog } from 'src/components/custom-dialog';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchLiveCounterMeals } from 'src/utils/Redux/slices/liveCounterMeals';
+import { fetchRepeatingMeals } from 'src/utils/Redux/slices/dailyMealsSlice';
+import { fetchQuickMeals } from 'src/utils/Redux/slices/quickMealSlice';
 
 import { ProductTableToolbar } from '../product-table-toolbar';
 import { ProductTableFiltersResult } from '../product-table-filters-result';
 import { FileManagerNewFolderDialog } from '../product-new-category-dialog';
-import {
-  RenderCellStock,
-  RenderCellPrice,
-  RenderCellPublish,
-  RenderCellProduct,
-  RenderCellCreatedAt,
-} from '../product-table-row';
+import { RenderCellPrice, RenderCellPublish, RenderCellProduct } from '../product-table-row';
 
 // ----------------------------------------------------------------------
 
@@ -57,13 +55,13 @@ const HIDE_COLUMNS_TOGGLABLE = ['category', 'actions'];
 // ----------------------------------------------------------------------
 
 export function ProductListView() {
+  const dispatch = useDispatch();
+
   const confirmRows = useBoolean();
 
   const router = useRouter();
 
   const upload = useBoolean();
-
-  const { products, productsLoading } = useGetProducts();
 
   const filters = useSetState({ publish: [], stock: [] });
 
@@ -74,12 +72,6 @@ export function ProductListView() {
   const [filterButtonEl, setFilterButtonEl] = useState(null);
 
   const [columnVisibilityModel, setColumnVisibilityModel] = useState(HIDE_COLUMNS);
-
-  useEffect(() => {
-    if (products.length) {
-      setTableData(products);
-    }
-  }, [products]);
 
   const canReset = filters.state.publish.length > 0 || filters.state.stock.length > 0;
 
@@ -134,31 +126,31 @@ export function ProductListView() {
   );
 
   const columns = [
-    { field: 'category', headerName: 'Category', filterable: false },
+    {
+      field: 'meal_id',
+      headerName: 'Meal ID',
+      width: 100,
+      hideable: false,
+    },
     {
       field: 'name',
-      headerName: 'Product',
+      headerName: 'Name',
       flex: 1,
-      minWidth: 360,
+      minWidth: 260,
       hideable: false,
       renderCell: (params) => (
         <RenderCellProduct params={params} onViewRow={() => handleViewRow(params.row.id)} />
       ),
     },
-    {
-      field: 'createdAt',
-      headerName: 'Create at',
-      width: 160,
-      renderCell: (params) => <RenderCellCreatedAt params={params} />,
-    },
-    {
-      field: 'inventoryType',
-      headerName: 'Ratings',
-      width: 160,
-      type: 'singleSelect',
-      valueOptions: PRODUCT_STOCK_OPTIONS,
-      renderCell: (params) => <RenderCellStock params={params} />,
-    },
+    // {
+    //   field: 'image',
+    //   headerName: 'Image',
+    //   width: 100,
+    //   renderCell: (params) => (
+    //     <img src={params.value} alt="Meal" style={{ width: 50, height: 50, borderRadius: 5 }} />
+    //   ),
+    // },
+
     {
       field: 'price',
       headerName: 'Price',
@@ -167,13 +159,19 @@ export function ProductListView() {
       renderCell: (params) => <RenderCellPrice params={params} />,
     },
     {
-      field: 'publish',
+      field: 'type',
       headerName: 'Meal Type',
       width: 110,
       type: 'singleSelect',
       editable: true,
       valueOptions: PUBLISH_OPTIONS,
       renderCell: (params) => <RenderCellPublish params={params} />,
+    },
+    {
+      field: 'is_subsidised',
+      headerName: 'Subsidised',
+      width: 130,
+      renderCell: (params) => (params.value ? 'Yes' : 'No'),
     },
     {
       type: 'actions',
@@ -216,7 +214,6 @@ export function ProductListView() {
       .filter((column) => !HIDE_COLUMNS_TOGGLABLE.includes(column.field))
       .map((column) => column.field);
 
-
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
@@ -227,6 +224,67 @@ export function ProductListView() {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const [selectedMenu, setSelectedMenu] = useState('quick');
+  const [masterMenuAnchorEl, setMasterMenuAnchorEl] = useState(null);
+  const masterMenuOpen = Boolean(masterMenuAnchorEl);
+
+  const handleMasterMenuClick = (event) => {
+    setMasterMenuAnchorEl(event.currentTarget); // Opens dropdown
+  };
+
+  const handleMasterMenuClose = () => {
+    setMasterMenuAnchorEl(null); // Closes dropdown
+  };
+
+  const handleMenuItemClick = (menuType) => {
+    setSelectedMenu(menuType); // Stores clicked menu type
+    setMasterMenuAnchorEl(null); // Closes dropdown after selection
+  };
+
+  // useEffect(() => {
+  //   console.log(selectedMenu);
+  // }, [selectedMenu]);
+
+  const { liveCounterMeals } = useSelector((state) => state.liveCounterMeals);
+  const { repeatingMeals } = useSelector((state) => state.repeatingMeals);
+  const { quickMeals } = useSelector((state) => state.quickMeals);
+
+  const MENU_LABELS = {
+    quick: 'Upgraded Meal',
+    repeating: 'Daily Meal',
+    liveCounter: 'Live Counter',
+  };
+
+  // console.log(liveCounterMeals);
+  // console.log(repeatingMeals);
+  // console.log(quickMeals);
+
+  useEffect(() => {
+    dispatch(fetchLiveCounterMeals());
+    dispatch(fetchRepeatingMeals());
+    dispatch(fetchQuickMeals());
+  }, [dispatch]);
+
+  useEffect(() => {
+    const formatMeals = (meals) =>
+      meals?.length
+        ? meals.map((meal) => ({
+            ...meal,
+            id: meal.meal_id, // Assign meal_id as id
+            image: JSON.parse(meal.image)?.url || '', // Extract image URL
+            categoryName: meal.category?.name || 'Uncategorized', // Handle category name
+          }))
+        : [];
+
+    if (selectedMenu === 'quick') {
+      setTableData(formatMeals(quickMeals));
+    } else if (selectedMenu === 'repeating') {
+      setTableData(formatMeals(repeatingMeals));
+    } else if (selectedMenu === 'liveCounter') {
+      setTableData(formatMeals(liveCounterMeals));
+    }
+  }, [selectedMenu, quickMeals, repeatingMeals, liveCounterMeals]);
 
   return (
     <>
@@ -240,6 +298,28 @@ export function ProductListView() {
           ]}
           action={
             <Stack direction="row" spacing={2}>
+              <Button
+                variant="contained"
+                startIcon={<Iconify icon="lets-icons:arrow-drop-down-big" />}
+                onClick={handleMasterMenuClick} // Opens dropdown menu
+              >
+                Master Menu Meal Type - {MENU_LABELS[selectedMenu] || 'Select'}
+              </Button>
+
+              <Menu
+                anchorEl={masterMenuAnchorEl}
+                open={masterMenuOpen}
+                onClose={handleMasterMenuClose}
+              >
+                <Box sx={{ width: '20vh' }}>
+                  <MenuItem onClick={() => handleMenuItemClick('quick')}>Upgraded Meal</MenuItem>
+                  <MenuItem onClick={() => handleMenuItemClick('repeating')}>Daily Meal</MenuItem>
+                  <MenuItem onClick={() => handleMenuItemClick('liveCounter')}>
+                    Live Counter
+                  </MenuItem>
+                </Box>
+              </Menu>
+
               <Button
                 variant="contained"
                 startIcon={<Iconify icon="mingcute:add-line" />}
@@ -268,14 +348,19 @@ export function ProductListView() {
                 New product
               </Button>
               <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-                <Box sx={{width: '10.5vw'}}>
-                <MenuItem component={RouterLink} href={paths.dashboard.product.new}>Upgraded Meal</MenuItem>
-                <MenuItem component={RouterLink} href={paths.dashboard.product.daily}>Daily Meal</MenuItem>
-                <MenuItem component={RouterLink} href={paths.dashboard.product.live}>Live Counter</MenuItem>
+                <Box sx={{ width: '10.5vw' }}>
+                  <MenuItem component={RouterLink} href={paths.dashboard.product.new}>
+                    Upgraded Meal
+                  </MenuItem>
+                  <MenuItem component={RouterLink} href={paths.dashboard.product.daily}>
+                    Daily Meal
+                  </MenuItem>
+                  <MenuItem component={RouterLink} href={paths.dashboard.product.live}>
+                    Live Counter
+                  </MenuItem>
                 </Box>
               </Menu>
             </Stack>
-
           }
           sx={{ mb: { xs: 3, md: 5 } }}
         />
@@ -284,16 +369,17 @@ export function ProductListView() {
           sx={{
             flexGrow: { md: 1 },
             display: { md: 'flex' },
-            height: { xs: 800, md: 2 },
+            height: { xs: '85vh', md: '90vh' },
             flexDirection: { md: 'column' },
           }}
         >
           <DataGrid
-            checkboxSelection
+            getRowId={(row) => row.meal_id} // Assign meal_id as id
+            // checkboxSelection
             disableRowSelectionOnClick
-            rows={dataFiltered}
+            rows={tableData}
             columns={columns}
-            loading={productsLoading}
+            // loading={productsLoading}
             getRowHeight={() => 'auto'}
             pageSizeOptions={[5, 10, 25]}
             initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}

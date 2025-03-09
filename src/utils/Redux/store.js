@@ -13,6 +13,9 @@ import fetchLocationsReducers from './slices/companyLocationSlice';
 import companyOrderReducers from './slices/companyOrderSlice';
 import categoriesReducers from './slices/categoriesSlice';
 import locationsReducers from './slices/locationsSlice';
+import liveCounterMealReducers from './slices/liveCounterMeals';
+import repeatingMealReducers from './slices/dailyMealsSlice';
+import quickMealReducers from './slices/quickMealSlice';
 
 // 🔹 Combine Reducers
 const rootReducer = combineReducers({
@@ -26,6 +29,9 @@ const rootReducer = combineReducers({
   companyOrders: companyOrderReducers,
   categories: categoriesReducers,
   allLocations: locationsReducers,
+  liveCounterMeals: liveCounterMealReducers,
+  repeatingMeals: repeatingMealReducers,
+  quickMeals: quickMealReducers,
 });
 
 // 🔹 Persist Configuration

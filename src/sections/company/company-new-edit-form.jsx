@@ -155,7 +155,8 @@ export function CompanyNewEditForm({ currentProduct }) {
       city: data.city,
       zip: data.zip.toString(), // Ensure zip is string
       subsidiaryType: data.type, // Map type to subsidiaryType
-      companyType: 'veg', // Static value
+      companyType: data.vegOnly.enabled ? 'veg' : 'non-veg',
+      isLiveCounter: data.liveCounter.enabled,
       contacts: data.contacts.map((contact) => ({
         name: contact.name,
         number: contact.number || '',
@@ -173,7 +174,6 @@ export function CompanyNewEditForm({ currentProduct }) {
     // console.log('📦 Formatted Data:', formattedData);
     // console.table(formattedData); // Log structured data
 
-    // Dispatch action to create company
     dispatch(createCompany(formattedData))
       .then((result) => {
         if (result.meta.requestStatus === 'fulfilled') {
@@ -252,7 +252,7 @@ export function CompanyNewEditForm({ currentProduct }) {
         >
           <Field.Select native name="type" label="Subsidy Type" InputLabelProps={{ shrink: true }}>
             <option>Flat</option>
-            <option>Fixed</option>
+            {/* <option>Fixed</option> */}
           </Field.Select>
           <Field.Text type="number" name="subsidyValue" label="Subsidy Value" />
         </section>
