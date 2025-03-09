@@ -77,16 +77,11 @@ export function ProductListView() {
 
   const dataFiltered = applyFilter({ inputData: tableData, filters: filters.state });
 
-  const handleDeleteRow = useCallback(
-    (id) => {
-      const deleteRow = tableData.filter((row) => row.id !== id);
+  const [confirmDelete, setConfirmDelete] = useState({ open: false, id: null });
 
-      toast.success('Delete success!');
-
-      setTableData(deleteRow);
-    },
-    [tableData]
-  );
+  const handleDeleteRow = useCallback((id) => {
+    setConfirmDelete({ open: true, id }); // Open confirmation dialog with row ID
+  }, []);
 
   const handleDeleteRows = useCallback(() => {
     const deleteRows = tableData.filter((row) => !selectedRowIds.includes(row.id));
@@ -184,12 +179,12 @@ export function ProductListView() {
       filterable: false,
       disableColumnMenu: true,
       getActions: (params) => [
-        <GridActionsCellItem
-          showInMenu
-          icon={<Iconify icon="solar:eye-bold" />}
-          label="View"
-          onClick={() => handleViewRow(params.row.id)}
-        />,
+        // <GridActionsCellItem
+        //   showInMenu
+        //   icon={<Iconify icon="solar:eye-bold" />}
+        //   label="View"
+        //   onClick={() => handleViewRow(params.row.id)}
+        // />,
         <GridActionsCellItem
           showInMenu
           icon={<Iconify icon="solar:pen-bold" />}
@@ -200,9 +195,7 @@ export function ProductListView() {
           showInMenu
           icon={<Iconify icon="solar:trash-bin-trash-bold" />}
           label="Delete"
-          onClick={() => {
-            handleDeleteRow(params.row.id);
-          }}
+          onClick={() => handleDeleteRow(params.row.id)} // Trigger confirmation
           sx={{ color: 'error.main' }}
         />,
       ],
@@ -267,24 +260,56 @@ export function ProductListView() {
   }, [dispatch]);
 
   useEffect(() => {
-    const formatMeals = (meals) =>
+    const formatAndSortMeals = (meals) =>
       meals?.length
-        ? meals.map((meal) => ({
-            ...meal,
-            id: meal.meal_id, // Assign meal_id as id
-            image: JSON.parse(meal.image)?.url || '', // Extract image URL
-            categoryName: meal.category?.name || 'Uncategorized', // Handle category name
-          }))
+        ? meals
+            .map((meal) => ({
+              ...meal,
+              id: meal.meal_id, // Assign meal_id as id
+              image: JSON.parse(meal.image)?.url || '', // Extract image URL
+              categoryName: meal.category?.name || 'Uncategorized', // Handle category name
+              createdAt: meal.createdAt ? new Date(meal.createdAt) : null, // Convert to Date object for sorting
+            }))
+            .sort((a, b) => (b.createdAt && a.createdAt ? b.createdAt - a.createdAt : 0)) // Sort by latest
+            .map(({ createdAt, ...meal }) => meal) // Remove createdAt from display
         : [];
 
     if (selectedMenu === 'quick') {
-      setTableData(formatMeals(quickMeals));
+      setTableData(formatAndSortMeals(quickMeals));
     } else if (selectedMenu === 'repeating') {
-      setTableData(formatMeals(repeatingMeals));
+      setTableData(formatAndSortMeals(repeatingMeals));
     } else if (selectedMenu === 'liveCounter') {
-      setTableData(formatMeals(liveCounterMeals));
+      setTableData(formatAndSortMeals(liveCounterMeals));
     }
   }, [selectedMenu, quickMeals, repeatingMeals, liveCounterMeals]);
+
+  const confirmDeleteRow = () => {
+    if (confirmDelete.id !== null) {
+      setTableData((prevData) => prevData.filter((row) => row.id !== confirmDelete.id));
+      toast.success('Delete success!');
+    }
+    setConfirmDelete({ open: false, id: null });
+  };
+
+  // useEffect(() => {
+  //   const formatMeals = (meals) =>
+  //     meals?.length
+  //       ? meals.map((meal) => ({
+  //           ...meal,
+  //           id: meal.meal_id, // Assign meal_id as id
+  //           image: JSON.parse(meal.image)?.url || '', // Extract image URL
+  //           categoryName: meal.category?.name || 'Uncategorized', // Handle category name
+  //         }))
+  //       : [];
+
+  //   if (selectedMenu === 'quick') {
+  //     setTableData(formatMeals(quickMeals));
+  //   } else if (selectedMenu === 'repeating') {
+  //     setTableData(formatMeals(repeatingMeals));
+  //   } else if (selectedMenu === 'liveCounter') {
+  //     setTableData(formatMeals(liveCounterMeals));
+  //   }
+  // }, [selectedMenu, quickMeals, repeatingMeals, liveCounterMeals]);
 
   return (
     <>
@@ -404,22 +429,15 @@ export function ProductListView() {
       <FileManagerNewFolderDialog open={upload.value} onClose={upload.onFalse} />
 
       <ConfirmDialog
-        open={confirmRows.value}
-        onClose={confirmRows.onFalse}
+        open={confirmDelete.open}
+        onClose={() => setConfirmDelete({ open: false, id: null })}
         title="Delete"
-        content={
-          <>
-            Are you sure want to delete <strong> {selectedRowIds.length} </strong> items?
-          </>
-        }
+        content={<>Are you sure want to delete</>}
         action={
           <Button
             variant="contained"
             color="error"
-            onClick={() => {
-              handleDeleteRows();
-              confirmRows.onFalse();
-            }}
+            onClick={confirmDeleteRow} // Call function to delete row
           >
             Delete
           </Button>

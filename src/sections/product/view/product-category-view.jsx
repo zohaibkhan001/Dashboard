@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
@@ -22,6 +22,8 @@ import { fIsAfter, fIsBetween } from 'src/utils/format-time';
 import { varAlpha } from 'src/theme/styles';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { _orders, ORDER_STATUS_OPTIONS } from 'src/_mock';
+import { useSelector } from 'react-redux';
+import api from 'src/utils/api';
 
 import { Label } from 'src/components/label';
 import { toast } from 'src/components/snackbar';
@@ -52,21 +54,40 @@ import { FileManagerNewFolderDialog } from '../product-new-category-dialog';
 // const STATUS_OPTIONS = [{ value: 'all', label: 'All' }, ...ORDER_STATUS_OPTIONS];
 
 const TABLE_HEAD = [
-  { id: 'categoryImage', label: 'Category Image', sx: { width: '50%', textAlign: 'center' } },
-  { id: 'categoryName', label: 'Category Name', sx: { width: '50%', textAlign: 'center' } },
+  { id: 'image', label: 'Category Image', sx: { width: '50%', textAlign: 'center' } },
+  { id: 'name', label: 'Category Name', sx: { width: '50%', textAlign: 'center' } },
   { id: '', width: 88, sx: { textAlign: 'right' } }, // Keep actions column right-aligned
 ];
 
 // ----------------------------------------------------------------------
 
 export function ProductCategoryListView() {
-  const table = useTable({ defaultOrderBy: 'orderNumber' });
+  const table = useTable();
 
   const router = useRouter();
 
   const confirm = useBoolean();
 
-  const [tableData, setTableData] = useState(_orders);
+  const [tableData, setTableData] = useState([]);
+
+  const { categories } = useSelector((state) => state.categories);
+  // console.log(categories);
+
+  const { token } = useSelector((state) => state.superAdminAuth);
+
+  useEffect(() => {
+    const formattedCategories = categories?.length
+      ? categories
+          .map((category) => ({
+            ...category,
+            id: category.category_id, // Ensure unique id for DataGrid
+            image: category.image || 'https://via.placeholder.com/100', // Placeholder if null
+          }))
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Sort latest first
+      : [];
+
+    setTableData(formattedCategories);
+  }, [categories]);
 
   const filters = useSetState({
     name: '',
@@ -94,16 +115,23 @@ export function ProductCategoryListView() {
   const notFound = (!dataFiltered.length && canReset) || !dataFiltered.length;
 
   const handleDeleteRow = useCallback(
-    (id) => {
-      const deleteRow = tableData.filter((row) => row.id !== id);
+    async (id) => {
+      try {
+        await api.delete(`/superAdmin/categories/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-      toast.success('Delete success!');
+        const deleteRow = tableData.filter((row) => row.id !== id);
+        setTableData(deleteRow);
+        table.onUpdatePageDeleteRow(dataInPage.length);
 
-      setTableData(deleteRow);
-
-      table.onUpdatePageDeleteRow(dataInPage.length);
+        toast.success('Category deleted successfully!');
+      } catch (error) {
+        toast.error(error.msg);
+        console.error('Delete error:', error);
+      }
     },
-    [dataInPage.length, table, tableData]
+    [dataInPage.length, table, tableData, token]
   );
 
   const handleDeleteRows = useCallback(() => {
@@ -147,17 +175,14 @@ export function ProductCategoryListView() {
               >
                 New Categories
               </Button>
-              
-
-              </Stack>
-              }
-              sx={{ mb: { xs: 3, md: 5 } }}
+            </Stack>
+          }
+          sx={{ mb: { xs: 3, md: 5 } }}
         />
 
-<FileManagerNewFolderDialog open={upload.value} onClose={upload.onFalse} />
+        <FileManagerNewFolderDialog open={upload.value} onClose={upload.onFalse} />
 
         <Card>
-
           {/* <CategoryTableToolbar
             filters={filters}
             onResetPage={table.onResetPage}
@@ -211,7 +236,7 @@ export function ProductCategoryListView() {
                 />
 
                 <TableBody>
-                  {dataFiltered
+                  {tableData
                     .slice(
                       table.page * table.rowsPerPage,
                       table.page * table.rowsPerPage + table.rowsPerPage
@@ -229,7 +254,7 @@ export function ProductCategoryListView() {
 
                   <TableEmptyRows
                     height={table.dense ? 56 : 56 + 20}
-                    emptyRows={emptyRows(table.page, table.rowsPerPage, dataFiltered.length)}
+                    emptyRows={emptyRows(table.page, table.rowsPerPage, tableData.length)}
                   />
 
                   <TableNoData notFound={notFound} />
@@ -310,4 +335,3 @@ function applyFilter({ inputData, comparator, filters, dateError }) {
 
   return inputData;
 }
-

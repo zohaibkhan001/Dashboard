@@ -38,7 +38,7 @@ export function CategoryTableRow({ row, selected, onSelectRow, onDeleteRow }) {
   const [selectedCategory, setSelectedCategory] = useState(null);
 
   const handleEditCategory = (category) => {
-    setSelectedCategory(category);
+    setSelectedCategory(category.category_id); // ✅ Store only category_id
     setOpenEdit(true);
   };
 
@@ -54,13 +54,15 @@ export function CategoryTableRow({ row, selected, onSelectRow, onDeleteRow }) {
 
       <TableCell sx={{ width: '50%', textAlign: 'center' }}>
         <Stack spacing={2} direction="row" alignItems="center" justifyContent="center">
-          <Avatar alt={row.customer.name} src={row.customer.avatarUrl} />
+          <Avatar
+            alt={row.name}
+            src={row.image || 'https://via.placeholder.com/100'}
+            sx={{ width: 100, height: 100, borderRadius: 2 }}
+          />
         </Stack>
       </TableCell>
 
-      <TableCell sx={{ width: '50%', textAlign: 'center' }}>
-        <p>Category Name</p>
-      </TableCell>
+      <TableCell sx={{ width: '50%', textAlign: 'center' }}>{row.name}</TableCell>
 
       <TableCell align="right" sx={{ px: 1, whiteSpace: 'nowrap' }}>
         <IconButton color={popover.open ? 'inherit' : 'default'} onClick={popover.onOpen}>
@@ -70,62 +72,61 @@ export function CategoryTableRow({ row, selected, onSelectRow, onDeleteRow }) {
     </TableRow>
   );
 
+  // const renderSecondary = (
+  //   <TableRow>
+  //     <TableCell sx={{ p: 0, border: 'none' }} colSpan={8}>
+  //       <Collapse
+  //         in={collapse.value}
+  //         timeout="auto"
+  //         unmountOnExit
+  //         sx={{ bgcolor: 'background.neutral' }}
+  //       >
+  //         <Paper sx={{ m: 1.5 }}>
+  //           {row.items.map((item) => (
+  //             <Stack
+  //               key={item.id}
+  //               direction="row"
+  //               alignItems="center"
+  //               sx={{
+  //                 p: (theme) => theme.spacing(1.5, 2, 1.5, 1.5),
+  //                 '&:not(:last-of-type)': {
+  //                   borderBottom: (theme) => `solid 2px ${theme.vars.palette.background.neutral}`,
+  //                 },
+  //               }}
+  //             >
+  //               <Avatar
+  //                 src={item.coverUrl}
+  //                 variant="rounded"
+  //                 sx={{ width: 48, height: 48, mr: 2 }}
+  //               />
 
-  const renderSecondary = (
-    <TableRow>
-      <TableCell sx={{ p: 0, border: 'none' }} colSpan={8}>
-        <Collapse
-          in={collapse.value}
-          timeout="auto"
-          unmountOnExit
-          sx={{ bgcolor: 'background.neutral' }}
-        >
-          <Paper sx={{ m: 1.5 }}>
-            {row.items.map((item) => (
-              <Stack
-                key={item.id}
-                direction="row"
-                alignItems="center"
-                sx={{
-                  p: (theme) => theme.spacing(1.5, 2, 1.5, 1.5),
-                  '&:not(:last-of-type)': {
-                    borderBottom: (theme) => `solid 2px ${theme.vars.palette.background.neutral}`,
-                  },
-                }}
-              >
-                <Avatar
-                  src={item.coverUrl}
-                  variant="rounded"
-                  sx={{ width: 48, height: 48, mr: 2 }}
-                />
+  //               <ListItemText
+  //                 primary={item.name}
+  //                 secondary={item.sku}
+  //                 primaryTypographyProps={{ typography: 'body2' }}
+  //                 secondaryTypographyProps={{
+  //                   component: 'span',
+  //                   color: 'text.disabled',
+  //                   mt: 0.5,
+  //                 }}
+  //               />
 
-                <ListItemText
-                  primary={item.name}
-                  secondary={item.sku}
-                  primaryTypographyProps={{ typography: 'body2' }}
-                  secondaryTypographyProps={{
-                    component: 'span',
-                    color: 'text.disabled',
-                    mt: 0.5,
-                  }}
-                />
+  //               <div>x{item.quantity} </div>
 
-                <div>x{item.quantity} </div>
-
-                <Box sx={{ width: 110, textAlign: 'right' }}>{fCurrency(item.price)}</Box>
-              </Stack>
-            ))}
-          </Paper>
-        </Collapse>
-      </TableCell>
-    </TableRow>
-  );
+  //               <Box sx={{ width: 110, textAlign: 'right' }}>{fCurrency(item.price)}</Box>
+  //             </Stack>
+  //           ))}
+  //         </Paper>
+  //       </Collapse>
+  //     </TableCell>
+  //   </TableRow>
+  // );
 
   return (
     <>
       {renderPrimary}
 
-      {renderSecondary}
+      {/* {renderSecondary} */}
 
       <CustomPopover
         open={popover.open}
@@ -134,6 +135,7 @@ export function CategoryTableRow({ row, selected, onSelectRow, onDeleteRow }) {
         slotProps={{ arrow: { placement: 'right-top' } }}
       >
         <MenuList>
+          {/* ✅ Fix: Ensure delete action applies to category */}
           <MenuItem
             onClick={() => {
               confirm.onTrue();
@@ -145,10 +147,11 @@ export function CategoryTableRow({ row, selected, onSelectRow, onDeleteRow }) {
             Delete
           </MenuItem>
 
+          {/* ✅ Fix: Ensure edit action works with categories */}
           <MenuItem
             onClick={() => {
-              handleEditCategory(row); // Pass the row data
-              popover.onClose(); // Close the popover
+              handleEditCategory(row);
+              popover.onClose();
             }}
           >
             <Iconify icon="material-symbols:edit-rounded" />
@@ -161,16 +164,23 @@ export function CategoryTableRow({ row, selected, onSelectRow, onDeleteRow }) {
         open={confirm.value}
         onClose={confirm.onFalse}
         title="Delete"
-        content="Are you sure want to delete?"
+        content={`Are you sure you want to delete the category "${row.name}"?`}
         action={
-          <Button variant="contained" color="error" onClick={onDeleteRow}>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => {
+              onDeleteRow(); // Ensure this function correctly removes the category
+              confirm.onFalse();
+            }}
+          >
             Delete
           </Button>
         }
       />
 
       <CategoryEditForm
-        currentUser={selectedCategory}
+        categoryId={selectedCategory} // ✅ Pass category_id as a prop
         open={openEdit}
         onClose={() => setOpenEdit(false)}
       />
