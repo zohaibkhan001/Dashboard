@@ -105,7 +105,7 @@ export function OverviewAnalyticsView() {
         >
           <Button
             component={RouterLink}
-            href={paths.dashboard.kanban}
+            href={`${paths.dashboard.company.addmeal}/${id}`}
             size="small"
             color="inherit"
             startIcon={<Iconify icon="mingcute:add-line" width={12} sx={{ ml: -0.5 }} />}

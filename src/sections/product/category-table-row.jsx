@@ -164,7 +164,7 @@ export function CategoryTableRow({ row, selected, onSelectRow, onDeleteRow }) {
         open={confirm.value}
         onClose={confirm.onFalse}
         title="Delete"
-        content={`Are you sure you want to delete the category "${row.name}"?`}
+        content={`Are you sure you want to delete the category "${row.name}"? The meals associated with "${row.name}" will also be deleted!`}
         action={
           <Button
             variant="contained"

@@ -29,7 +29,14 @@ const ProductEditPage = lazy(() => import('src/pages/dashboard/product/edit'));
 const GuestMealPage = lazy(() => import('src/pages/dashboard/product/guest'));
 const ProductOptionsPage = lazy(() => import('src/pages/dashboard/product/options'));
 const ProductCategoryPage = lazy(() => import('src/pages/dashboard/product/category'));
+
+const QuickEditPage = lazy(() => import('src/pages/dashboard/product/quick-edit'));
+const LiveEditPage = lazy(() => import('src/pages/dashboard/product/live-edit'));
+const DailyEditPage = lazy(() => import('src/pages/dashboard/product/daily-edit'));
+
 // Company
+const CompanyAddMealPage = lazy(() => import('src/pages/dashboard/company/addMeal'));
+
 const CompanyListPage = lazy(() => import('src/pages/dashboard/company/list'));
 // const CompanyDetailsPage = lazy(() => import('src/pages/dashboard/company/details'));
 const CompanyCreatePage = lazy(() => import('src/pages/dashboard/company/new'));
@@ -125,6 +132,10 @@ export const dashboardRoutes = [
           // { path: ':id', element: <ProductDetailsPage /> },
           { path: 'new', element: <ProductCreatePage /> },
           { path: 'options/:meal_id/:meal_type', element: <ProductOptionsPage /> },
+          { path: 'dailyedit/:meal_id', element: <DailyEditPage /> },
+          { path: 'quickedit/:meal_id', element: <QuickEditPage /> },
+          { path: 'liveedit/:meal_id', element: <LiveEditPage /> },
+
           { path: 'daily', element: <ProductDailyCreatePage /> },
           { path: 'live', element: <ProductLiveCreatePage /> },
           { path: ':id/edit', element: <ProductEditPage /> },
@@ -139,6 +150,7 @@ export const dashboardRoutes = [
           { path: 'list', element: <CompanyListPage /> },
           { path: ':id', element: <OverviewAnalyticsPage /> }, // ✅ Using OverviewAnalyticsPage for company details
           { path: 'new', element: <CompanyCreatePage /> },
+          { path: 'addmeal/:company_id', element: <CompanyAddMealPage /> },
         ],
       },
       {
@@ -193,7 +205,7 @@ export const dashboardRoutes = [
       { path: 'mail', element: <MailPage /> },
       // { path: 'chat', element: <ChatPage /> },
       // { path: 'calendar', element: <CalendarPage /> },
-      { path: 'kanban', element: <KanbanPage /> },
+      { path: 'kanban/:company_id', element: <KanbanPage /> },
       { path: 'permission', element: <PermissionDeniedPage /> },
       { path: 'params', element: <ParamsPage /> },
       { path: 'blank', element: <BlankPage /> },

@@ -20,14 +20,14 @@ const swrOptions = {
 export function useGetBoard() {
   const { data, isLoading, error, isValidating } = useSWR(KANBAN_ENDPOINT, fetcher, swrOptions);
 
-
-  console.log("Fetched board data:", data);
+  // console.log("Fetched board data:", data);
 
   const memoizedValue = useMemo(() => {
     const tasks = data?.board.tasks ?? {};
     // const columns = data?.board.columns ?? [];
     const columns = (data?.board?.columns ?? []).filter(
-      (column) => column.name !== "In progress" &&  column.name !== "Ready to test" && column.name !== "Done" // Remove specific columns
+      (column) =>
+        column.name !== 'In progress' && column.name !== 'Ready to test' && column.name !== 'Done' // Remove specific columns
     );
 
     return {
@@ -384,7 +384,14 @@ export async function updateTask(columnId, taskData) {
 //   }
 // }
 
-export async function moveTask(updateTasks, fromColumn, toColumn, taskId, isFirstColumn, isDropped) {
+export async function moveTask(
+  updateTasks,
+  fromColumn,
+  toColumn,
+  taskId,
+  isFirstColumn,
+  isDropped
+) {
   // Only proceed if the item was actually dropped
   if (!isDropped) return;
 
@@ -411,7 +418,11 @@ export async function moveTask(updateTasks, fromColumn, toColumn, taskId, isFirs
         // Prevent multiple copies
         const alreadyCopied = tasks[toColumn].some((task) => task.originalId === taskId);
         if (!alreadyCopied) {
-          const copiedTask = { ...taskToMove, id: `copy-${taskId}-${Date.now()}`, originalId: taskId };
+          const copiedTask = {
+            ...taskToMove,
+            id: `copy-${taskId}-${Date.now()}`,
+            originalId: taskId,
+          };
           tasks[toColumn] = [...tasks[toColumn], copiedTask];
         }
       } else {
@@ -433,9 +444,6 @@ export async function moveTask(updateTasks, fromColumn, toColumn, taskId, isFirs
     await axios.post(KANBAN_ENDPOINT, data, { params: { endpoint: 'move-task' } });
   }
 }
-
-
-
 
 // ----------------------------------------------------------------------
 

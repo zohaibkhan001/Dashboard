@@ -25,6 +25,7 @@ import { useSetState } from 'src/hooks/use-set-state';
 import { PRODUCT_STOCK_OPTIONS } from 'src/_mock';
 import { useGetProducts } from 'src/actions/product';
 import { DashboardContent } from 'src/layouts/dashboard';
+import api from 'src/utils/api';
 
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
@@ -35,6 +36,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchLiveCounterMeals } from 'src/utils/Redux/slices/liveCounterMeals';
 import { fetchRepeatingMeals } from 'src/utils/Redux/slices/dailyMealsSlice';
 import { fetchQuickMeals } from 'src/utils/Redux/slices/quickMealSlice';
+import { LoadingScreen } from 'src/components/loading-screen';
 
 import { ProductTableToolbar } from '../product-table-toolbar';
 import { ProductTableFiltersResult } from '../product-table-filters-result';
@@ -79,8 +81,34 @@ export function ProductListView() {
 
   const [confirmDelete, setConfirmDelete] = useState({ open: false, id: null });
 
+  const [selectedMenu, setSelectedMenu] = useState('quick');
+
+  const { liveCounterMeals, loading: liveCounterLoading } = useSelector(
+    (state) => state.liveCounterMeals
+  );
+  const { repeatingMeals, loading: repeatingMealsLoading } = useSelector(
+    (state) => state.repeatingMeals
+  );
+  const { quickMeals, loading: quickMealsLoading } = useSelector((state) => state.quickMeals);
+
+  const MENU_LABELS = {
+    quick: 'Upgraded Meal',
+    repeating: 'Daily Meal',
+    liveCounter: 'Live Counter',
+  };
+
+  const { token } = useSelector((state) => state.superAdminAuth);
+
+  const superAdminRoutes = {
+    deleteQuickMeal: (id) => `/superAdmin/delete_quick_meal/${id}`,
+    deleteRepeatingMeal: (id) => `/superAdmin/delete_repeating_meal/${id}`,
+    deleteLiveCounterMeal: (id) => `/superAdmin/delete_live_counter_meal/${id}`,
+  };
+
   const handleDeleteRow = useCallback((id) => {
-    setConfirmDelete({ open: true, id }); // Open confirmation dialog with row ID
+    setConfirmDelete({ open: true, id });
+    // console.log(selectedMenu, id);
+    // console.log(confirmDelete);
   }, []);
 
   const handleDeleteRows = useCallback(() => {
@@ -93,9 +121,23 @@ export function ProductListView() {
 
   const handleEditRow = useCallback(
     (id) => {
-      router.push(paths.dashboard.product.edit(id));
+      let editRoute;
+
+      if (selectedMenu === 'repeating') {
+        editRoute = `${paths.dashboard.product.dailyedit}/${id}`;
+      } else if (selectedMenu === 'liveCounter') {
+        editRoute = `${paths.dashboard.product.liveedit}/${id}`;
+      } else if (selectedMenu === 'quick') {
+        editRoute = `${paths.dashboard.product.quickedit}/${id}`;
+      }
+
+      if (editRoute) {
+        router.push(editRoute);
+      } else {
+        console.error('Invalid selectedMenu:', selectedMenu);
+      }
     },
-    [router]
+    [router, selectedMenu]
   );
 
   const handleViewRow = useCallback(
@@ -137,14 +179,6 @@ export function ProductListView() {
         <RenderCellProduct params={params} onViewRow={() => handleViewRow(params.row.id)} />
       ),
     },
-    // {
-    //   field: 'image',
-    //   headerName: 'Image',
-    //   width: 100,
-    //   renderCell: (params) => (
-    //     <img src={params.value} alt="Meal" style={{ width: 50, height: 50, borderRadius: 5 }} />
-    //   ),
-    // },
 
     {
       field: 'price',
@@ -179,12 +213,6 @@ export function ProductListView() {
       filterable: false,
       disableColumnMenu: true,
       getActions: (params) => [
-        // <GridActionsCellItem
-        //   showInMenu
-        //   icon={<Iconify icon="solar:eye-bold" />}
-        //   label="View"
-        //   onClick={() => handleViewRow(params.row.id)}
-        // />,
         <GridActionsCellItem
           showInMenu
           icon={<Iconify icon="solar:pen-bold" />}
@@ -218,7 +246,6 @@ export function ProductListView() {
     setAnchorEl(null);
   };
 
-  const [selectedMenu, setSelectedMenu] = useState('quick');
   const [masterMenuAnchorEl, setMasterMenuAnchorEl] = useState(null);
   const masterMenuOpen = Boolean(masterMenuAnchorEl);
 
@@ -238,20 +265,6 @@ export function ProductListView() {
   // useEffect(() => {
   //   console.log(selectedMenu);
   // }, [selectedMenu]);
-
-  const { liveCounterMeals } = useSelector((state) => state.liveCounterMeals);
-  const { repeatingMeals } = useSelector((state) => state.repeatingMeals);
-  const { quickMeals } = useSelector((state) => state.quickMeals);
-
-  const MENU_LABELS = {
-    quick: 'Upgraded Meal',
-    repeating: 'Daily Meal',
-    liveCounter: 'Live Counter',
-  };
-
-  // console.log(liveCounterMeals);
-  // console.log(repeatingMeals);
-  // console.log(quickMeals);
 
   useEffect(() => {
     dispatch(fetchLiveCounterMeals());
@@ -283,33 +296,53 @@ export function ProductListView() {
     }
   }, [selectedMenu, quickMeals, repeatingMeals, liveCounterMeals]);
 
-  const confirmDeleteRow = () => {
+  // const confirmDeleteRow = async () => {
+  //   if (confirmDelete.id !== null) {
+  //     setTableData((prevData) => prevData.filter((row) => row.id !== confirmDelete.id));
+  //     toast.success('Delete success!');
+  //   }
+  //   setConfirmDelete({ open: false, id: null });
+  // };
+  const confirmDeleteRow = async () => {
     if (confirmDelete.id !== null) {
-      setTableData((prevData) => prevData.filter((row) => row.id !== confirmDelete.id));
-      toast.success('Delete success!');
+      let deleteRoute;
+
+      // Determine the appropriate delete route based on selectedMenu
+      if (selectedMenu === 'quick') {
+        deleteRoute = superAdminRoutes.deleteQuickMeal(confirmDelete.id);
+      } else if (selectedMenu === 'repeating') {
+        deleteRoute = superAdminRoutes.deleteRepeatingMeal(confirmDelete.id);
+      } else if (selectedMenu === 'liveCounter') {
+        deleteRoute = superAdminRoutes.deleteLiveCounterMeal(confirmDelete.id);
+      }
+
+      if (deleteRoute) {
+        try {
+          // Make the API call using Axios instance with token in headers
+          const response = await api.delete(deleteRoute, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          // Remove the deleted row from table data
+          setTableData((prevData) => prevData.filter((row) => row.id !== confirmDelete.id));
+          toast.success('Delete success!');
+          // console.log(response);
+        } catch (error) {
+          console.error('Error deleting meal:', error);
+          toast.error(error.msg);
+        }
+      }
+
+      // Close confirmation dialog
+      setConfirmDelete({ open: false, id: null });
     }
-    setConfirmDelete({ open: false, id: null });
   };
 
-  // useEffect(() => {
-  //   const formatMeals = (meals) =>
-  //     meals?.length
-  //       ? meals.map((meal) => ({
-  //           ...meal,
-  //           id: meal.meal_id, // Assign meal_id as id
-  //           image: JSON.parse(meal.image)?.url || '', // Extract image URL
-  //           categoryName: meal.category?.name || 'Uncategorized', // Handle category name
-  //         }))
-  //       : [];
-
-  //   if (selectedMenu === 'quick') {
-  //     setTableData(formatMeals(quickMeals));
-  //   } else if (selectedMenu === 'repeating') {
-  //     setTableData(formatMeals(repeatingMeals));
-  //   } else if (selectedMenu === 'liveCounter') {
-  //     setTableData(formatMeals(liveCounterMeals));
-  //   }
-  // }, [selectedMenu, quickMeals, repeatingMeals, liveCounterMeals]);
+  if (quickMealsLoading || liveCounterLoading || repeatingMealsLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <>
@@ -370,7 +403,7 @@ export function ProductListView() {
                 onClick={handleClick}
                 endIcon={<Iconify icon="lets-icons:arrow-drop-down-big" />}
               >
-                New product
+                New Meal
               </Button>
               <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
                 <Box sx={{ width: '10.5vw' }}>

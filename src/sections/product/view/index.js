@@ -19,3 +19,7 @@ export * from './product-details-view';
 export * from './product-shop-details-view';
 
 export * from './product-options-view';
+
+export * from './daily-edit-view';
+export * from './live-edit-view';
+export * from './quick-edit-view';

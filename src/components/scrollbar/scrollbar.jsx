@@ -19,6 +19,12 @@ export const Scrollbar = forwardRef(
         minHeight: 0,
         flexGrow: 1,
         display: 'flex',
+        '& .simplebar-scrollbar': {
+          display: 'none', // ✅ Hides scrollbar but keeps scrolling
+        },
+        '& .simplebar-track': {
+          display: 'none !important', // ✅ Ensures scrollbar track is hidden
+        },
         flexDirection: 'column',
         '& .simplebar-wrapper': slotProps?.wrapper,
         '& .simplebar-content-wrapper': slotProps?.contentWrapper,

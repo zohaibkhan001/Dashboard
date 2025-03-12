@@ -134,6 +134,10 @@ export const paths = {
       root: `${ROOTS.DASHBOARD}/product`,
       new: `${ROOTS.DASHBOARD}/product/new`,
       options: `${ROOTS.DASHBOARD}/product/options`,
+      dailyedit: `${ROOTS.DASHBOARD}/product/dailyedit`,
+      quickedit: `${ROOTS.DASHBOARD}/product/quickedit`,
+      liveedit: `${ROOTS.DASHBOARD}/product/liveedit`,
+
       daily: `${ROOTS.DASHBOARD}/product/daily`,
       live: `${ROOTS.DASHBOARD}/product/live`,
       guest: `${ROOTS.DASHBOARD}/product/guest`,
@@ -168,6 +172,8 @@ export const paths = {
     company: {
       root: `${ROOTS.DASHBOARD}/company`,
       new: `${ROOTS.DASHBOARD}/company/new`,
+      addmeal: `${ROOTS.DASHBOARD}/company/addmeal`,
+
       details: (id) => `${ROOTS.DASHBOARD}/company/${id}`,
       demo: {
         details: `${ROOTS.DASHBOARD}/company/${MOCK_ID}`,

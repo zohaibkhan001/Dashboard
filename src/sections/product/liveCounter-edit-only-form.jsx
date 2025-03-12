@@ -11,30 +11,16 @@ import CardHeader from '@mui/material/CardHeader';
 import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import {
-  Radio,
-  Button,
-  Collapse,
-  RadioGroup,
-  CardContent,
-  IconButton,
-  Box,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-} from '@mui/material';
+import { Radio, Button, IconButton, Box, TextField } from '@mui/material';
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
-
-import { PRODUCT_CATEGORY_GROUP_OPTIONS } from 'src/_mock';
 
 import { toast } from 'src/components/snackbar';
 import { Form, Field, schemaHelper } from 'src/components/hook-form';
 import api from 'src/utils/api';
 import { Iconify } from 'src/components/iconify';
 import { useDispatch, useSelector } from 'react-redux';
-import { useLocation } from 'react-router';
+import { useLocation, useParams } from 'react-router';
 import { fetchCategories } from 'src/utils/Redux/slices/categoriesSlice';
 
 // ----------------------------------------------------------------------
@@ -60,11 +46,16 @@ export const NewProductSchema = zod.object({
 
 // ----------------------------------------------------------------------
 
-export function ProductNewEditForm({ currentProduct }) {
+export function LiveEditForm({ currentProduct }) {
   // console.log('check current');
   const { token } = useSelector((state) => state.superAdminAuth);
   // console.log(token);
+  const { meal_id } = useParams();
+  const numericMealId = Number(meal_id);
 
+  const { liveCounterMeals } = useSelector((state) => state.liveCounterMeals);
+
+  //   console.log(liveCounterMeals);
   const dispatch = useDispatch();
   const { categories, loading } = useSelector((state) => state.categories);
   const location = useLocation();
@@ -78,28 +69,26 @@ export function ProductNewEditForm({ currentProduct }) {
   const router = useRouter();
   const [uploadLoading, setUploadLoading] = useState(false);
 
+  const currentMeal = liveCounterMeals.find((meal) => meal.meal_id === numericMealId);
+
   const defaultValues = useMemo(
     () => ({
-      mealName: currentProduct?.mealName || '',
-      category_id: currentProduct?.category_id || 1, // Default category
-      type: currentProduct?.type || 'veg', // Default to veg
-
-      description: currentProduct?.description || '',
-
+      mealName: currentMeal?.mealName || '',
+      category_id: currentMeal?.category_id || 1, // Default category
+      type: currentMeal?.type || 'veg', // Default to veg
+      description: currentMeal?.description || '',
       images: {
-        url: currentProduct?.image?.url || '',
-        alt: currentProduct?.mealName || 'meal', // Automatically set alt to mealName
+        url: currentMeal?.image ? JSON.parse(currentMeal.image).url : '',
+        alt: currentMeal?.mealName || 'meal',
       },
-
-      price: currentProduct?.price || 0,
-      fat: currentProduct?.fat || 0,
-      calorie: currentProduct?.calorie || 0,
-      protein: currentProduct?.protein || 0,
-      is_subsidised: currentProduct?.is_subsidised ?? false, // ✅ Default value added
+      price: currentMeal?.price || 0,
+      fat: currentMeal?.fat || 0,
+      calorie: currentMeal?.calorie || 0,
+      protein: currentMeal?.protein || 0,
+      is_subsidised: currentMeal?.is_subsidised ?? false,
     }),
-    [currentProduct]
+    [currentMeal]
   );
-
   const methods = useForm({
     resolver: zodResolver(NewProductSchema),
     defaultValues,
@@ -116,10 +105,10 @@ export function ProductNewEditForm({ currentProduct }) {
   const values = watch();
 
   useEffect(() => {
-    if (currentProduct) {
+    if (currentMeal) {
       reset(defaultValues);
     }
-  }, [currentProduct, defaultValues, reset]);
+  }, [currentMeal, defaultValues, reset]);
 
   const validateAndSubmit = () => {
     const imageUrl = values.images?.url;
@@ -137,7 +126,7 @@ export function ProductNewEditForm({ currentProduct }) {
     try {
       const mealData = {
         mealName: data.mealName,
-        category_id: data.category_id,
+        // category_id: data.category_id,
         type: data.type,
         description: data.description,
         image: {
@@ -151,24 +140,28 @@ export function ProductNewEditForm({ currentProduct }) {
         is_subsidised: data.is_subsidised,
       };
 
-      const response = await api.post('/superAdmin/add_quick_meal', mealData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      console.log(mealData);
+
+      const response = await api.put(
+        `/superAdmin/update_live_counter_meal/${numericMealId}`,
+        mealData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       if (response.status === 200) {
-        toast.success(currentProduct ? 'Meal updated successfully!' : 'Meal added successfully!');
+        toast.success('Meal updated successfully!');
         reset();
 
-        // console.log(response.data);
-        const meal_id = response.data?.data?.meal_id;
         setTimeout(() => {
-          router.push(`${paths.dashboard.product.options}/${meal_id}/quick`);
+          router.push(-1);
         }, 2000);
       } else {
         toast.error('Something went wrong. Please try again.');
       }
     } catch (error) {
-      toast.error(error.msg || 'Failed to add meal. Please try again.');
+      toast.error(error.msg || 'Failed to update meal. Please try again.');
     }
   });
 
@@ -205,7 +198,7 @@ export function ProductNewEditForm({ currentProduct }) {
       if (response.data.success) {
         setValue('images.url', response.data.url, { shouldValidate: true }); // ✅ Replace existing image
         console.log(response.data);
-        toast.success('Image uploaded successfully!Proceed with adding meal');
+        toast.success('Image uploaded successfully!');
       } else {
         alert('Image upload failed!');
       }
@@ -236,22 +229,15 @@ export function ProductNewEditForm({ currentProduct }) {
         <Field.Text name="mealName" label="Meal Name" />
 
         <section style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem' }}>
-          <Field.Select
-            native
-            name="category_id"
+          <TextField
             label="Category"
-            InputLabelProps={{ shrink: true }}
-            onChange={(e) =>
-              setValue('category_id', Number(e.target.value), { shouldValidate: true })
+            value={
+              categories.find((category) => category.category_id === currentMeal?.category_id)
+                ?.name || 'N/A'
             }
-          >
-            {/* <option value="">Select Category</option> */}
-            {categories.map((category) => (
-              <option key={category.category_id} value={category.category_id}>
-                {category.name}
-              </option>
-            ))}
-          </Field.Select>
+            disabled
+            fullWidth
+          />
 
           <Field.Select
             native
