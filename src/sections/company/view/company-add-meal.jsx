@@ -44,6 +44,7 @@ export function CompanyAddMealView() {
   const [fetchedMenu, setFetchedMenu] = useState([]);
   const [menuLoading, setMenuLoading] = useState(false);
   const [addMealLoading, setAddMealLoading] = useState(false);
+  const [locationLoading, setLocationLoading] = useState(false);
 
   const masterMenuOpen = Boolean(masterMenuAnchorEl);
 
@@ -54,35 +55,6 @@ export function CompanyAddMealView() {
     (state) => state.repeatingMeals
   );
   const { quickMeals, loading: quickMealsLoading } = useSelector((state) => state.quickMeals);
-
-  const nndate = dayjs(selectedDate).format('YYYY-MM-DD');
-  useEffect(() => {
-    console.log(
-      'Selected Menu:',
-      selectedMenu,
-      'Location:',
-      selectedLocation,
-      'date:',
-      nndate,
-      'weeknumber:',
-      selectedWeekNumber,
-      'selected Meal id:',
-      selectedMeal,
-      'selected meal name:',
-      selectedMeals,
-      'selected Meal times',
-      selectedMealTimes
-    );
-  }, [
-    selectedMealTimes,
-    selectedMeal,
-    selectedMeals,
-    selectedMenu,
-    selectedLocation,
-    selectedDate,
-    nndate,
-    selectedWeekNumber,
-  ]);
 
   useEffect(() => {
     if (selectedMenu === 'quick') {
@@ -104,6 +76,7 @@ export function CompanyAddMealView() {
 
   useEffect(() => {
     if (selectedLocation) {
+      setLocationLoading(true);
       api
         .get(`/superAdmin/get_locations/${selectedLocation}`, {
           headers: {
@@ -132,6 +105,9 @@ export function CompanyAddMealView() {
         .catch((error) => {
           console.error('Error fetching location data:', error);
           setLocationData(null); // ✅ Fallback in case of API error
+        })
+        .finally(() => {
+          setLocationLoading(false);
         });
     } else {
       setLocationData(null); // ✅ Reset when no location is selected
@@ -225,17 +201,22 @@ export function CompanyAddMealView() {
       requestBody.week_number = selectedWeekNumber;
     }
 
-    console.log(requestBody);
+    // console.log(requestBody);
+    setAddMealLoading(true);
+    try {
+      const response = await api.post('/superAdmin/add_to_location_menu', requestBody, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    // try {
-    //   const response = await api.post('/superAdmin/add_to_location_menu', requestBody, {
-    //     headers: { Authorization: `Bearer ${token}` },
-    //   });
-
-    //   console.log('Meal added successfully:', response.data);
-    // } catch (error) {
-    //   console.error('Error adding meal:', error.response?.data || error.message);
-    // }
+      console.log('Meal added successfully:', response.data);
+      toast.success('Meal added successfully!');
+      fetchMenuForMealType();
+      //   setSelectedMeals([]);
+    } catch (error) {
+      console.error('Error adding meal:', error.response?.data || error.message);
+    } finally {
+      setAddMealLoading(false);
+    }
   };
 
   const fetchMenuForMealType = async () => {
@@ -316,7 +297,6 @@ export function CompanyAddMealView() {
       console.error('Error fetching menu:', error);
 
       if (error.response) {
-        // ✅ Check if status is 404 (No meals found)
         if (error.response.status === 404) {
           toast.error('No meals found for the selected criteria.');
         } else {
@@ -351,7 +331,25 @@ export function CompanyAddMealView() {
       </Menu>
 
       {/* Location Selection Dropdown */}
-      <Button
+
+      <LoadingButton
+        type="button"
+        variant="contained"
+        onClick={handleLocationMenuClick}
+        startIcon={<Iconify icon="lets-icons:arrow-drop-down-big" />}
+        loading={locationLoading}
+        disabled={!locations || locations.length === 0} // ✅ Disable if empty
+      >
+        {locations && locations.length > 0
+          ? `Select Location - ${
+              selectedLocation
+                ? locations.find((loc) => loc.location_id === selectedLocation)?.locationName
+                : 'Choose'
+            }`
+          : 'No Locations Available'}{' '}
+      </LoadingButton>
+
+      {/* <Button
         variant="contained"
         startIcon={<Iconify icon="lets-icons:arrow-drop-down-big" />}
         onClick={handleLocationMenuClick}
@@ -364,8 +362,7 @@ export function CompanyAddMealView() {
                 : 'Choose'
             }`
           : 'No Locations Available'}{' '}
-        {/* ✅ Show message if empty */}
-      </Button>
+      </Button> */}
 
       <Menu
         anchorEl={locationAnchorEl}
@@ -477,7 +474,7 @@ export function CompanyAddMealView() {
         variant="contained"
         size="large"
         onClick={addMealToLocationMenu}
-        // loading={isSubmitting}
+        loading={addMealLoading}
       >
         Add Meal
       </LoadingButton>

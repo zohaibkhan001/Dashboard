@@ -81,7 +81,7 @@ export function ProductNewEditForm({ currentProduct }) {
   const defaultValues = useMemo(
     () => ({
       mealName: currentProduct?.mealName || '',
-      category_id: currentProduct?.category_id || 1, // Default category
+      category_id: currentProduct?.category_id || '', // Default category
       type: currentProduct?.type || 'veg', // Default to veg
 
       description: currentProduct?.description || '',
@@ -241,11 +241,14 @@ export function ProductNewEditForm({ currentProduct }) {
             name="category_id"
             label="Category"
             InputLabelProps={{ shrink: true }}
-            onChange={(e) =>
-              setValue('category_id', Number(e.target.value), { shouldValidate: true })
-            }
+            value={values.category_id} // Ensure controlled component
+            onChange={(e) => {
+              const selectedCategoryId = e.target.value ? Number(e.target.value) : '';
+              setValue('category_id', selectedCategoryId, { shouldValidate: true });
+            }}
           >
-            {/* <option value="">Select Category</option> */}
+            <option value="">Select Category</option>{' '}
+            {/* Empty option to prevent default selection */}
             {categories.map((category) => (
               <option key={category.category_id} value={category.category_id}>
                 {category.name}
