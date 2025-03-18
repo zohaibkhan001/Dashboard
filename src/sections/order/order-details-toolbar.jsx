@@ -12,6 +12,7 @@ import { fDateTime } from 'src/utils/format-time';
 import { Label } from 'src/components/label';
 import { Iconify } from 'src/components/iconify';
 import { usePopover, CustomPopover } from 'src/components/custom-popover';
+import dayjs from 'dayjs';
 
 // ----------------------------------------------------------------------
 
@@ -23,6 +24,12 @@ export function OrderDetailsToolbar({
   statusOptions,
   onChangeStatus,
 }) {
+  const statusColors = {
+    completed: 'success',
+    pending: 'warning',
+    cancelled: 'error',
+    refund: 'info', // Add refund status
+  };
   const popover = usePopover();
 
   return (
@@ -36,21 +43,13 @@ export function OrderDetailsToolbar({
           <Stack spacing={0.5}>
             <Stack spacing={1} direction="row" alignItems="center">
               <Typography variant="h4"> Order {orderNumber} </Typography>
-              <Label
-                variant="soft"
-                color={
-                  (status === 'completed' && 'success') ||
-                  (status === 'pending' && 'warning') ||
-                  (status === 'cancelled' && 'error') ||
-                  'default'
-                }
-              >
-                {status}
+              <Label variant="soft" color={statusColors[status] || 'default'}>
+                {status ? status.charAt(0).toUpperCase() + status.slice(1) : 'N/A'}
               </Label>
             </Stack>
 
             <Typography variant="body2" sx={{ color: 'text.disabled' }}>
-              {fDateTime(createdAt)}
+              {createdAt ? dayjs(createdAt).format('DD MMM YYYY') : 'N/A'}
             </Typography>
           </Stack>
         </Stack>
@@ -62,7 +61,7 @@ export function OrderDetailsToolbar({
           alignItems="center"
           justifyContent="flex-end"
         >
-          <Button
+          {/* <Button
             color="inherit"
             variant="outlined"
             endIcon={<Iconify icon="eva:arrow-ios-downward-fill" />}
@@ -70,19 +69,19 @@ export function OrderDetailsToolbar({
             sx={{ textTransform: 'capitalize' }}
           >
             {status}
-          </Button>
+          </Button> */}
 
-          <Button
+          {/* <Button
             color="inherit"
             variant="outlined"
             startIcon={<Iconify icon="solar:printer-minimalistic-bold" />}
           >
             Print
-          </Button>
+          </Button> */}
 
-          <Button color="inherit" variant="contained" startIcon={<Iconify icon="solar:pen-bold" />}>
+          {/* <Button color="inherit" variant="contained" startIcon={<Iconify icon="solar:pen-bold" />}>
             Edit
-          </Button>
+          </Button> */}
         </Stack>
       </Stack>
 

@@ -59,7 +59,6 @@ export function OrderListView() {
   const table = useTable({ defaultOrderBy: 'orderNumber' });
 
   const { orders, loading } = useSelector((state) => state.companyOrders);
-  console.log(orders);
 
   const router = useRouter();
 
@@ -216,7 +215,7 @@ export function OrderListView() {
                         selected={table.selected.includes(row.id)}
                         onSelectRow={() => table.onSelectRow(row.id)}
                         onDeleteRow={() => handleDeleteRow(row.id)}
-                        onViewRow={() => handleViewRow(row.id)}
+                        onViewRow={() => handleViewRow(row.order_id)}
                       />
                     ))}
 

@@ -26,8 +26,8 @@ export function OrderDetailsView({ order }) {
     <DashboardContent>
       <OrderDetailsToolbar
         backLink={paths.dashboard.order.root}
-        orderNumber={order?.orderNumber}
-        createdAt={order?.createdAt}
+        orderNumber={order?.order_id}
+        createdAt={order?.order_date}
         status={status}
         onChangeStatus={handleChangeStatus}
         statusOptions={ORDER_STATUS_OPTIONS}
@@ -37,24 +37,21 @@ export function OrderDetailsView({ order }) {
         <Grid xs={12} md={8}>
           <Stack spacing={3} direction={{ xs: 'column-reverse', md: 'column' }}>
             <OrderDetailsItems
-              items={order?.items}
-              taxes={order?.taxes}
-              shipping={order?.shipping}
-              discount={order?.discount}
-              subtotal={order?.subtotal}
-              totalAmount={order?.totalAmount}
+              items={[
+                ...(order?.order_data?.quick_meals ?? []),
+                ...(order?.order_data?.repeating_meals ?? []),
+                ...(order?.order_data?.live_counter_meals ?? []),
+              ]}
+              totalAmount={order?.total_price}
             />
-
-            <OrderDetailsHistory history={order?.history} />
           </Stack>
         </Grid>
 
         <Grid xs={12} md={4}>
           <OrderDetailsInfo
             customer={order?.customer}
-            delivery={order?.delivery}
+            delivery={order?.company_name}
             payment={order?.payment}
-            shippingAddress={order?.shippingAddress}
           />
         </Grid>
       </Grid>

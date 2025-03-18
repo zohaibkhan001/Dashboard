@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -34,6 +34,9 @@ import {
   TableSelectedAction,
   TablePaginationCustom,
 } from 'src/components/table';
+import api from 'src/utils/api';
+import { useSelector } from 'react-redux';
+import { LoadingScreen } from 'src/components/loading-screen';
 
 import { UserTableRow } from '../user-table-row';
 import { UserTableToolbar } from '../user-table-toolbar';
@@ -43,25 +46,49 @@ import { UserTableFiltersResult } from '../user-table-filters-result';
 
 const TABLE_HEAD = [
   { id: 'name', label: 'Name', width: 200 },
-  { id: 'phoneNumber', label: 'Phone number', width: 200 },
-  { id: 'company', label: 'Company', width: 200 },
-  { id: 'role', label: 'Role', width: 200 },
-  { id: 'wallet', label: 'Wallet Bal.', width: 200 },
+  // { id: 'email', label: 'Email', width: 250 },
+  { id: 'phone', label: 'Phone Number', width: 200 },
+  { id: 'designation', label: 'Designation', width: 200 },
+  { id: 'wallet_balance', label: 'Wallet Balance', width: 200 },
+  { id: 'company.companyName', label: 'Company', width: 200 },
   { id: '', width: 100 },
 ];
-
 // ----------------------------------------------------------------------
 
 export function UserListView() {
+  const [loading, setLoading] = useState(false);
   const table = useTable();
 
   const router = useRouter();
 
   const confirm = useBoolean();
 
-  const [tableData, setTableData] = useState(_userList);
+  const [tableData, setTableData] = useState([]);
 
   const filters = useSetState({ name: '', role: [], status: 'all' });
+
+  const { token } = useSelector((state) => state.superAdminAuth);
+
+  useEffect(() => {
+    setLoading(true);
+    const fetchCustomers = async () => {
+      try {
+        const response = await api.get('/superAdmin/fetch_all_customer', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (response.data.success === 1) {
+          setTableData(response.data.data);
+        }
+      } catch (error) {
+        console.error('Error fetching customers:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCustomers();
+  }, [token]);
 
   const dataFiltered = applyFilter({
     inputData: tableData,
@@ -102,33 +129,37 @@ export function UserListView() {
     });
   }, [dataFiltered.length, dataInPage.length, table, tableData]);
 
-  const handleEditRow = useCallback(
+  const handleViewRow = useCallback(
     (id) => {
-      router.push(paths.dashboard.user.edit(id));
+      router.push(paths.dashboard.user.details(id));
     },
     [router]
   );
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <>
       <DashboardContent>
         <CustomBreadcrumbs
-          heading="List"
+          heading="Users List"
           links={[
             { name: 'Dashboard', href: paths.dashboard.root },
             { name: 'User', href: paths.dashboard.user.list },
             { name: 'List' },
           ]}
-          action={
-            <Button
-              component={RouterLink}
-              href={paths.dashboard.user.new}
-              variant="contained"
-              startIcon={<Iconify icon="mingcute:add-line" />}
-            >
-              New user
-            </Button>
-          }
+          // action={
+          //   <Button
+          //     component={RouterLink}
+          //     href={paths.dashboard.user.new}
+          //     variant="contained"
+          //     startIcon={<Iconify icon="mingcute:add-line" />}
+          //   >
+          //     New user
+          //   </Button>
+          // }
           sx={{ mb: { xs: 3, md: 5 } }}
         />
 
@@ -193,12 +224,20 @@ export function UserListView() {
                     )
                     .map((row) => (
                       <UserTableRow
-                        key={row.id}
-                        row={row}
-                        selected={table.selected.includes(row.id)}
-                        onSelectRow={() => table.onSelectRow(row.id)}
-                        onDeleteRow={() => handleDeleteRow(row.id)}
-                        onEditRow={() => handleEditRow(row.id)}
+                        key={row.customer_id}
+                        row={{
+                          id: row.customer_id,
+                          name: row.name,
+                          email: row.email,
+                          phoneNumber: row.phone,
+                          designation: row.designation,
+                          walletBalance: row.wallet_balance,
+                          company: row.company.companyName,
+                        }}
+                        selected={table.selected.includes(row.customer_id)}
+                        onSelectRow={() => table.onSelectRow(row.customer_id)}
+                        onDeleteRow={() => handleDeleteRow(row.customer_id)}
+                        onViewRow={() => handleViewRow(row.customer_id)}
                       />
                     ))}
 

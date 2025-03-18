@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
@@ -39,6 +39,9 @@ import {
   TableSelectedAction,
   TablePaginationCustom,
 } from 'src/components/table';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchAllOrders } from 'src/utils/Redux/slices/allOrderSlice';
+import { LoadingScreen } from 'src/components/loading-screen';
 
 import { OrderTableRow } from '../order-table-row';
 import { OrderTableToolbar } from '../order-table-toolbar';
@@ -49,30 +52,35 @@ import { OrderTableFiltersResult } from '../order-table-filters-result';
 const STATUS_OPTIONS = [{ value: 'all', label: 'All' }, ...ORDER_STATUS_OPTIONS];
 
 const TABLE_HEAD = [
-  { id: 'orderNumber', label: 'Order', width: 88 },
-  { id: 'name', label: 'Customer' },
-  { id: 'createdAt', label: 'Date', width: 140 },
-  {
-    id: 'totalQuantity',
-    label: 'Items',
-    width: 120,
-    align: 'center',
-  },
-  { id: 'totalAmount', label: 'Price', width: 140 },
+  { id: 'order_id', label: 'Order ID', width: 100 },
+  { id: 'customer_name', label: 'Customer' },
+  { id: 'order_date', label: 'Order Date', width: 140 },
+  // { id: 'items', label: 'Total Items', width: 120, align: 'center' },
+  { id: 'total_price', label: 'Total Price (₹)', width: 140 },
   { id: 'status', label: 'Status', width: 110 },
+  { id: 'company_name', label: 'Company', width: 160 },
   { id: '', width: 88 },
 ];
 
 // ----------------------------------------------------------------------
 
 export function OrderListView() {
+  const { token } = useSelector((state) => state.superAdminAuth);
+  const dispatch = useDispatch();
+
+  const { orders, loading } = useSelector((state) => state.allOrders);
+
+  useEffect(() => {
+    dispatch(fetchAllOrders(token));
+  }, [dispatch, token]);
+
   const table = useTable({ defaultOrderBy: 'orderNumber' });
 
   const router = useRouter();
 
   const confirm = useBoolean();
 
-  const [tableData, setTableData] = useState(_orders);
+  const [tableData, setTableData] = useState(orders);
 
   const filters = useSetState({
     name: '',
@@ -140,6 +148,10 @@ export function OrderListView() {
     [filters, table]
   );
 
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <>
       <DashboardContent>
@@ -163,32 +175,40 @@ export function OrderListView() {
                 `inset 0 -2px 0 0 ${varAlpha(theme.vars.palette.grey['500Channel'], 0.08)}`,
             }}
           >
-            {STATUS_OPTIONS.map((tab) => (
-              <Tab
-                key={tab.value}
-                iconPosition="end"
-                value={tab.value}
-                label={tab.label}
-                icon={
-                  <Label
-                    variant={
-                      ((tab.value === 'all' || tab.value === filters.state.status) && 'filled') ||
-                      'soft'
-                    }
-                    color={
-                      (tab.value === 'completed' && 'success') ||
-                      (tab.value === 'pending' && 'warning') ||
-                      (tab.value === 'cancelled' && 'error') ||
-                      'default'
-                    }
-                  >
-                    {['completed', 'pending', 'cancelled', 'refunded'].includes(tab.value)
-                      ? tableData.filter((user) => user.status === tab.value).length
-                      : tableData.length}
-                  </Label>
-                }
-              />
-            ))}
+            {STATUS_OPTIONS.map((tab) => {
+              const count =
+                tab.value === 'all'
+                  ? tableData.length
+                  : tableData.filter((order) => order.status === tab.value).length;
+
+              return (
+                <Tab
+                  key={tab.value}
+                  iconPosition="end"
+                  value={tab.value}
+                  label={tab.label}
+                  icon={
+                    <Label
+                      variant={
+                        ((tab.value === 'all' || tab.value === filters.state.status) && 'filled') ||
+                        'soft'
+                      }
+                      color={
+                        (tab.value === 'confirmed' && 'success') ||
+                        (tab.value === 'pending' && 'warning') ||
+                        (tab.value === 'cancelled' && 'error') ||
+                        (tab.value === 'delivered' && 'success') ||
+                        (tab.value === 'failed' && 'error') ||
+                        (tab.value === 'refund' && 'info') ||
+                        'default'
+                      }
+                    >
+                      {count}
+                    </Label>
+                  }
+                />
+              );
+            })}
           </Tabs>
 
           <OrderTableToolbar
@@ -256,7 +276,7 @@ export function OrderListView() {
                         selected={table.selected.includes(row.id)}
                         onSelectRow={() => table.onSelectRow(row.id)}
                         onDeleteRow={() => handleDeleteRow(row.id)}
-                        onViewRow={() => handleViewRow(row.id)}
+                        onViewRow={() => handleViewRow(row.order_id)}
                       />
                     ))}
 
@@ -325,9 +345,9 @@ function applyFilter({ inputData, comparator, filters, dateError }) {
   if (name) {
     inputData = inputData.filter(
       (order) =>
-        order.orderNumber.toLowerCase().indexOf(name.toLowerCase()) !== -1 ||
-        order.customer.name.toLowerCase().indexOf(name.toLowerCase()) !== -1 ||
-        order.customer.email.toLowerCase().indexOf(name.toLowerCase()) !== -1
+        order.order_id.toString().includes(name) ||
+        order.customer.name.toLowerCase().includes(name.toLowerCase()) ||
+        order.customer.email.toLowerCase().includes(name.toLowerCase())
     );
   }
 

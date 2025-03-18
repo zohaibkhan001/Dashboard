@@ -44,30 +44,26 @@ import { OrderTableFiltersResult } from 'src/sections/user/orders/order-table-fi
 const STATUS_OPTIONS = [{ value: 'all', label: 'All' }, ...ORDER_STATUS_OPTIONS];
 
 const TABLE_HEAD = [
-  { id: 'orderNumber', label: 'Order', width: 88 },
-  { id: 'name', label: 'Customer', width: 250 },
-  { id: 'createdAt', label: 'Order Date', width: 120 },
-  {
-    id: 'createdAt',
-    label: 'Order On',
-    width: 120,
-    align: 'center',
-  },
-  { id: 'totalAmount', label: 'Price', width: 100 },
+  { id: 'order_id', label: 'Order ID', width: 100 },
+  // { id: 'customer_name', label: 'Customer', width: 250 },
+  { id: 'order_date', label: 'Order Date', width: 120 },
+  { id: 'total_price', label: 'Total Price', width: 120 },
   { id: 'status', label: 'Status', width: 110 },
+  { id: 'payment_method', label: 'Payment Method', width: 150 },
+  { id: 'transaction_id', label: 'Transaction ID', width: 200 },
   { id: '', width: 88 },
 ];
 
 // ----------------------------------------------------------------------
 
-export function OrderListView() {
+export function OrderListView({ orders }) {
   const table = useTable({ defaultOrderBy: 'orderNumber' });
 
   const router = useRouter();
 
   const confirm = useBoolean();
 
-  const [tableData, setTableData] = useState(_orders);
+  const [tableData, setTableData] = useState(orders || []);
 
   const filters = useSetState({
     name: '',
@@ -183,12 +179,12 @@ export function OrderListView() {
                   rowCount={dataFiltered.length}
                   numSelected={table.selected.length}
                   onSort={table.onSort}
-                  onSelectAllRows={(checked) =>
-                    table.onSelectAllRows(
-                      checked,
-                      dataFiltered.map((row) => row.id)
-                    )
-                  }
+                  // onSelectAllRows={(checked) =>
+                  //   table.onSelectAllRows(
+                  //     checked,
+                  //     dataFiltered.map((row) => row.id)
+                  //   )
+                  // }
                 />
 
                 <TableBody>
@@ -199,12 +195,12 @@ export function OrderListView() {
                     )
                     .map((row) => (
                       <OrderTableRow
-                        key={row.id}
+                        key={row.order_id}
                         row={row}
-                        selected={table.selected.includes(row.id)}
-                        onSelectRow={() => table.onSelectRow(row.id)}
-                        onDeleteRow={() => handleDeleteRow(row.id)}
-                        onViewRow={() => handleViewRow(row.id)}
+                        selected={table.selected.includes(row.order_id)}
+                        onSelectRow={() => table.onSelectRow(row.order_id)}
+                        onViewRow={() => handleViewRow(row.order_id)}
+                        onDeleteRow={() => handleDeleteRow(row.order_id)}
                       />
                     ))}
 
@@ -258,7 +254,7 @@ export function OrderListView() {
 }
 
 function applyFilter({ inputData, comparator, filters, dateError }) {
-  const { status, name, startDate, endDate } = filters;
+  const { name, status, startDate, endDate } = filters;
 
   const stabilizedThis = inputData.map((el, index) => [el, index]);
 
@@ -273,9 +269,8 @@ function applyFilter({ inputData, comparator, filters, dateError }) {
   if (name) {
     inputData = inputData.filter(
       (order) =>
-        order.orderNumber.toLowerCase().indexOf(name.toLowerCase()) !== -1 ||
-        order.customer.name.toLowerCase().indexOf(name.toLowerCase()) !== -1 ||
-        order.customer.email.toLowerCase().indexOf(name.toLowerCase()) !== -1
+        order.customer.name.toLowerCase().includes(name.toLowerCase()) ||
+        order.customer.email.toLowerCase().includes(name.toLowerCase())
     );
   }
 

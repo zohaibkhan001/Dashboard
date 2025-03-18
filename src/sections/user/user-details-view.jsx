@@ -14,7 +14,7 @@ import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
 
 import { paths } from 'src/routes/paths';
-import { useRouter } from 'src/routes/hooks';
+import { useParams, useRouter } from 'src/routes/hooks';
 
 import { fData } from 'src/utils/format-number';
 
@@ -24,6 +24,7 @@ import { Form, Field, schemaHelper } from 'src/components/hook-form';
 
 import { OrderListView } from 'src/sections/user/orders/order-list-view';
 import { InvoiceListView } from 'src/sections/user/view/invoice-list-view';
+import { useSelector } from 'react-redux';
 
 // ----------------------------------------------------------------------
 
@@ -40,10 +41,8 @@ export const NewUserSchema = zod.object({
 
 // ----------------------------------------------------------------------
 
-export function UserNewEditForm({ currentUser }) {
+export function UserDetails({ currentUser, transactions, orders }) {
   const router = useRouter();
-
-  // console.log('current Check');
 
   const defaultValues = useMemo(
     () => ({
@@ -94,14 +93,14 @@ export function UserNewEditForm({ currentUser }) {
     <Box sx={{ width: '100%', bgcolor: 'background.paper' }}>
       {/* Tabs Header */}
       <Tabs value={activeTab} onChange={handleChange} centered>
-        <Tab label="General" />
+        {/* <Tab label="General" /> */}
         <Tab label="Wallet Transactions" />
         <Tab label="Orders" />
       </Tabs>
 
       {/* Tabs Content */}
       <Box sx={{ p: 3 }}>
-        {activeTab === 0 && (
+        {/* {activeTab === 0 && (
           <Form methods={methods} onSubmit={onSubmit}>
             <Grid container spacing={3}>
               <Grid xs={12} md={4}>
@@ -178,15 +177,15 @@ export function UserNewEditForm({ currentUser }) {
               </Grid>
             </Grid>
           </Form>
+        )} */}
+        {activeTab === 0 && (
+          <Box sx={{ width: '110%', maxWidth: '1200px', marginLeft: '-2.5rem', p: 0 }}>
+            <InvoiceListView transactions={transactions} />
+          </Box>
         )}
         {activeTab === 1 && (
           <Box sx={{ width: '110%', maxWidth: '1200px', marginLeft: '-2.5rem', p: 0 }}>
-            <InvoiceListView />
-          </Box>
-        )}
-        {activeTab === 2 && (
-          <Box sx={{ width: '110%', maxWidth: '1200px', marginLeft: '-2.5rem', p: 0 }}>
-            <OrderListView />
+            <OrderListView orders={orders} />
           </Box>
         )}
       </Box>

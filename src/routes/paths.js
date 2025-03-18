@@ -129,6 +129,7 @@ export const paths = {
       },
       companyNew: (company_id) => `${ROOTS.DASHBOARD}/user/company-new/${company_id}`, // New path for user creation inside a company
       userEdit: (customer_id) => `${ROOTS.DASHBOARD}/user/user-edit/${customer_id}`,
+      details: (id) => `${ROOTS.DASHBOARD}/user/details/${id}`,
     },
     product: {
       root: `${ROOTS.DASHBOARD}/product`,

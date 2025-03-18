@@ -10,20 +10,21 @@ import CardHeader from '@mui/material/CardHeader';
 import Typography from '@mui/material/Typography';
 
 import { Iconify } from 'src/components/iconify';
+import dayjs from 'dayjs';
 
 // ----------------------------------------------------------------------
 
 export function OrderDetailsInfo({ customer, delivery, payment, shippingAddress }) {
   const renderCustomer = (
     <>
-      <CardHeader
+      {/* <CardHeader
         title="Customer info"
         action={
           <IconButton>
             <Iconify icon="solar:pen-bold" />
           </IconButton>
         }
-      />
+      /> */}
       <Stack direction="row" sx={{ p: 3 }}>
         <Avatar
           alt={customer?.name}
@@ -34,23 +35,25 @@ export function OrderDetailsInfo({ customer, delivery, payment, shippingAddress 
         <Stack spacing={0.5} alignItems="flex-start" sx={{ typography: 'body2' }}>
           <Typography variant="subtitle2">{customer?.name}</Typography>
 
-          <Box sx={{ color: 'text.secondary' }}>{customer?.email}</Box>
+          <Box sx={{ color: 'text.secondary' }}>
+            {customer?.email} | {customer?.phone}
+          </Box>
 
-          <div>
+          {/* <div>
             IP address:
             <Box component="span" sx={{ color: 'text.secondary', ml: 0.25 }}>
               {customer?.ipAddress}
             </Box>
-          </div>
+          </div> */}
 
-          <Button
+          {/* <Button
             size="small"
             color="error"
             startIcon={<Iconify icon="mingcute:add-line" />}
             sx={{ mt: 1 }}
           >
             Add to Blacklist
-          </Button>
+          </Button> */}
         </Stack>
       </Stack>
     </>
@@ -58,62 +61,86 @@ export function OrderDetailsInfo({ customer, delivery, payment, shippingAddress 
 
   const renderDelivery = (
     <>
-      <CardHeader
+      {/* <CardHeader
         title="Delivery"
         action={
           <IconButton>
             <Iconify icon="solar:pen-bold" />
           </IconButton>
         }
-      />
+      /> */}
       <Stack spacing={1.5} sx={{ p: 3, typography: 'body2' }}>
         <Stack direction="row" alignItems="center">
           <Box component="span" sx={{ color: 'text.secondary', width: 120, flexShrink: 0 }}>
-            Ship by
+            Payment Id:
           </Box>
-          {delivery?.shipBy}
+          {payment.payment_id}
         </Stack>
         <Stack direction="row" alignItems="center">
           <Box component="span" sx={{ color: 'text.secondary', width: 120, flexShrink: 0 }}>
-            Speedy
+            Payment Method:
           </Box>
-          {delivery?.speedy}
+          {payment.payment_method.toUpperCase()}
         </Stack>
         <Stack direction="row" alignItems="center">
+          <Box component="span" sx={{ color: 'text.secondary', width: 120, flexShrink: 0 }}>
+            Payment Amount:
+          </Box>
+          {`₹${payment.amount}`}{' '}
+        </Stack>
+        <Stack direction="row" alignItems="center">
+          <Box component="span" sx={{ color: 'text.secondary', width: 120, flexShrink: 0 }}>
+            Transaction Id:
+          </Box>
+          {payment.transaction_id}
+        </Stack>
+        <Stack direction="row" alignItems="center">
+          <Box component="span" sx={{ color: 'text.secondary', width: 120, flexShrink: 0 }}>
+            Status
+          </Box>
+          {payment.status.toUpperCase()}{' '}
+        </Stack>
+        <Stack direction="row" alignItems="center">
+          <Box component="span" sx={{ color: 'text.secondary', width: 120, flexShrink: 0 }}>
+            Created on
+          </Box>
+          {payment?.createdAt ? dayjs(payment.createdAt).format('DD MMM YYYY, hh:mm A') : 'N/A'}
+        </Stack>
+        {/* <Stack direction="row" alignItems="center">
           <Box component="span" sx={{ color: 'text.secondary', width: 120, flexShrink: 0 }}>
             Tracking No.
           </Box>
           <Link underline="always" color="inherit">
             {delivery?.trackingNumber}
           </Link>
-        </Stack>
+        </Stack> */}
       </Stack>
     </>
   );
 
   const renderShipping = (
     <>
-      <CardHeader
+      {/* <CardHeader
         title="Shipping"
         action={
           <IconButton>
             <Iconify icon="solar:pen-bold" />
           </IconButton>
         }
-      />
+      /> */}
       <Stack spacing={1.5} sx={{ p: 3, typography: 'body2' }}>
         <Stack direction="row">
           <Box component="span" sx={{ color: 'text.secondary', width: 120, flexShrink: 0 }}>
-            Address
+            Company
           </Box>
-          {shippingAddress?.fullAddress}
+          {delivery}
         </Stack>
 
         <Stack direction="row">
           <Box component="span" sx={{ color: 'text.secondary', width: 120, flexShrink: 0 }}>
-            Phone number
+            Location{' '}
           </Box>
-          {shippingAddress?.phoneNumber}
+          name{' '}
         </Stack>
       </Stack>
     </>
@@ -121,15 +148,15 @@ export function OrderDetailsInfo({ customer, delivery, payment, shippingAddress 
 
   const renderPayment = (
     <>
-      <CardHeader
+      {/* <CardHeader
         title="Payment"
         action={
           <IconButton>
             <Iconify icon="solar:pen-bold" />
           </IconButton>
         }
-      />
-      <Box
+      /> */}
+      {/* <Box
         display="flex"
         alignItems="center"
         justifyContent="flex-end"
@@ -137,7 +164,7 @@ export function OrderDetailsInfo({ customer, delivery, payment, shippingAddress 
       >
         {payment?.cardNumber}
         <Iconify icon="logos:mastercard" width={24} />
-      </Box>
+      </Box> */}
     </>
   );
 

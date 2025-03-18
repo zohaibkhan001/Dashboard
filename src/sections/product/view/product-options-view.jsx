@@ -35,6 +35,16 @@ export function ProductOptionsView() {
   const { locations } = useSelector((state) => state.allLocations);
   const { token } = useSelector((state) => state.superAdminAuth);
 
+  const [allCompaniesSelected, setAllCompaniesSelected] = useState(false);
+  const [allLocationsSelected, setAllLocationsSelected] = useState(false);
+
+  const [selectedCompanies, setSelectedCompanies] = useState([]);
+  const [selectedLocations, setSelectedLocations] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(dayjs());
+  const [selectedMealTimes, setSelectedMealTimes] = useState([]);
+  const [selectedWeekNumber, setSelectedWeekNumber] = useState(dayjs().week());
+  const [loading, setLoading] = useState(false);
+
   // console.log(token);
 
   useEffect(() => {
@@ -50,20 +60,38 @@ export function ProductOptionsView() {
   // console.log(companies);
   // console.log(locations);
 
-  const [loading, setLoading] = useState(false);
+  const toggleSelectAllCompanies = () => {
+    if (allCompaniesSelected) {
+      setSelectedCompanies([]);
+      setSelectedLocations([]); // Also clear selected locations
+      setAllLocationsSelected(false); // Reset "Select All" for locations
+    } else {
+      setSelectedCompanies(companies.map((company) => company.company_id));
+      setAllLocationsSelected(false); // Do NOT select all locations automatically
+    }
+    setAllCompaniesSelected(!allCompaniesSelected);
+  };
 
-  // Track selected companies and locations
-  const [selectedCompanies, setSelectedCompanies] = useState([]);
-  const [selectedLocations, setSelectedLocations] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(dayjs());
-  const [selectedMealTimes, setSelectedMealTimes] = useState([]);
-  const [selectedWeekNumber, setSelectedWeekNumber] = useState(dayjs().week());
+  const toggleSelectAllLocations = () => {
+    const filteredLocations = locations.filter((location) =>
+      selectedCompanies.includes(location.company_id)
+    );
 
-  // Handle company selection
+    if (allLocationsSelected) {
+      setSelectedLocations([]);
+    } else {
+      setSelectedLocations(filteredLocations.map((location) => location.location_id));
+    }
+
+    setAllLocationsSelected(!allLocationsSelected && filteredLocations.length > 0);
+  };
+
   const handleCompanySelection = (updatedCompanies) => {
     setSelectedCompanies(updatedCompanies);
 
-    // Remove selected locations that are no longer associated with selected companies
+    const isAllCompaniesSelected = updatedCompanies.length === companies.length;
+    setAllCompaniesSelected(isAllCompaniesSelected);
+
     const updatedLocations = selectedLocations.filter((locationId) =>
       locations.some(
         (location) =>
@@ -72,6 +100,14 @@ export function ProductOptionsView() {
     );
 
     setSelectedLocations(updatedLocations);
+
+    const filteredLocations = locations.filter((location) =>
+      updatedCompanies.includes(location.company_id)
+    );
+
+    setAllLocationsSelected(
+      updatedLocations.length === filteredLocations.length && filteredLocations.length > 0
+    );
   };
 
   const handleWeekSelection = (weekNumber) => {
@@ -86,11 +122,8 @@ export function ProductOptionsView() {
   // Handle location selection
   const handleLocationSelection = (updatedLocations) => {
     setSelectedLocations(updatedLocations);
+    setAllLocationsSelected(updatedLocations.length === filteredLocations.length);
   };
-  //
-  // useEffect(() => {
-  //   console.log(selectedWeekNumber);
-  // }, [selectedWeekNumber]);
 
   const handleSaveClick = async () => {
     const payload = {
@@ -103,7 +136,7 @@ export function ProductOptionsView() {
         : { specific_date: selectedDate.format('YYYY-MM-DD') }), // Use specific_date otherwise
     };
 
-    // console.log(formattedData);
+    console.log(payload);
     setLoading(true);
 
     try {
@@ -132,20 +165,6 @@ export function ProductOptionsView() {
     }
   };
 
-  // const handleSaveClick = () => {
-  //   const payload = {
-  //     location_id: selectedLocations, // Array of selected location IDs
-  //     meal_id: Number(meal_id), // Convert meal_id to a number
-  //     meal_type, // Directly use the meal type from params
-  //     meal_time: selectedMealTimes,
-  //     ...(meal_type === 'repeating'
-  //       ? { week_number: selectedWeekNumber } // Use week_number for repeating meals
-  //       : { specific_date: selectedDate.format('YYYY-MM-DD') }), // Use specific_date otherwise
-  //   };
-
-  //   console.log(payload);
-  // };
-
   const handleCancelClick = () => {
     router.push(paths.dashboard.product.root);
   };
@@ -166,6 +185,9 @@ export function ProductOptionsView() {
         {/* Company Selection */}
         <Grid container spacing={3}>
           <Grid xs={12} md={5} lg={5}>
+            <Button variant="outlined" onClick={toggleSelectAllCompanies} sx={{ mb: 2 }}>
+              {allCompaniesSelected ? 'Deselect All' : 'Select All'}
+            </Button>
             <ProductOptions
               title="Company"
               list={companies.map((company) => ({
@@ -179,6 +201,9 @@ export function ProductOptionsView() {
 
           {/* Location Selection (Filtered) */}
           <Grid xs={12} md={7} lg={7}>
+            <Button variant="outlined" onClick={toggleSelectAllLocations} sx={{ mb: 2 }}>
+              {allLocationsSelected ? 'Deselect All' : 'Select All'}
+            </Button>
             <ProductOptions
               title="Locations"
               list={filteredLocations.map((location) => ({

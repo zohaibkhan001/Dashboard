@@ -62,7 +62,7 @@ export function InvoiceTableToolbar({ filters, options, dateError, onResetPage }
         direction={{ xs: 'column', md: 'row' }}
         sx={{ p: 2.5, pr: { xs: 2.5, md: 1 } }}
       >
-        <FormControl sx={{ flexShrink: 0, width: { xs: 1, md: 180 } }}>
+        {/* <FormControl sx={{ flexShrink: 0, width: { xs: 1, md: 180 } }}>
           <InputLabel htmlFor="invoice-filter-service-select-label">Service</InputLabel>
 
           <Select
@@ -85,7 +85,7 @@ export function InvoiceTableToolbar({ filters, options, dateError, onResetPage }
               </MenuItem>
             ))}
           </Select>
-        </FormControl>
+        </FormControl> */}
 
         <DatePicker
           label="Start date"
@@ -115,9 +115,26 @@ export function InvoiceTableToolbar({ filters, options, dateError, onResetPage }
           }}
         />
 
-        <Stack direction="row" alignItems="center" spacing={2} flexGrow={1} sx={{ width: 1, justifyContent: 'flex-end', marginRight: '3rem' }}>
-
-          <div style={{backgroundColor: '#FFC109', borderRadius: '10px'}}><p style={{fontSize: '0.8rem', paddingLeft:'1rem', paddingRight:'1rem', paddingTop: '0.3rem', paddingBottom: '0.3rem'}}>Current Wallet Balance - <b>3550.56</b></p></div>
+        <Stack
+          direction="row"
+          alignItems="center"
+          spacing={2}
+          flexGrow={1}
+          sx={{ width: 1, justifyContent: 'flex-end', marginRight: '3rem' }}
+        >
+          <div style={{ backgroundColor: '#FFC109', borderRadius: '10px' }}>
+            <p
+              style={{
+                fontSize: '0.8rem',
+                paddingLeft: '1rem',
+                paddingRight: '1rem',
+                paddingTop: '0.3rem',
+                paddingBottom: '0.3rem',
+              }}
+            >
+              Current Wallet Balance - <b>3550.56</b>
+            </p>
+          </div>
         </Stack>
       </Stack>
 

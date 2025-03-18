@@ -23,7 +23,7 @@ export function OrderDetailsItems({
 }) {
   const renderTotal = (
     <Stack spacing={2} alignItems="flex-end" sx={{ p: 3, textAlign: 'right', typography: 'body2' }}>
-      <Stack direction="row">
+      {/* <Stack direction="row">
         <Box sx={{ color: 'text.secondary' }}>Subtotal</Box>
         <Box sx={{ width: 160, typography: 'subtitle2' }}>{fCurrency(subtotal) || '-'}</Box>
       </Stack>
@@ -40,12 +40,12 @@ export function OrderDetailsItems({
         <Box sx={{ width: 160, ...(discount && { color: 'error.main' }) }}>
           {discount ? `- ${fCurrency(discount)}` : '-'}
         </Box>
-      </Stack>
+      </Stack> */}
 
-      <Stack direction="row">
+      {/* <Stack direction="row">
         <Box sx={{ color: 'text.secondary' }}>Taxes</Box>
         <Box sx={{ width: 160 }}>{taxes ? fCurrency(taxes) : '-'}</Box>
-      </Stack>
+      </Stack> */}
 
       <Stack direction="row" sx={{ typography: 'subtitle1' }}>
         <div>Total</div>
@@ -56,14 +56,14 @@ export function OrderDetailsItems({
 
   return (
     <Card>
-      <CardHeader
+      {/* <CardHeader
         title="Details"
         action={
           <IconButton>
             <Iconify icon="solar:pen-bold" />
           </IconButton>
         }
-      />
+      /> */}
 
       <Scrollbar>
         {items.map((item) => (
@@ -77,11 +77,15 @@ export function OrderDetailsItems({
               borderBottom: (theme) => `dashed 2px ${theme.vars.palette.background.neutral}`,
             }}
           >
-            <Avatar src={item.coverUrl} variant="rounded" sx={{ width: 48, height: 48, mr: 2 }} />
+            <Avatar
+              src={JSON.parse(item.image)?.url || ''}
+              variant="rounded"
+              sx={{ width: 60, height: 60, mr: 2 }}
+            />
 
             <ListItemText
-              primary={item.name}
-              secondary={item.sku}
+              primary={item.meal_name}
+              secondary={item.type === 'non-veg' ? 'Non-Veg' : 'Veg'}
               primaryTypographyProps={{ typography: 'body2' }}
               secondaryTypographyProps={{
                 component: 'span',
@@ -90,10 +94,10 @@ export function OrderDetailsItems({
               }}
             />
 
-            <Box sx={{ typography: 'body2' }}>x{item.quantity}</Box>
+            <Box sx={{ typography: 'body2' }}>x{item.qty}</Box>
 
             <Box sx={{ width: 110, textAlign: 'right', typography: 'subtitle2' }}>
-              {fCurrency(item.price)}
+              {`₹${item.price || 0}`} {/* Default price if missing */}
             </Box>
           </Stack>
         ))}

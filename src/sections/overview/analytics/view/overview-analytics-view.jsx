@@ -62,6 +62,9 @@ export function OverviewAnalyticsView() {
   const { orders } = useSelector((state) => state.companyOrders);
   const { locations } = useSelector((state) => state.companyLocations);
 
+  const customerCount = Array.isArray(customers) ? customers.length : 0;
+  const orderCount = Array.isArray(orders) ? orders.length : 0;
+
   const customerLoading = useSelector((state) => state.companyCustomer.loading);
   const locationsLoading = useSelector((state) => state.companyLocations.loading);
   const ordersLoading = useSelector((state) => state.companyOrders.loading);
@@ -179,7 +182,7 @@ export function OverviewAnalyticsView() {
         <Grid xs={12} sm={6} md={3}>
           <AnalyticsWidgetSummary
             title="Total Users"
-            total={719}
+            total={customerCount}
             icon={
               <img alt="icon" src={`${CONFIG.site.basePath}/assets/icons/glass/ic-glass-bag.svg`} />
             }
@@ -197,7 +200,7 @@ export function OverviewAnalyticsView() {
         <Grid xs={12} sm={6} md={3}>
           <AnalyticsWidgetSummary
             title="Total Orders"
-            total={719}
+            total={orderCount}
             color="warning"
             icon={
               <img alt="icon" src={`${CONFIG.site.basePath}/assets/icons/glass/ic-glass-buy.svg`} />

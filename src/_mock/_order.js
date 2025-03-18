@@ -3,10 +3,12 @@ import { _mock } from './_mock';
 // ----------------------------------------------------------------------
 
 export const ORDER_STATUS_OPTIONS = [
-  // { value: 'pending', label: 'Pending' },
-  { value: 'completed', label: 'Completed' },
+  { value: 'confirmed', label: 'Confirmed' },
+  { value: 'pending', label: 'Pending' },
   { value: 'cancelled', label: 'Cancelled' },
-  { value: 'refunded', label: 'Refunded' },
+  { value: 'refund', label: 'Refunded' }, // Changed from 'refunded' to 'refund'
+  { value: 'failed', label: 'Failed' },
+  { value: 'delivered', label: 'Delivered' },
 ];
 
 const ITEMS = [...Array(3)].map((_, index) => ({

@@ -192,6 +192,37 @@ export function CompanyNewEditForm({ currentProduct }) {
       });
   };
 
+  const renderProperties = (
+    <Card sx={{ flex: 2, minWidth: 750, maxWidth: 350, minHeight: 200, maxHeight: 380 }}>
+      <CardHeader title="Company Permissions" sx={{ mb: 3, textAlign: 'center' }} />
+
+      <Divider />
+
+      <Stack spacing={3} sx={{ p: 3 }}>
+        <Stack direction="row" alignItems="center" spacing={3}>
+          <section
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1rem',
+              padding: '0',
+            }}
+          >
+            <Field.Switch name="meal.enabled" label="Add Meal" defaultChecked={false} />
+            <Field.Switch name="export.enabled" label="Export Orders" defaultChecked={false} />
+            <Field.Switch
+              name="guestMeal.enabled"
+              label="Order Guest Meal"
+              defaultChecked={false}
+            />
+            <Field.Switch name="vegOnly.enabled" label="Veg Only" defaultChecked={false} />
+            <Field.Switch name="liveCounter.enabled" label="Live Counter" defaultChecked={false} />
+          </section>
+        </Stack>
+      </Stack>
+    </Card>
+  );
+
   const renderDetails = (
     <Card sx={{ flex: 1, minWidth: 700, maxWidth: 800 }}>
       <Stack spacing={3} sx={{ p: 3 }}>
@@ -283,6 +314,8 @@ export function CompanyNewEditForm({ currentProduct }) {
         />
 
         <Divider />
+
+        {renderProperties}
 
         <section style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {values.domains?.map((domain, index) => (
@@ -436,37 +469,6 @@ export function CompanyNewEditForm({ currentProduct }) {
     </Card>
   );
 
-  const renderProperties = (
-    <Card sx={{ flex: 2, minWidth: 300, maxWidth: 350, minHeight: 200, maxHeight: 380 }}>
-      <CardHeader title="Company Permissions" sx={{ mb: 3 }} />
-
-      <Divider />
-
-      <Stack spacing={3} sx={{ p: 3 }}>
-        <Stack direction="row" alignItems="center" spacing={3}>
-          <section
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '1rem',
-              padding: '0',
-            }}
-          >
-            <Field.Switch name="meal.enabled" label="Add Meal" defaultChecked={false} />
-            <Field.Switch name="export.enabled" label="Export Orders" defaultChecked={false} />
-            <Field.Switch
-              name="guestMeal.enabled"
-              label="Order Guest Meal"
-              defaultChecked={false}
-            />
-            <Field.Switch name="vegOnly.enabled" label="Veg Only" defaultChecked={false} />
-            <Field.Switch name="liveCounter.enabled" label="Live Counter" defaultChecked={false} />
-          </section>
-        </Stack>
-      </Stack>
-    </Card>
-  );
-
   const renderActions = (
     <Stack spacing={3} direction="row" alignItems="center" flexWrap="wrap" marginRight={5}>
       <LoadingButton type="submit" variant="contained" size="large" loading={isSubmitting}>
@@ -477,11 +479,10 @@ export function CompanyNewEditForm({ currentProduct }) {
 
   return (
     <Form methods={methods} onSubmit={handleSubmit(onSubmit)}>
-      <Stack spacing={{ xs: 3, md: 5 }} sx={{ mx: '0', maxWidth: { xs: 720, xl: 880 } }}>
-        <div style={{ display: 'flex', gap: '1rem', width: '100%' }}>
-          {renderDetails}
-          {renderProperties}
-        </div>
+      <Stack spacing={{ xs: 3, md: 5 }} sx={{ mx: '0', maxWidth: { xs: 720, xl: 800 } }}>
+        {/* <div style={{ display: 'flex', gap: '1rem', width: '100%' }}> */}
+        {renderDetails}
+        {/* </div> */}
 
         <div
           style={{ marginTop: '1rem', display: 'flex', width: '140%', justifyContent: 'flex-end' }}

@@ -11,3 +11,5 @@ export * from './user-profile-view';
 export * from './user-company-edit-new';
 
 export * from './user-company-edit-form';
+
+export * from './user-details-view';

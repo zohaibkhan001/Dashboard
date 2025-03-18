@@ -31,83 +31,71 @@ export function InvoiceTableRow({ row, selected, onSelectRow, onViewRow, onEditR
   return (
     <>
       <TableRow hover selected={selected}>
-        <TableCell padding="checkbox">
+        {/* <TableCell padding="checkbox">
           <Checkbox
             checked={selected}
             onClick={onSelectRow}
             inputProps={{ id: `row-checkbox-${row.id}`, 'aria-label': `Row checkbox` }}
           />
-        </TableCell>
+        </TableCell> */}
 
         <TableCell>
-          <Stack spacing={2} direction="row" alignItems="center">
-            <Avatar alt={row.invoiceTo.name}>{row.invoiceTo.name.charAt(0).toUpperCase()}</Avatar>
-
-            <ListItemText
-              disableTypography
-              primary={
-                <Typography variant="body2" noWrap>
-                  {row.invoiceTo.name}
-                </Typography>
-              }
-              secondary={
-                <Link
-                  noWrap
-                  variant="body2"
-                  onClick={onViewRow}
-                  sx={{ color: 'text.disabled', cursor: 'pointer' }}
-                >
-                  {row.invoiceNumber}
-                </Link>
-              }
-            />
-          </Stack>
+          <Typography variant="body2" noWrap>
+            {row.transaction_id}
+          </Typography>
         </TableCell>
-
-        <TableCell>
-          <ListItemText
-            primary={fDate(row.createDate)}
-            secondary={fTime(row.createDate)}
-            primaryTypographyProps={{ typography: 'body2', noWrap: true }}
-            secondaryTypographyProps={{ mt: 0.5, component: 'span', typography: 'caption' }}
-          />
-        </TableCell>
-
-        <TableCell>
-          <ListItemText
-            primary={fDate(row.dueDate)}
-            secondary={fTime(row.dueDate)}
-            primaryTypographyProps={{ typography: 'body2', noWrap: true }}
-            secondaryTypographyProps={{ mt: 0.5, component: 'span', typography: 'caption' }}
-          />
-        </TableCell>
-
-        <TableCell>{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(row.totalAmount)}</TableCell>
-
-        <TableCell align="center">{row.paymentMethod}</TableCell>
 
         <TableCell>
           <Label
             variant="soft"
             color={
-              (row.status === 'paid' && 'success') ||
-              (row.status === 'pending' && 'warning') ||
-              // (row.status === 'overdue' && 'error') ||
+              (row.type === 'credit' && 'success') ||
+              (row.type === 'debit' && 'warning') ||
+              (row.type === 'refund' && 'info') ||
               'default'
             }
           >
+            {row.type}
+          </Label>
+        </TableCell>
+
+        <TableCell>
+          {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(
+            row.amount
+          )}
+        </TableCell>
+
+        <TableCell>
+          <Label variant="soft" color={row.status === 'completed' ? 'success' : 'warning'}>
             {row.status}
           </Label>
         </TableCell>
 
-        <TableCell align="right" sx={{ px: 1 }}>
+        <TableCell align="center">{row.payment_method}</TableCell>
+
+        <TableCell>
+          <Typography variant="body2" noWrap>
+            {row.description}
+          </Typography>
+        </TableCell>
+
+        <TableCell>
+          <ListItemText
+            primary={fDate(row.createdAt)}
+            secondary={fTime(row.createdAt)}
+            primaryTypographyProps={{ typography: 'body2', noWrap: true }}
+            secondaryTypographyProps={{ mt: 0.5, component: 'span', typography: 'caption' }}
+          />
+        </TableCell>
+
+        {/* <TableCell align="right" sx={{ px: 1 }}>
           <IconButton color={popover.open ? 'inherit' : 'default'} onClick={popover.onOpen}>
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
-        </TableCell>
+        </TableCell> */}
       </TableRow>
 
-      <CustomPopover
+      {/* <CustomPopover
         open={popover.open}
         anchorEl={popover.anchorEl}
         onClose={popover.onClose}
@@ -147,7 +135,7 @@ export function InvoiceTableRow({ row, selected, onSelectRow, onViewRow, onEditR
             Delete
           </MenuItem>
         </MenuList>
-      </CustomPopover>
+      </CustomPopover> */}
 
       <ConfirmDialog
         open={confirm.value}

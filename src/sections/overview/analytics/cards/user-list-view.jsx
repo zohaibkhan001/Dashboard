@@ -87,6 +87,13 @@ export function UserListView({ company_id }) {
   const notFound = (!dataFiltered.length && canReset) || !dataFiltered.length;
   const { token } = useSelector((state) => state.superAdminAuth);
 
+  const handleViewRow = useCallback(
+    (id) => {
+      router.push(paths.dashboard.user.details(id));
+    },
+    [router]
+  );
+
   const handleDeleteRow = useCallback(
     async (customer_id) => {
       try {
@@ -226,6 +233,7 @@ export function UserListView({ company_id }) {
                         onSelectRow={() => table.onSelectRow(row.id)}
                         onDeleteRow={() => handleDeleteRow(row.customer_id)}
                         onEditRow={() => handleEditRow(row.customer_id)}
+                        onViewRow={() => handleViewRow(row.customer_id)}
                       />
                     ))}
 
