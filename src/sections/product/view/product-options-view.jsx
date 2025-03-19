@@ -6,7 +6,7 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Unstable_Grid2';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
-import { LocalizationProvider, StaticDatePicker } from '@mui/x-date-pickers';
+import { LocalizationProvider, PickersDay, StaticDatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import { useParams } from 'react-router';
@@ -19,6 +19,10 @@ import { useRouter } from 'src/routes/hooks';
 import { LoadingButton } from '@mui/lab';
 import { Stack } from '@mui/material';
 import { Scrollbar } from 'src/components/scrollbar';
+import DatePicker from 'react-multi-date-picker';
+import DatePanel from 'react-multi-date-picker/plugins/date_panel';
+import 'react-multi-date-picker/styles/colors/green.css'; // ✅ Ensures Green Theme
+import 'react-multi-date-picker/styles/backgrounds/bg-dark.css'; // ✅ Optional: Dark Background if needed
 
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 import { DashboardContent } from 'src/layouts/dashboard';
@@ -40,9 +44,11 @@ export function ProductOptionsView() {
 
   const [selectedCompanies, setSelectedCompanies] = useState([]);
   const [selectedLocations, setSelectedLocations] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(dayjs());
+
+  const [selectedDates, setSelectedDates] = useState([]);
+
   const [selectedMealTimes, setSelectedMealTimes] = useState([]);
-  const [selectedWeekNumber, setSelectedWeekNumber] = useState(dayjs().week());
+  const [selectedWeeks, setSelectedWeeks] = useState([]);
   const [loading, setLoading] = useState(false);
 
   // console.log(token);
@@ -111,18 +117,28 @@ export function ProductOptionsView() {
   };
 
   const handleWeekSelection = (weekNumber) => {
-    setSelectedWeekNumber(weekNumber);
+    setSelectedWeeks(
+      (prevWeeks) =>
+        prevWeeks.includes(weekNumber)
+          ? prevWeeks.filter((week) => week !== weekNumber) // Remove if already selected
+          : [...prevWeeks, weekNumber] // Add if not selected
+    );
   };
 
-  // Filter locations based on selected companies
   const filteredLocations = locations.filter((location) =>
     selectedCompanies.includes(location.company_id)
   );
 
-  // Handle location selection
   const handleLocationSelection = (updatedLocations) => {
     setSelectedLocations(updatedLocations);
     setAllLocationsSelected(updatedLocations.length === filteredLocations.length);
+  };
+
+  const handleDateSelection = (dates) => {
+    if (!Array.isArray(dates)) return;
+
+    // Ensure all dates are stored as Day.js objects
+    setSelectedDates(dates.map((date) => dayjs(date)));
   };
 
   const handleSaveClick = async () => {
@@ -132,8 +148,8 @@ export function ProductOptionsView() {
       meal_type, // Directly use the meal type from params
       meal_time: selectedMealTimes,
       ...(meal_type === 'repeating'
-        ? { week_number: selectedWeekNumber } // Use week_number for repeating meals
-        : { specific_date: selectedDate.format('YYYY-MM-DD') }), // Use specific_date otherwise
+        ? { week_number: selectedWeeks } // Use week_number for repeating meals
+        : { specific_date: selectedDates }), // Use specific_date otherwise
     };
 
     console.log(payload);
@@ -234,7 +250,7 @@ export function ProductOptionsView() {
           </Grid>
           <Grid xs={12} md={7} lg={7}>
             <Card sx={{ p: 0, bgcolor: '#FFFFFF', borderRadius: 2 }}>
-              <Typography variant="h5" sx={{ marginBottom: '0.5em', ml: 4, mt: 2 }}>
+              <Typography variant="h5" sx={{ mb: 1, ml: 4, mt: 2 }}>
                 {meal_type === 'repeating' ? 'Select Week Number' : 'Date'}
               </Typography>
 
@@ -258,12 +274,21 @@ export function ProductOptionsView() {
                         .add(1, 'day')
                         .format('MMM D');
 
+                      const isSelected = selectedWeeks.includes(weekNumber); // ✅ Check if selected
+
                       return (
                         <Button
                           key={weekNumber}
-                          variant={selectedWeekNumber === weekNumber ? 'contained' : 'outlined'}
+                          variant={isSelected ? 'contained' : 'outlined'} // ✅ Highlight selected weeks
                           onClick={() => handleWeekSelection(weekNumber)}
-                          sx={{ mb: 1 }}
+                          sx={{
+                            mb: 1,
+                            backgroundColor: isSelected ? '#00A76F' : 'transparent', // ✅ Green highlight
+                            color: isSelected ? 'white' : '#00A76F',
+                            fontWeight: isSelected ? 'bold' : 'normal',
+                            border: isSelected ? '2px solid #00A76F' : '1px solid #00A76F',
+                            '&:hover': { backgroundColor: '#00A76F', color: 'white' },
+                          }}
                         >
                           Week {weekNumber} ({weekStart} - {weekEnd})
                         </Button>
@@ -272,13 +297,65 @@ export function ProductOptionsView() {
                   </Stack>
                 </Scrollbar>
               ) : (
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <StaticDatePicker
-                    displayStaticWrapperAs="desktop"
-                    value={selectedDate}
-                    onChange={(newValue) => newValue && setSelectedDate(newValue)}
+                <Box
+                  sx={{
+                    height: '50vh',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    mt: 2,
+                  }}
+                >
+                  <DatePicker
+                    multiple
+                    value={selectedDates}
+                    onChange={(dates) =>
+                      setSelectedDates(dates.map((date) => date.format('YYYY-MM-DD')))
+                    }
+                    placeholder="Click to select...."
+                    format="YYYY-MM-DD"
+                    highlightToday
+                    sort
+                    fixMainPosition
+                    inputClass="custom-datepicker-input"
+                    className="green"
+                    input={false} // Keeps the calendar always visible
+                    plugins={[<DatePanel removeButton={false} />]}
+                    mapDays={({ date }) => {
+                      const formattedDate = date.format('YYYY-MM-DD');
+
+                      const isSelected = selectedDates.some(
+                        (d) => dayjs(d).format('YYYY-MM-DD') === formattedDate
+                      );
+
+                      return {
+                        style: {
+                          backgroundColor: isSelected ? '#00A76F' : 'transparent', // ✅ Changed to Green
+                          color: isSelected ? 'white' : 'black',
+                          fontWeight: isSelected ? 'bold' : 'normal',
+                          borderRadius: '50%',
+                          padding: '5px',
+                          cursor: 'pointer',
+                          border: isSelected ? '2px solid #00A76F' : '1px solid transparent', // ✅ Border color fixed
+                          '&:hover': {
+                            backgroundColor: isSelected ? '#00A76F' : '#E0F2EF', // ✅ Light green hover effect
+                          },
+                        },
+                      };
+                    }}
+                    style={{
+                      display: 'block',
+                      width: '350px', // Increase width
+                      height: '40px', // Increase height
+                      fontSize: '15px', // Increase font size
+                      padding: '15px', // Add padding
+                      borderRadius: '8px', // Rounded corners
+                      border: '1px solid black', // Green border
+                      backgroundColor: 'white', // Keep background white
+                      color: 'black', // Green text color
+                    }}
                   />
-                </LocalizationProvider>
+                </Box>
               )}
 
               {/* <LocalizationProvider dateAdapter={AdapterDayjs}>

@@ -364,7 +364,18 @@ export function ProductLiveEditForm({ currentProduct }) {
           <CardHeader title="Details" />
           <Stack spacing={3} sx={{ p: 3 }}>
             <section style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem' }}>
-              <Field.Text name="price" label="Price in Rupees" type="number" />
+              <Field.Text
+                name="price"
+                label="Price in Rupees"
+                type="number"
+                onWheel={(e) => e.target.blur()} // ✅ Prevent scroll changing value
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                    e.preventDefault(); // ✅ Prevent arrow keys from changing value
+                  }
+                }}
+              />
+
               <Field.Text name="fat" label="Fat" type="number" />
             </section>
 

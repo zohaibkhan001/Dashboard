@@ -38,10 +38,12 @@ export const NewProductSchema = zod.object({
     alt: zod.string().min(1, { message: 'Alt text is required!' }),
   }),
 
+  price: zod.number().min(1, { message: 'Price is required!' }),
+
   weekDetails: zod.array(
     zod.object({
       day: zod.string(),
-      price: zod.number().optional(), // ✅ Make these fields optional
+      // price: zod.number().optional(), // ✅ Make these fields optional
       fat: zod.number().optional(),
       calorie: zod.number().optional(),
       protein: zod.number().optional(),
@@ -92,6 +94,7 @@ export function ProductDailyEditForm({ currentProduct }) {
         alt: currentProduct?.mealName || 'meal', // Automatically set alt to mealName
       },
       is_subsidised: currentProduct?.is_subsidised ?? false,
+      price: currentProduct?.price || 0, // ✅ Added main price field
 
       weekDetails: daysOfWeek.map((day) => ({
         day: day.toLowerCase(),
@@ -144,10 +147,15 @@ export function ProductDailyEditForm({ currentProduct }) {
   const onSubmit = handleSubmit(async (data) => {
     try {
       // ✅ Filter out empty days
-      const filteredWeekDetails = data.weekDetails.filter((day) => {
-        const hasValidItem = day.items && day.items.some((item) => item.trim() !== ''); // ✅ Ensure item is non-empty
-        return day.price || day.fat || day.calorie || day.protein || hasValidItem;
-      });
+      const filteredWeekDetails = data.weekDetails
+        .filter((day) => {
+          const hasValidItem = day.items && day.items.some((item) => item.trim() !== '');
+          return day.fat || day.calorie || day.protein || hasValidItem; // ✅ Removed individual price check
+        })
+        .map((day) => ({
+          ...day,
+          price: data.price,
+        }));
 
       // const filteredWeekDetails = data.weekDetails.filter(
       //   (day) =>
@@ -272,6 +280,18 @@ export function ProductDailyEditForm({ currentProduct }) {
       <Stack spacing={3} sx={{ p: 3 }}>
         <Field.Text name="mealName" label="Meal Name" />
 
+        <Field.Text
+          name="price"
+          label="Price (in Rupees)"
+          type="number"
+          onWheel={(e) => e.target.blur()} // ✅ Prevent scroll changing value
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+              e.preventDefault(); // ✅ Prevent arrow keys from changing value
+            }
+          }}
+        />
+
         <section style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem' }}>
           <Field.Select
             native
@@ -304,7 +324,6 @@ export function ProductDailyEditForm({ currentProduct }) {
             <option value="non-veg">Non-Veg</option>
           </Field.Select>
         </section>
-
         <Field.Text name="description" label="Description" multiline rows={4} />
         <Field.Select
           native
@@ -316,7 +335,6 @@ export function ProductDailyEditForm({ currentProduct }) {
           <option value="true">Yes</option>
           <option value="false">No</option>
         </Field.Select>
-
         <Stack spacing={1.5}>
           <Typography variant="subtitle2">Images</Typography>
 
@@ -388,11 +406,9 @@ export function ProductDailyEditForm({ currentProduct }) {
                   onClick={() => handleCardClick(index)} // ✅ Use `index` instead of day.toLowerCase()
                 />
                 <Collapse in={openCard === index}>
-                  {' '}
-                  {/* ✅ Compare with `index` instead of day.toLowerCase() */}
                   <CardContent>
                     <Stack spacing={3} sx={{ p: 3 }}>
-                      <section
+                      {/* <section
                         style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem' }}
                       >
                         <Field.Text
@@ -400,12 +416,13 @@ export function ProductDailyEditForm({ currentProduct }) {
                           label="Price in Rupees"
                           type="number"
                         />
-                        <Field.Text name={`weekDetails.${index}.fat`} label="Fat" type="number" />
-                      </section>
+                      </section> */}
 
                       <section
-                        style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem' }}
+                        style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem' }}
                       >
+                        <Field.Text name={`weekDetails.${index}.fat`} label="Fat" type="number" />
+
                         <Field.Text
                           name={`weekDetails.${index}.protein`}
                           label="Protein"
