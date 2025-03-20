@@ -51,7 +51,7 @@ const TABLE_HEAD = [
   { id: 'status', label: 'Status' },
   { id: 'payment_method', label: 'Payment Method' },
   { id: 'description', label: 'Description' },
-  { id: 'createdAt', label: 'Date' },
+  { id: 'createdAt', label: 'Payment Date' },
   { id: '' },
 ];
 

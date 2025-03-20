@@ -14,7 +14,18 @@ import { Iconify } from 'src/components/iconify';
 // ----------------------------------------------------------------------
 
 export function RenderCellPrice({ params }) {
-  return params.row.price ? `₹${params.row.price}` : '-';
+  // Ensure the row exists
+  if (!params.row) return '-';
+
+  // Check if it's a repeating meal and extract the first week's price
+  const isRepeatingMeal =
+    params.row.repeatingMealDetails && Array.isArray(params.row.repeatingMealDetails);
+
+  const price = isRepeatingMeal
+    ? params.row.repeatingMealDetails[0]?.price ?? '-' // Use the first available price
+    : params.row.price ?? '-'; // Use the regular price if not a repeating meal
+
+  return price !== '-' ? `₹${price}` : '-';
 }
 
 // ----------------------------------------------------------------------
@@ -81,13 +92,7 @@ export function RenderCellProduct({ params, onViewRow }) {
       <ListItemText
         disableTypography
         primary={
-          <Link
-            noWrap
-            color="inherit"
-            variant="subtitle2"
-            onClick={onViewRow}
-            sx={{ cursor: 'pointer' }}
-          >
+          <Link noWrap color="inherit" variant="subtitle2" sx={{ cursor: 'pointer' }}>
             {params.row.mealName}
           </Link>
         }

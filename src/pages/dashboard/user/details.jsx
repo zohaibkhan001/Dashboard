@@ -18,74 +18,61 @@ export default function Page() {
   const { id } = useParams();
   const { token } = useSelector((state) => state.superAdminAuth);
 
-  const [transactions, setTransactions] = useState(null);
-  const [transactionsLoading, setTransactionsLoading] = useState(true);
+  const [userData, setUserData] = useState({
+    user: null,
+    orders: null,
+    transactions: null,
+  });
 
-  const [orders, setOrders] = useState(null);
-  const [orderLoading, setOrdersLoading] = useState(true);
-
-  useEffect(() => {
-    if (!id || !token) return;
-
-    const getTransactions = async () => {
-      setTransactionsLoading(true);
-      try {
-        const response = await api.get(`/superAdmin/fetch_particular_customer_transaction/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        setTransactions(response.data.data);
-      } catch (error) {
-        console.error('Error fetching customer transactions:', error);
-        setTransactions(null);
-      } finally {
-        setTransactionsLoading(false);
-      }
-    };
-
-    getTransactions();
-  }, [id, token]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!id || !token) return;
 
-    const getCustomerOrders = async () => {
-      setOrdersLoading(true);
+    const fetchData = async () => {
+      setLoading(true);
       try {
-        const response = await api.get(`/superAdmin/fetch_particular_user_order/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const [userRes, ordersRes, transactionsRes] = await Promise.all([
+          api.get(`/superAdmin/fetch_particular_customer/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          api.get(`/superAdmin/fetch_particular_user_order/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          api.get(`/superAdmin/fetch_particular_customer_transaction/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
 
-        setOrders(response.data.data);
+        setUserData({
+          user: userRes.data.data,
+          orders: ordersRes.data.data,
+          transactions: transactionsRes.data.data,
+        });
       } catch (error) {
-        console.error('Error fetching customer orders:', error);
-        setOrders(null);
+        console.error('Error fetching data:', error);
+        setUserData({ user: null, orders: null, transactions: null });
       } finally {
-        setOrdersLoading(false);
+        setLoading(false);
       }
     };
 
-    getCustomerOrders();
+    fetchData();
   }, [id, token]);
 
-  console.log(transactions);
-  console.log(orders);
-
-  if (orderLoading || transactionsLoading) {
+  if (loading) {
     return <LoadingScreen />;
   }
-
   return (
     <>
       <Helmet>
         <title> {metadata.title}</title>
       </Helmet>
-
-      <UserDetailsVew orders={orders} transactions={transactions} />
+      <UserDetailsVew
+        user={userData.user}
+        orders={userData.orders}
+        transactions={userData.transactions}
+      />
     </>
   );
 }

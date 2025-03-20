@@ -20,6 +20,7 @@ import { Label } from 'src/components/label';
 import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 import { AnimateAvatar } from 'src/components/animate';
+import { useSelector } from 'react-redux';
 
 import { useMockedUser } from 'src/auth/hooks';
 
@@ -30,6 +31,7 @@ import { SignOutButton } from './sign-out-button';
 // ----------------------------------------------------------------------
 
 export function AccountDrawer({ data = [], sx, ...other }) {
+  const { user: superAdmin } = useSelector((state) => state.superAdminAuth);
   const theme = useTheme();
 
   const router = useRouter();
@@ -39,6 +41,15 @@ export function AccountDrawer({ data = [], sx, ...other }) {
   const { user } = useMockedUser();
 
   const [open, setOpen] = useState(false);
+
+  const toTitleCase = (str) => {
+    if (!str) return 'N/A';
+    return str
+      .toLowerCase()
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
 
   const handleOpenDrawer = useCallback(() => {
     setOpen(true);
@@ -102,16 +113,16 @@ export function AccountDrawer({ data = [], sx, ...other }) {
             {renderAvatar}
 
             <Typography variant="subtitle1" noWrap sx={{ mt: 2 }}>
-              {user?.displayName}
+              {toTitleCase(superAdmin?.name)}
             </Typography>
 
             <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }} noWrap>
-              {user?.email}
+              {superAdmin?.email}
             </Typography>
           </Stack>
 
           <Stack direction="row" spacing={1} flexWrap="wrap" justifyContent="center" sx={{ p: 3 }}>
-            {[...Array(3)].map((_, index) => (
+            {/* {[...Array(3)].map((_, index) => (
               <Tooltip
                 key={_mock.fullName(index + 1)}
                 title={`Switch to: ${_mock.fullName(index + 1)}`}
@@ -122,9 +133,9 @@ export function AccountDrawer({ data = [], sx, ...other }) {
                   onClick={() => {}}
                 />
               </Tooltip>
-            ))}
+            ))} */}
 
-            <Tooltip title="Add account">
+            {/* <Tooltip title="Add account">
               <IconButton
                 sx={{
                   bgcolor: varAlpha(theme.vars.palette.grey['500Channel'], 0.08),
@@ -133,7 +144,7 @@ export function AccountDrawer({ data = [], sx, ...other }) {
               >
                 <Iconify icon="mingcute:add-line" />
               </IconButton>
-            </Tooltip>
+            </Tooltip> */}
           </Stack>
 
           <Stack
@@ -176,9 +187,9 @@ export function AccountDrawer({ data = [], sx, ...other }) {
             })}
           </Stack>
 
-          <Box sx={{ px: 2.5, py: 3 }}>
+          {/* <Box sx={{ px: 2.5, py: 3 }}>
             <UpgradeBlock />
-          </Box>
+          </Box> */}
         </Scrollbar>
 
         <Box sx={{ p: 2.5 }}>

@@ -8,7 +8,7 @@ import { UserDetails } from '../user-details-view';
 
 // ----------------------------------------------------------------------
 
-export function UserDetailsVew({ user: currentUser, transactions, orders }) {
+export function UserDetailsVew({ currentUser, transactions, orders, user }) {
   return (
     <DashboardContent>
       <CustomBreadcrumbs
@@ -20,7 +20,7 @@ export function UserDetailsVew({ user: currentUser, transactions, orders }) {
         ]}
         sx={{ mb: { xs: 3, md: 5 } }}
       />
-      <UserDetails transactions={transactions} orders={orders} />
+      <UserDetails transactions={transactions} orders={orders} user={user[0]} />
     </DashboardContent>
   );
 }

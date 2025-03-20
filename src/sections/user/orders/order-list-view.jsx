@@ -46,7 +46,9 @@ const STATUS_OPTIONS = [{ value: 'all', label: 'All' }, ...ORDER_STATUS_OPTIONS]
 const TABLE_HEAD = [
   { id: 'order_id', label: 'Order ID', width: 100 },
   // { id: 'customer_name', label: 'Customer', width: 250 },
-  { id: 'order_date', label: 'Order Date', width: 120 },
+  { id: 'order_date', label: 'Order For', width: 120 },
+  { id: 'createdAt', label: 'Ordered on', width: 120 },
+
   { id: 'total_price', label: 'Total Price', width: 120 },
   { id: 'status', label: 'Status', width: 110 },
   { id: 'payment_method', label: 'Payment Method', width: 150 },

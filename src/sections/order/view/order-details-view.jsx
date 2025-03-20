@@ -28,6 +28,7 @@ export function OrderDetailsView({ order }) {
         backLink={paths.dashboard.order.root}
         orderNumber={order?.order_id}
         createdAt={order?.order_date}
+        createdOn={order?.createdAt}
         status={status}
         onChangeStatus={handleChangeStatus}
         statusOptions={ORDER_STATUS_OPTIONS}
@@ -49,9 +50,11 @@ export function OrderDetailsView({ order }) {
 
         <Grid xs={12} md={4}>
           <OrderDetailsInfo
+            order_id={order?.order_id}
             customer={order?.customer}
             delivery={order?.company_name}
             payment={order?.payment}
+            orderStatus={order?.status}
           />
         </Grid>
       </Grid>

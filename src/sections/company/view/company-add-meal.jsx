@@ -57,15 +57,19 @@ export function CompanyAddMealView() {
   const { quickMeals, loading: quickMealsLoading } = useSelector((state) => state.quickMeals);
 
   useEffect(() => {
+    let sortedMeals = [];
+
     if (selectedMenu === 'quick') {
-      setMasterMenuMeals(quickMeals);
+      sortedMeals = [...quickMeals];
     } else if (selectedMenu === 'repeating') {
-      setMasterMenuMeals(repeatingMeals);
+      sortedMeals = [...repeatingMeals];
     } else if (selectedMenu === 'liveCounter') {
-      setMasterMenuMeals(liveCounterMeals);
-    } else {
-      setMasterMenuMeals([]); // Empty if no valid selection
+      sortedMeals = [...liveCounterMeals];
     }
+
+    sortedMeals.sort((a, b) => b.meal_id - a.meal_id);
+
+    setMasterMenuMeals(sortedMeals); // ✅ Update state with sorted meals
 
     setSelectedMeal(null);
     setSelectedMeals([]);
@@ -542,10 +546,7 @@ export function CompanyAddMealView() {
                     setSelectedMeals([meal]); // ✅ Replaces the previously selected meal (only one meal is selected at a time)
                   }}
                 >
-                  {/* Meal Name & Price */}
-                  {/* Meal Container */}
                   <Box sx={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-                    {/* First Line: Meal Name & Price */}
                     <Box
                       sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}
                     >
@@ -570,7 +571,10 @@ export function CompanyAddMealView() {
                           whiteSpace: 'nowrap',
                         }}
                       >
-                        ₹ {meal.price || 0}
+                        ₹{' '}
+                        {selectedMenu === 'repeating' && meal.repeatingMealDetails?.length
+                          ? meal.repeatingMealDetails[0].price || 0
+                          : meal.price || 0}{' '}
                       </Typography>
                     </Box>
 

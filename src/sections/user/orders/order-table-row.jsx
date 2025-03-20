@@ -70,6 +70,15 @@ export function OrderTableRow({ row, selected, onViewRow, onSelectRow, onDeleteR
       <TableCell>
         <ListItemText
           primary={fDate(row.order_date)} // Updated to use `order_date`
+          secondary={fTime(row.order_date)} // Use `createdAt` for time
+          primaryTypographyProps={{ typography: 'body2', noWrap: true }}
+          secondaryTypographyProps={{ mt: 0.5, component: 'span', typography: 'caption' }}
+        />
+      </TableCell>
+
+      <TableCell>
+        <ListItemText
+          primary={fDate(row.createdAt)} // Updated to use `order_date`
           secondary={fTime(row.createdAt)} // Use `createdAt` for time
           primaryTypographyProps={{ typography: 'body2', noWrap: true }}
           secondaryTypographyProps={{ mt: 0.5, component: 'span', typography: 'caption' }}

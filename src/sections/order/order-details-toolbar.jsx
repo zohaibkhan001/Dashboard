@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 
 import { RouterLink } from 'src/routes/components';
 
-import { fDateTime } from 'src/utils/format-time';
+import { fDateTime, fTime } from 'src/utils/format-time';
 
 import { Label } from 'src/components/label';
 import { Iconify } from 'src/components/iconify';
@@ -20,6 +20,7 @@ export function OrderDetailsToolbar({
   status,
   backLink,
   createdAt,
+  createdOn,
   orderNumber,
   statusOptions,
   onChangeStatus,
@@ -42,14 +43,19 @@ export function OrderDetailsToolbar({
 
           <Stack spacing={0.5}>
             <Stack spacing={1} direction="row" alignItems="center">
-              <Typography variant="h4"> Order {orderNumber} </Typography>
+              <Typography variant="h4"> {`Order number #${orderNumber} `}</Typography>
               <Label variant="soft" color={statusColors[status] || 'default'}>
                 {status ? status.charAt(0).toUpperCase() + status.slice(1) : 'N/A'}
               </Label>
             </Stack>
 
             <Typography variant="body2" sx={{ color: 'text.disabled' }}>
-              {createdAt ? dayjs(createdAt).format('DD MMM YYYY') : 'N/A'}
+              Order for:{createdAt ? dayjs(createdAt).format(' DD MMM YYYY ') : 'N/A'}
+              {fTime(createdAt)}
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'text.disabled' }}>
+              Ordered on:{createdAt ? dayjs(createdOn).format(' DD MMM YYYY ') : 'N/A'}
+              {fTime(createdOn)}
             </Typography>
           </Stack>
         </Stack>

@@ -54,7 +54,9 @@ const STATUS_OPTIONS = [{ value: 'all', label: 'All' }, ...ORDER_STATUS_OPTIONS]
 const TABLE_HEAD = [
   { id: 'order_id', label: 'Order ID', width: 100 },
   { id: 'customer_name', label: 'Customer' },
-  { id: 'order_date', label: 'Order Date', width: 140 },
+  { id: 'order_date', label: 'Ordered for', width: 140 },
+  { id: 'createdAt', label: 'Ordered on', width: 140 },
+
   // { id: 'items', label: 'Total Items', width: 120, align: 'center' },
   { id: 'total_price', label: 'Total Price (₹)', width: 140 },
   { id: 'status', label: 'Status', width: 110 },
@@ -74,7 +76,7 @@ export function OrderListView() {
     dispatch(fetchAllOrders(token));
   }, [dispatch, token]);
 
-  const table = useTable({ defaultOrderBy: 'orderNumber' });
+  const table = useTable({ defaultOrderBy: 'order_id' });
 
   const router = useRouter();
 
@@ -335,9 +337,8 @@ function applyFilter({ inputData, comparator, filters, dateError }) {
   const stabilizedThis = inputData.map((el, index) => [el, index]);
 
   stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
+    const order = comparator(a[0], b[0]); // Default sorting logic
+    return -order; // Negate the result to enforce descending order
   });
 
   inputData = stabilizedThis.map((el) => el[0]);

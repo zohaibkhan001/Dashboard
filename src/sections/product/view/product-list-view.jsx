@@ -278,7 +278,7 @@ export function ProductListView() {
         ? meals
             .map((meal) => ({
               ...meal,
-              id: meal.meal_id, // Assign meal_id as id
+              id: meal.meal_id,
               image: JSON.parse(meal.image)?.url || '', // Extract image URL
               categoryName: meal.category?.name || 'Uncategorized', // Handle category name
               createdAt: meal.createdAt ? new Date(meal.createdAt) : null, // Convert to Date object for sorting
@@ -295,6 +295,8 @@ export function ProductListView() {
       setTableData(formatAndSortMeals(liveCounterMeals));
     }
   }, [selectedMenu, quickMeals, repeatingMeals, liveCounterMeals]);
+
+  console.log(tableData);
 
   // const confirmDeleteRow = async () => {
   //   if (confirmDelete.id !== null) {

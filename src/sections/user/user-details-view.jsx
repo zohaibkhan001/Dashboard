@@ -41,19 +41,33 @@ export const NewUserSchema = zod.object({
 
 // ----------------------------------------------------------------------
 
-export function UserDetails({ currentUser, transactions, orders }) {
+export function UserDetails({ currentUser, transactions, orders, user }) {
   const router = useRouter();
+
+  const { id } = useParams();
 
   const defaultValues = useMemo(
     () => ({
-      name: '',
-      email: '',
-      phone: '',
-      company_id: '',
-      designation: '',
+      name: user?.name || '',
+      email: user?.email || '',
+      phone: user?.phone || '',
+      companyName: user?.company?.companyName || '',
+      designation: user?.designation || '',
+      wallet_balance: user?.wallet_balance || 0,
     }),
-    []
+    [user]
   );
+
+  const deviceInfo = useMemo(() => {
+    try {
+      return user?.device_info ? JSON.parse(user.device_info) : null;
+    } catch (error) {
+      console.error('Error parsing device_info:', error);
+      return null;
+    }
+  }, [user]);
+
+  console.log(deviceInfo);
 
   const methods = useForm({
     mode: 'onSubmit',
@@ -71,17 +85,18 @@ export function UserDetails({ currentUser, transactions, orders }) {
 
   const values = watch();
 
-  const onSubmit = handleSubmit(async (data) => {
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      reset();
-      toast.success(currentUser ? 'Update success!' : 'Create success!');
-      router.push(paths.dashboard.user.list);
-      console.info('DATA', data);
-    } catch (error) {
-      console.error(error);
-    }
-  });
+  const hanldeEditClick = () => {
+    router.push(paths.dashboard.user.userEdit(Number(id)));
+  };
+
+  const toTitleCase = (str) => {
+    if (!str) return 'N/A';
+    return str
+      .toLowerCase()
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
 
   const [activeTab, setActiveTab] = useState(0);
 
@@ -93,17 +108,17 @@ export function UserDetails({ currentUser, transactions, orders }) {
     <Box sx={{ width: '100%', bgcolor: 'background.paper' }}>
       {/* Tabs Header */}
       <Tabs value={activeTab} onChange={handleChange} centered>
-        {/* <Tab label="General" /> */}
+        <Tab label="General" />
         <Tab label="Wallet Transactions" />
         <Tab label="Orders" />
       </Tabs>
 
       {/* Tabs Content */}
       <Box sx={{ p: 3 }}>
-        {/* {activeTab === 0 && (
-          <Form methods={methods} onSubmit={onSubmit}>
-            <Grid container spacing={3}>
-              <Grid xs={12} md={4}>
+        {activeTab === 0 && (
+          <Form methods={methods}>
+            <Grid container spacing={3} sx={{ width: '100%' }}>
+              {/* <Grid xs={12} md={4}>
                 <Card sx={{ py: 2.5, px: 3 }}>
                   {currentUser && (
                     <Label
@@ -148,42 +163,141 @@ export function UserDetails({ currentUser, transactions, orders }) {
                     </Stack>
                   )}
                 </Card>
-              </Grid>
+              </Grid> */}
 
-              <Grid xs={12} md={8}>
-                <Card sx={{ p: 3 }}>
+              <Grid xs={12}>
+                <Card sx={{ p: 3, width: '100%' }}>
                   <Box
                     rowGap={3}
                     columnGap={2}
                     display="grid"
                     gridTemplateColumns={{
                       xs: 'repeat(1, 1fr)',
-                      sm: 'repeat(2, 1fr)',
+                      sm: 'repeat(3, 1fr)',
+                      md: 'repeat(3,1f)',
                     }}
                   >
-                    <Field.Text name="name" label="Full Name" />
-                    <Field.Text name="email" label="Email Address" />
-                    <Field.Text name="phone" label="Phone Number" />
-                    <Field.Text name="company_id" label="Company ID" type="number" />
-                    <Field.Text name="designation" label="Designation" />
+                    <Field.Text
+                      name="name"
+                      label="Full Name"
+                      InputProps={{ readOnly: true }}
+                      value={user?.name || ''}
+                    />
+                    <Field.Text
+                      name="email"
+                      label="Email Address"
+                      InputProps={{ readOnly: true }}
+                      value={user?.email || ''}
+                    />
+                    <Field.Text
+                      name="phone"
+                      label="Phone Number"
+                      InputProps={{ readOnly: true }}
+                      value={user?.phone || ''}
+                    />
+                    <Field.Text
+                      name="companyName"
+                      label="Company Name"
+                      InputProps={{ readOnly: true }}
+                      value={user?.company?.companyName || ''}
+                    />
+                    <Field.Text
+                      name="designation"
+                      label="Designation"
+                      InputProps={{ readOnly: true }}
+                      value={user?.designation || ''}
+                    />
+                    <Field.Text
+                      name="wallet_balance"
+                      label="Wallet Balance"
+                      InputProps={{ readOnly: true }}
+                      value={user?.wallet_balance || 0}
+                    />
                   </Box>
 
                   <Stack alignItems="flex-end" sx={{ mt: 3 }}>
-                    <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
-                      {!currentUser ? 'Create user' : 'Save changes'}
+                    <LoadingButton type="button" variant="contained" onClick={hanldeEditClick}>
+                      Edit user info
                     </LoadingButton>
                   </Stack>
+                </Card>
+
+                <Card sx={{ p: 3, width: '100%', mt: 3 }}>
+                  <Typography variant="h6" gutterBottom>
+                    Device Info
+                  </Typography>
+
+                  {deviceInfo ? (
+                    <Box
+                      rowGap={2}
+                      columnGap={2}
+                      display="grid"
+                      gridTemplateColumns={{
+                        xs: 'repeat(1, 1fr)',
+                        sm: 'repeat(3, 1fr)',
+                        md: 'repeat(3, 1fr)',
+                      }}
+                      sx={{ width: '100%' }}
+                    >
+                      <Field.Text
+                        name="brand"
+                        label="Brand"
+                        value={toTitleCase(deviceInfo?.brand) || 'N/A'}
+                        InputProps={{ readOnly: true }}
+                      />
+                      <Field.Text
+                        name="model"
+                        label="Model"
+                        value={deviceInfo.model || 'N/A'}
+                        InputProps={{ readOnly: true }}
+                      />
+                      <Field.Text
+                        name="systemName"
+                        label="OS Name"
+                        value={deviceInfo.systemName || 'N/A'}
+                        InputProps={{ readOnly: true }}
+                      />
+                      <Field.Text
+                        name="systemVersion"
+                        label="OS Version"
+                        value={deviceInfo.systemVersion || 'N/A'}
+                        InputProps={{ readOnly: true }}
+                      />
+                      <Field.Text
+                        name="deviceId"
+                        label="Device ID"
+                        value={deviceInfo.deviceId || 'N/A'}
+                        InputProps={{ readOnly: true }}
+                      />
+                      <Field.Text
+                        name="ipAddress"
+                        label="IP Address"
+                        value={deviceInfo.ipAddress || 'N/A'}
+                        InputProps={{ readOnly: true }}
+                      />
+                      <Field.Text
+                        name="AppVersion"
+                        label="App Version"
+                        value={toTitleCase(deviceInfo.AppVersion) || 'N/A'}
+                        InputProps={{ readOnly: true }}
+                      />
+                    </Box>
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">
+                      No device information available.
+                    </Typography>
+                  )}
                 </Card>
               </Grid>
             </Grid>
           </Form>
-        )} */}
-        {activeTab === 0 && (
+        )}
+        {activeTab === 1 && (
           <Box sx={{ width: '110%', maxWidth: '1200px', marginLeft: '-2.5rem', p: 0 }}>
             <InvoiceListView transactions={transactions} />
           </Box>
         )}
-        {activeTab === 1 && (
+        {activeTab === 2 && (
           <Box sx={{ width: '110%', maxWidth: '1200px', marginLeft: '-2.5rem', p: 0 }}>
             <OrderListView orders={orders} />
           </Box>

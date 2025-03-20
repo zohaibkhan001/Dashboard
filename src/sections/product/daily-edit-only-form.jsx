@@ -32,7 +32,8 @@ export const NewProductSchema = zod.object({
   type: zod.enum(['veg', 'non-veg'], { message: 'Type must be "veg" or "non-veg"' }),
   description: zod.string().min(1, { message: 'Description is required!' }),
 
-  // Validate image structure
+  price: zod.number().min(1, { message: 'Price is required!' }), // ✅ Price moved to the main form
+
   images: zod.object({
     url: zod.string().url({ message: 'Valid Image URL required!' }),
     alt: zod.string().min(1, { message: 'Alt text is required!' }),
@@ -41,7 +42,7 @@ export const NewProductSchema = zod.object({
   weekDetails: zod.array(
     zod.object({
       day: zod.string(),
-      price: zod.number().optional(), // ✅ Make these fields optional
+      // price: zod.number().optional(), // ✅ Make these fields optional
       fat: zod.number().optional(),
       calorie: zod.number().optional(),
       protein: zod.number().optional(),
@@ -86,6 +87,8 @@ export function DailyEditForm({ currentProduct }) {
 
   const currentMeal = repeatingMeals.find((meal) => meal.meal_id === numericMealId);
 
+  const defaultPrice = currentMeal?.repeatingMealDetails?.[0]?.price || 0; // ✅ Pick price from any entry
+
   const defaultValues = useMemo(
     () => ({
       mealName: currentMeal?.mealName || '',
@@ -97,8 +100,8 @@ export function DailyEditForm({ currentProduct }) {
         alt: currentMeal?.mealName || 'meal',
       },
       is_subsidised: currentMeal?.is_subsidised ?? false,
+      price: defaultPrice, // ✅ Price added in the main form
 
-      // Populate weekDetails correctly
       weekDetails: daysOfWeek.map((day) => {
         const dayDetails = currentMeal?.repeatingMealDetails?.find(
           (d) => d.dayOfWeek.toLowerCase() === day
@@ -106,7 +109,7 @@ export function DailyEditForm({ currentProduct }) {
 
         return {
           day,
-          price: dayDetails?.price || 0,
+          // price: dayDetails?.price || 0,
           fat: dayDetails?.fat || 0,
           calorie: dayDetails?.calorie || 0,
           protein: dayDetails?.protein || 0,
@@ -114,7 +117,7 @@ export function DailyEditForm({ currentProduct }) {
         };
       }),
     }),
-    [currentMeal, daysOfWeek]
+    [currentMeal, daysOfWeek, defaultPrice]
   );
 
   const methods = useForm({
@@ -154,26 +157,23 @@ export function DailyEditForm({ currentProduct }) {
     try {
       const existingDetails = currentMeal?.repeatingMealDetails || [];
 
-      // ✅ Process `weekDetails`, ensuring correct IDs and formatting
       const filteredDetails = data.weekDetails
         .filter((day) => {
           const hasValidItem = day.items && day.items.some((item) => item.trim() !== '');
-          return day.price || day.fat || day.calorie || day.protein || hasValidItem;
+          return day.fat || day.calorie || day.protein || hasValidItem; // ✅ Removed price check
         })
         .map((day) => {
           const existingDetail = existingDetails.find((d) => d.dayOfWeek.toLowerCase() === day.day);
 
-          // ✅ Build the `detail` object dynamically, excluding `id` if not available
           const detail = {
             dayOfWeek: day.day,
-            price: day.price,
+            price: data.price, // ✅ Use main price for all days
             fat: day.fat,
             calorie: day.calorie,
             protein: day.protein,
-            items: day.items, // ✅ API expects an array, no need to stringify
+            items: day.items,
           };
 
-          // ✅ Only include `id` if it exists
           if (existingDetail?.id) {
             detail.id = existingDetail.id;
           }
@@ -278,7 +278,6 @@ export function DailyEditForm({ currentProduct }) {
     name: 'weekDetails',
   });
 
-  // ✅ Now map over `weekDetailsArray.fields` instead of using `daysOfWeek`
   const weekDetailsFields = weekDetailsArray.fields.map((field, index) => ({
     day: field.day, // Assuming `field.day` exists
     index, // Store index for field reference
@@ -296,6 +295,18 @@ export function DailyEditForm({ currentProduct }) {
 
       <Stack spacing={3} sx={{ p: 3 }}>
         <Field.Text name="mealName" label="Meal Name" />
+
+        <Field.Text
+          name="price"
+          label="Price (in Rupees)"
+          type="number"
+          onWheel={(e) => e.target.blur()} // ✅ Prevent scroll changing value
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+              e.preventDefault(); // ✅ Prevent arrow keys from changing value
+            }
+          }}
+        />
 
         <section style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem' }}>
           <TextField
@@ -403,7 +414,7 @@ export function DailyEditForm({ currentProduct }) {
                 <Collapse in={openCard === index}>
                   <CardContent>
                     <Stack spacing={3} sx={{ p: 3 }}>
-                      <section
+                      {/* <section
                         style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem' }}
                       >
                         <Field.Text
@@ -411,12 +422,13 @@ export function DailyEditForm({ currentProduct }) {
                           label="Price in Rupees"
                           type="number"
                         />
-                        <Field.Text name={`weekDetails.${index}.fat`} label="Fat" type="number" />
-                      </section>
+                      </section> */}
 
                       <section
                         style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem' }}
                       >
+                        <Field.Text name={`weekDetails.${index}.fat`} label="Fat" type="number" />
+
                         <Field.Text
                           name={`weekDetails.${index}.protein`}
                           label="Protein"

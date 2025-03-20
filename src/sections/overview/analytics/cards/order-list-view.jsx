@@ -47,7 +47,9 @@ import { OrderTableFiltersResult } from './order-table-filters-result';
 const TABLE_HEAD = [
   { id: 'order_id', label: 'Order ID', width: 88 },
   { id: 'customer_name', label: 'Customer' },
-  { id: 'order_date', label: 'Date', width: 140 },
+  { id: 'order_date', label: 'Ordered for', width: 140 },
+  { id: 'createdAt', label: 'Ordered on', width: 140 },
+
   { id: 'total_price', label: 'Price', width: 140 },
   { id: 'status', label: 'Status', width: 110 },
   { id: '', width: 88 },
@@ -56,7 +58,7 @@ const TABLE_HEAD = [
 // ----------------------------------------------------------------------
 
 export function OrderListView() {
-  const table = useTable({ defaultOrderBy: 'orderNumber' });
+  const table = useTable({ defaultOrderBy: 'order_id' });
 
   const { orders, loading } = useSelector((state) => state.companyOrders);
 
@@ -274,9 +276,8 @@ function applyFilter({ inputData, comparator, filters, dateError }) {
   const stabilizedThis = inputData.map((el, index) => [el, index]);
 
   stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
+    const order = comparator(a[0], b[0]); // Default sorting logic
+    return -order; // Negate the result to enforce descending order
   });
 
   inputData = stabilizedThis.map((el) => el[0]);

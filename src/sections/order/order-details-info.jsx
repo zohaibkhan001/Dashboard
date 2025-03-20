@@ -11,10 +11,61 @@ import Typography from '@mui/material/Typography';
 
 import { Iconify } from 'src/components/iconify';
 import dayjs from 'dayjs';
+import { Field } from 'src/components/hook-form';
+import { useState } from 'react';
+import { Menu, MenuItem } from '@mui/material';
+import { ConfirmDialog } from 'src/components/custom-dialog';
 
 // ----------------------------------------------------------------------
 
-export function OrderDetailsInfo({ customer, delivery, payment, shippingAddress }) {
+export function OrderDetailsInfo({
+  order_id,
+  customer,
+  delivery,
+  payment,
+  orderStatus,
+  shippingAddress,
+}) {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialogTitle, setDialogTitle] = useState('');
+  const [dialogContent, setDialogContent] = useState('');
+  const [selectedAction, setSelectedAction] = useState('');
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleCancelClick = () => {
+    setSelectedAction('Cancel Order');
+    setDialogTitle('Cancel Order');
+    setDialogContent('Are you sure you want to cancel this order? This action cannot be undone.');
+    setOpenDialog(true);
+  };
+
+  const handleConfirmClick = () => {
+    setSelectedAction('Confirm Order');
+    setDialogTitle('Confirm Order');
+    setDialogContent('Are you sure you want to confirm this order? This action cannot be undone.');
+    setOpenDialog(true);
+  };
+
+  const handleConfirmAction = () => {
+    if (selectedAction === 'Cancel Order') {
+      handleClose();
+      alert(`Order ID: ${order_id}\nAction: Order has been cancelled.`);
+    } else if (selectedAction === 'Confirm Order') {
+      handleClose();
+
+      alert(`Order ID: ${order_id}\nAction: Order has been confirmed.`);
+    }
+    setOpenDialog(false);
+  };
+
   const renderCustomer = (
     <>
       {/* <CardHeader
@@ -102,7 +153,7 @@ export function OrderDetailsInfo({ customer, delivery, payment, shippingAddress 
         </Stack>
         <Stack direction="row" alignItems="center">
           <Box component="span" sx={{ color: 'text.secondary', width: 120, flexShrink: 0 }}>
-            Created on
+            Paid on:
           </Box>
           {payment?.createdAt ? dayjs(payment.createdAt).format('DD MMM YYYY, hh:mm A') : 'N/A'}
         </Stack>
@@ -146,6 +197,33 @@ export function OrderDetailsInfo({ customer, delivery, payment, shippingAddress 
     </>
   );
 
+  const renderActionButtons = (
+    <Stack spacing={1.5} sx={{ p: 3, typography: 'body2' }}>
+      <Stack direction="row">
+        <Button
+          variant="contained"
+          onClick={handleClick}
+          startIcon={<Iconify icon="lets-icons:arrow-drop-down-big" />}
+          fullWidth
+        >
+          Change order status
+        </Button>
+        <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+          <Box sx={{ width: '20vh', justifyContent: 'center' }}>
+            <MenuItem onClick={handleCancelClick}>Cancel Order</MenuItem>
+            <MenuItem onClick={handleConfirmClick}>Confirm Order</MenuItem>
+          </Box>
+        </Menu>
+      </Stack>
+
+      <Stack direction="row">
+        <Button variant="contained" fullWidth disabled={orderStatus !== 'cancelled'}>
+          Initiate Refund
+        </Button>
+      </Stack>
+    </Stack>
+  );
+
   const renderPayment = (
     <>
       {/* <CardHeader
@@ -171,18 +249,23 @@ export function OrderDetailsInfo({ customer, delivery, payment, shippingAddress 
   return (
     <Card>
       {renderCustomer}
-
       <Divider sx={{ borderStyle: 'dashed' }} />
-
       {renderDelivery}
-
       <Divider sx={{ borderStyle: 'dashed' }} />
-
       {renderShipping}
-
       <Divider sx={{ borderStyle: 'dashed' }} />
-
-      {renderPayment}
+      {renderActionButtons}
+      <ConfirmDialog
+        title={dialogTitle}
+        content={dialogContent}
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        action={
+          <Button variant="contained" color="error" onClick={handleConfirmAction}>
+            Confirm
+          </Button>
+        }
+      />{' '}
     </Card>
   );
 }
