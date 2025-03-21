@@ -15,6 +15,11 @@ import { Field } from 'src/components/hook-form';
 import { useState } from 'react';
 import { Menu, MenuItem } from '@mui/material';
 import { ConfirmDialog } from 'src/components/custom-dialog';
+import api from 'src/utils/api';
+import { toast } from 'sonner';
+import { useSelector } from 'react-redux';
+import { LoadingButton } from '@mui/lab';
+import { useRouter } from 'src/routes/hooks';
 
 // ----------------------------------------------------------------------
 
@@ -25,16 +30,23 @@ export function OrderDetailsInfo({
   payment,
   orderStatus,
   shippingAddress,
+  status,
 }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogTitle, setDialogTitle] = useState('');
   const [dialogContent, setDialogContent] = useState('');
   const [selectedAction, setSelectedAction] = useState('');
+  const [cancelLoading, setCancelLoading] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+
+  const router = useRouter();
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
+  const { token } = useSelector((state) => state.superAdminAuth);
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -54,10 +66,34 @@ export function OrderDetailsInfo({
     setOpenDialog(true);
   };
 
-  const handleConfirmAction = () => {
+  const handleConfirmAction = async () => {
     if (selectedAction === 'Cancel Order') {
       handleClose();
-      alert(`Order ID: ${order_id}\nAction: Order has been cancelled.`);
+      setOpenDialog(false);
+      setCancelLoading(true);
+      try {
+        const response = await api.post(
+          'superAdmin/cancel_order',
+          { order_id },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        if (response.status === 200) {
+          toast.success(
+            `Order ${order_id} has been cancelled successfully.Refund will be initiated`
+          );
+          setTimeout(() => {
+            router.push(0);
+          }, 2000);
+        } else {
+          toast.error(`Failed to cancel order ${order_id}.`);
+        }
+      } catch (error) {
+        console.error('Error cancelling order:', error);
+        toast.error(error.msg);
+      } finally {
+        setCancelLoading(false);
+      }
     } else if (selectedAction === 'Confirm Order') {
       handleClose();
 
@@ -200,27 +236,45 @@ export function OrderDetailsInfo({
   const renderActionButtons = (
     <Stack spacing={1.5} sx={{ p: 3, typography: 'body2' }}>
       <Stack direction="row">
-        <Button
+        <LoadingButton
           variant="contained"
           onClick={handleClick}
           startIcon={<Iconify icon="lets-icons:arrow-drop-down-big" />}
           fullWidth
+          loading={cancelLoading || confirmLoading}
+          disabled={status === 'cancelled'}
         >
           Change order status
-        </Button>
+        </LoadingButton>
+
         <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
-          <Box sx={{ width: '20vh', justifyContent: 'center' }}>
-            <MenuItem onClick={handleCancelClick}>Cancel Order</MenuItem>
-            <MenuItem onClick={handleConfirmClick}>Confirm Order</MenuItem>
+          <Box
+            sx={{
+              width: '20vh',
+              justifyContent: 'center',
+            }}
+          >
+            <MenuItem
+              onClick={handleCancelClick}
+              sx={{ border: '1px solid black', borderRadius: '8px' }}
+            >
+              Cancel Order
+            </MenuItem>
+            <MenuItem
+              onClick={handleConfirmClick}
+              sx={{ border: '1px solid black', borderRadius: '8px' }}
+            >
+              Confirm Order
+            </MenuItem>
           </Box>
         </Menu>
       </Stack>
 
-      <Stack direction="row">
+      {/* <Stack direction="row">
         <Button variant="contained" fullWidth disabled={orderStatus !== 'cancelled'}>
           Initiate Refund
         </Button>
-      </Stack>
+      </Stack> */}
     </Stack>
   );
 

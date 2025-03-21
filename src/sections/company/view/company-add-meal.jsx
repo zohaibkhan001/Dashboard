@@ -197,12 +197,14 @@ export function CompanyAddMealView() {
 
     // Add `specific_date` for quick & liveCounter meals
     if (mealType === 'quick' || mealType === 'liveCounter') {
-      requestBody.specific_date = formattedDate;
+      requestBody.specific_date = Array.isArray(formattedDate) ? formattedDate : [formattedDate];
     }
 
     // Add `week_number` for repeating meals
     if (mealType === 'repeating') {
-      requestBody.week_number = selectedWeekNumber;
+      requestBody.week_number = Array.isArray(selectedWeekNumber)
+        ? selectedWeekNumber
+        : [selectedWeekNumber];
     }
 
     // console.log(requestBody);
@@ -217,7 +219,8 @@ export function CompanyAddMealView() {
       fetchMenuForMealType();
       //   setSelectedMeals([]);
     } catch (error) {
-      console.error('Error adding meal:', error.response?.data || error.message);
+      toast.error(error.msg);
+      console.error('Error adding meal:', error.msg);
     } finally {
       setAddMealLoading(false);
     }

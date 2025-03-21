@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
@@ -16,6 +16,8 @@ import { orderBy } from 'src/utils/helper';
 import { POST_SORT_OPTIONS } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { useGetPosts, useSearchPosts } from 'src/actions/blog';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchAllBlogs } from 'src/utils/Redux/slices/allBlogs';
 
 import { Label } from 'src/components/label';
 import { Iconify } from 'src/components/iconify';
@@ -34,13 +36,19 @@ export function PostListView() {
 
   const debouncedQuery = useDebounce(searchQuery);
 
-  const { posts, postsLoading } = useGetPosts();
-
   const { searchResults, searchLoading } = useSearchPosts(debouncedQuery);
 
   const filters = useSetState({ publish: 'all' });
 
-  const dataFiltered = applyFilter({ inputData: posts, filters: filters.state, sortBy });
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchAllBlogs());
+  }, [dispatch]);
+
+  const { blogs, loading, error } = useSelector((state) => state.allBlogs);
+
+  const dataFiltered = applyFilter({ inputData: blogs, filters: filters.state, sortBy });
 
   const handleSortBy = useCallback((newValue) => {
     setSortBy(newValue);
@@ -60,7 +68,7 @@ export function PostListView() {
   return (
     <DashboardContent>
       <CustomBreadcrumbs
-        heading="List"
+        heading="Blogs List"
         links={[
           { name: 'Dashboard', href: paths.dashboard.root },
           { name: 'Blog', href: paths.dashboard.post.root },
@@ -86,13 +94,13 @@ export function PostListView() {
         direction={{ xs: 'column', sm: 'row' }}
         sx={{ mb: { xs: 3, md: 5 } }}
       >
-        <PostSearch
+        {/* <PostSearch
           query={debouncedQuery}
           results={searchResults}
           onSearch={handleSearch}
           loading={searchLoading}
           hrefItem={(title) => paths.dashboard.post.details(title)}
-        />
+        /> */}
 
         <PostSort sort={sortBy} onSort={handleSortBy} sortOptions={POST_SORT_OPTIONS} />
       </Stack>
@@ -102,7 +110,7 @@ export function PostListView() {
         onChange={handleFilterPublish}
         sx={{ mb: { xs: 3, md: 5 } }}
       >
-        {['all', 'published', 'draft'].map((tab) => (
+        {/* {['all', 'published', 'draft'].map((tab) => (
           <Tab
             key={tab}
             iconPosition="end"
@@ -113,19 +121,17 @@ export function PostListView() {
                 variant={((tab === 'all' || tab === filters.state.publish) && 'filled') || 'soft'}
                 color={(tab === 'published' && 'info') || 'default'}
               >
-                {tab === 'all' && posts.length}
-
-                {tab === 'published' && posts.filter((post) => post.publish === 'published').length}
-
-                {tab === 'draft' && posts.filter((post) => post.publish === 'draft').length}
+                {tab === 'all' && blogs.length}
+                {tab === 'published' && blogs.filter((post) => post.publish === 'published').length}
+                {tab === 'draft' && blogs.filter((post) => post.publish === 'draft').length}
               </Label>
             }
             sx={{ textTransform: 'capitalize' }}
           />
-        ))}
+        ))} */}
       </Tabs>
 
-      <PostListHorizontal posts={dataFiltered} loading={postsLoading} />
+      <PostListHorizontal posts={dataFiltered} loading={loading} />
     </DashboardContent>
   );
 }

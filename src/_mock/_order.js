@@ -6,7 +6,7 @@ export const ORDER_STATUS_OPTIONS = [
   { value: 'confirmed', label: 'Confirmed' },
   { value: 'pending', label: 'Pending' },
   { value: 'cancelled', label: 'Cancelled' },
-  { value: 'refund', label: 'Refunded' }, // Changed from 'refunded' to 'refund'
+  // { value: 'refund', label: 'Refunded' }, // Changed from 'refunded' to 'refund'
   { value: 'failed', label: 'Failed' },
   { value: 'delivered', label: 'Delivered' },
 ];

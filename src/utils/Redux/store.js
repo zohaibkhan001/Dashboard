@@ -17,6 +17,7 @@ import liveCounterMealReducers from './slices/liveCounterMeals';
 import repeatingMealReducers from './slices/dailyMealsSlice';
 import quickMealReducers from './slices/quickMealSlice';
 import allOrdersReducers from './slices/allOrderSlice';
+import allBlogsReducers from './slices/allBlogs';
 
 // 🔹 Combine Reducers
 const rootReducer = combineReducers({
@@ -34,6 +35,7 @@ const rootReducer = combineReducers({
   repeatingMeals: repeatingMealReducers,
   quickMeals: quickMealReducers,
   allOrders: allOrdersReducers,
+  allBlogs: allBlogsReducers,
 });
 
 // 🔹 Persist Configuration

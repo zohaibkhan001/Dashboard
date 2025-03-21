@@ -49,7 +49,7 @@ export function OrderDetailsItems({
 
       <Stack direction="row" sx={{ typography: 'subtitle1' }}>
         <div>Total</div>
-        <Box sx={{ width: 160 }}>{fCurrency(totalAmount) || '-'}</Box>
+        <Box sx={{ width: 160 }}>{`₹${totalAmount}` || '-'}</Box>
       </Stack>
     </Stack>
   );

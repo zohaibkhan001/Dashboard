@@ -29,8 +29,6 @@ import { PostCommentForm } from '../post-comment-form';
 import { PostDetailsSkeleton } from '../post-skeleton';
 import { PostDetailsToolbar } from '../post-details-toolbar';
 
-// ----------------------------------------------------------------------
-
 export function PostDetailsView({ post, loading, error }) {
   const [publish, setPublish] = useState('');
 
@@ -57,7 +55,7 @@ export function PostDetailsView({ post, loading, error }) {
       <DashboardContent maxWidth={false}>
         <EmptyContent
           filled
-          title="Post not found!"
+          title="no found!"
           action={
             <Button
               component={RouterLink}

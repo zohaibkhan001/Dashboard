@@ -32,26 +32,16 @@ export function PostItemHorizontal({ post }) {
 
   const router = useRouter();
 
-  const {
-    title,
-    author,
-    publish,
-    coverUrl,
-    createdAt,
-    totalViews,
-    totalShares,
-    totalComments,
-    description,
-  } = post;
+  const { title, description, category, image, createdAt, blog_id } = post;
 
   return (
     <>
       <Card sx={{ display: 'flex' }}>
         <Stack spacing={1} sx={{ p: theme.spacing(3, 3, 2, 3) }}>
           <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-            <Label variant="soft" color={(publish === 'published' && 'info') || 'default'}>
+            {/* <Label variant="soft" color={(publish === 'published' && 'info') || 'default'}>
               {publish}
-            </Label>
+            </Label> */}
 
             <Box component="span" sx={{ typography: 'caption', color: 'text.disabled' }}>
               {fDate(createdAt)}
@@ -61,7 +51,7 @@ export function PostItemHorizontal({ post }) {
           <Stack spacing={1} flexGrow={1}>
             <Link
               component={RouterLink}
-              href={paths.dashboard.post.details(title)}
+              href={paths.dashboard.post.details(blog_id)}
               color="inherit"
               variant="subtitle2"
               sx={{ ...maxLine({ line: 2 }) }}
@@ -87,7 +77,7 @@ export function PostItemHorizontal({ post }) {
               justifyContent="flex-end"
               sx={{ typography: 'caption', color: 'text.disabled' }}
             >
-              <Box display="flex" alignItems="center" gap={0.5}>
+              {/* <Box display="flex" alignItems="center" gap={0.5}>
                 <Iconify icon="eva:message-circle-fill" width={16} />
                 {fShortenNumber(totalComments)}
               </Box>
@@ -95,12 +85,12 @@ export function PostItemHorizontal({ post }) {
               <Box display="flex" alignItems="center" gap={0.5}>
                 <Iconify icon="solar:eye-bold" width={16} />
                 {fShortenNumber(totalViews)}
-              </Box>
+              </Box> */}
 
-              <Box display="flex" alignItems="center" gap={0.5}>
+              {/* <Box display="flex" alignItems="center" gap={0.5}>
                 <Iconify icon="solar:share-bold" width={16} />
                 {fShortenNumber(totalShares)}
-              </Box>
+              </Box> */}
             </Box>
           </Box>
         </Stack>
@@ -115,12 +105,12 @@ export function PostItemHorizontal({ post }) {
             display: { xs: 'none', sm: 'block' },
           }}
         >
-          <Avatar
+          {/* <Avatar
             alt={author.name}
             src={author.avatarUrl}
             sx={{ top: 16, right: 16, zIndex: 9, position: 'absolute' }}
-          />
-          <Image alt={title} src={coverUrl} sx={{ height: 1, borderRadius: 1.5 }} />
+          /> */}
+          <Image alt={title} src={image} sx={{ height: 1, borderRadius: 1.5 }} />
         </Box>
       </Card>
 
@@ -134,7 +124,7 @@ export function PostItemHorizontal({ post }) {
           <MenuItem
             onClick={() => {
               popover.onClose();
-              router.push(paths.dashboard.post.details(title));
+              router.push(paths.dashboard.post.details(blog_id));
             }}
           >
             <Iconify icon="solar:eye-bold" />
@@ -144,7 +134,7 @@ export function PostItemHorizontal({ post }) {
           <MenuItem
             onClick={() => {
               popover.onClose();
-              router.push(paths.dashboard.post.edit(title));
+              router.push(paths.dashboard.post.details(blog_id));
             }}
           >
             <Iconify icon="solar:pen-bold" />

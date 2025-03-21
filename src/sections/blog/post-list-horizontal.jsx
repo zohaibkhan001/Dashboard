@@ -9,7 +9,7 @@ import { PostItemHorizontal } from './post-item-horizontal';
 export function PostListHorizontal({ posts, loading }) {
   const renderLoading = <PostItemSkeleton variant="horizontal" />;
 
-  const renderList = posts.map((post) => <PostItemHorizontal key={post.id} post={post} />);
+  const renderList = posts.map((post) => <PostItemHorizontal key={post.blog_id} post={post} />);
 
   return (
     <>
@@ -22,6 +22,16 @@ export function PostListHorizontal({ posts, loading }) {
       </Box>
 
       {posts.length > 8 && (
+        //   <Pagination
+        //   count={Math.ceil(posts.length / 8)} // Replace hardcoded count
+        //   page={1} // or currentPage
+        //   onChange={(e, value) => setCurrentPage(value)} // when implemented
+        //   sx={{
+        //     mt: { xs: 5, md: 8 },
+        //     [`& .${paginationClasses.ul}`]: { justifyContent: 'center' },
+        //   }}
+        // />
+
         <Pagination
           count={8}
           sx={{
