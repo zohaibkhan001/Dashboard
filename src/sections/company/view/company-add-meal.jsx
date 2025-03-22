@@ -279,7 +279,6 @@ export function CompanyAddMealView() {
           // ✅ Ensure array exists for the meal time
           if (!acc[mealTimeKey]) acc[mealTimeKey] = [];
 
-          // ✅ Store the meal details
           acc[mealTimeKey].push({
             meal_id: mealDetails.meal_id,
             mealName: mealDetails.mealName || 'Unnamed Meal',
@@ -391,7 +390,13 @@ export function CompanyAddMealView() {
       {/* Date or Week Selector */}
       <Box sx={{ position: 'relative', display: 'inline-block' }}>
         <Button variant="contained" onClick={() => setShowDateSelector(!showDateSelector)}>
-          {selectedMenu === 'repeating' ? 'Select Week Number' : 'Select Date'}
+          {selectedMenu === 'repeating'
+            ? selectedWeekNumber
+              ? `Week ${selectedWeekNumber}`
+              : 'Select Week Number'
+            : selectedDate
+              ? dayjs(selectedDate).format('DD MMM YYYY')
+              : 'Select Date'}{' '}
         </Button>
 
         {showDateSelector && (
@@ -631,7 +636,7 @@ export function CompanyAddMealView() {
                     paddingBottom: '8px',
                   }}
                 >
-                  {mealTime}
+                  {mealTime.toUpperCase()}
                 </Typography>
 
                 <Box sx={{ borderBottom: '1px solid #ddd', marginBottom: '12px' }} />

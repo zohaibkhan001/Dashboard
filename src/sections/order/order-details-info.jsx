@@ -31,6 +31,7 @@ export function OrderDetailsInfo({
   orderStatus,
   shippingAddress,
   status,
+  location,
 }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
@@ -225,9 +226,9 @@ export function OrderDetailsInfo({
 
         <Stack direction="row">
           <Box component="span" sx={{ color: 'text.secondary', width: 120, flexShrink: 0 }}>
-            Location{' '}
+            Location
           </Box>
-          name{' '}
+          {location}
         </Stack>
       </Stack>
     </>

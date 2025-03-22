@@ -23,6 +23,7 @@ import { useParams } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCompanyCustomer } from 'src/utils/Redux/slices/companyCustomerSlice';
 import { fetchCompanyOrders } from 'src/utils/Redux/slices/companyOrderSlice';
+import { fetchCompanyReviews } from 'src/utils/Redux/slices/companyReviews';
 
 import { useMockedUser } from 'src/auth/hooks';
 import { fetchLocations } from 'src/utils/Redux/slices/companyLocationSlice';
@@ -61,20 +62,23 @@ export function OverviewAnalyticsView() {
   const { customers } = useSelector((state) => state.companyCustomer);
   const { orders } = useSelector((state) => state.companyOrders);
   const { locations } = useSelector((state) => state.companyLocations);
+  const { reviews } = useSelector((state) => state.companyReviews);
 
   const customerCount = Array.isArray(customers) ? customers.length : 0;
   const orderCount = Array.isArray(orders) ? orders.length : 0;
+  const reviewCount = Array.isArray(reviews) ? reviews.length : 0;
 
   const customerLoading = useSelector((state) => state.companyCustomer.loading);
   const locationsLoading = useSelector((state) => state.companyLocations.loading);
   const ordersLoading = useSelector((state) => state.companyOrders.loading);
-  // console.log(locations);
+  const reviewLoading = useSelector((state) => state.companyReviews.loading);
 
   useEffect(() => {
     if (id) {
       dispatch(fetchCompanyCustomer(id));
       dispatch(fetchLocations(id));
       dispatch(fetchCompanyOrders(id));
+      dispatch(fetchCompanyReviews(id));
     }
   }, [dispatch, id]);
 
@@ -179,7 +183,7 @@ export function OverviewAnalyticsView() {
       </div>
 
       <Grid container spacing={3}>
-        <Grid xs={12} sm={6} md={3}>
+        <Grid xs={12} sm={6} md={4}>
           <AnalyticsWidgetSummary
             title="Total Users"
             total={customerCount}
@@ -197,7 +201,7 @@ export function OverviewAnalyticsView() {
           />
         </Grid>
 
-        <Grid xs={12} sm={6} md={3}>
+        <Grid xs={12} sm={6} md={4}>
           <AnalyticsWidgetSummary
             title="Total Orders"
             total={orderCount}
@@ -216,10 +220,10 @@ export function OverviewAnalyticsView() {
           />
         </Grid>
 
-        <Grid xs={12} sm={6} md={3}>
+        <Grid xs={12} sm={6} md={4}>
           <AnalyticsWidgetSummary
             title="Total Reviews"
-            total={719}
+            total={reviewCount}
             color="secondary"
             icon={
               <img
@@ -238,7 +242,7 @@ export function OverviewAnalyticsView() {
           />
         </Grid>
 
-        <Grid xs={12} sm={6} md={3}>
+        {/* <Grid xs={12} sm={6} md={3}>
           <AnalyticsWidgetSummary
             title="Total Meal Items"
             total={719}
@@ -251,7 +255,7 @@ export function OverviewAnalyticsView() {
             }
             chart={{}}
           />
-        </Grid>
+        </Grid> */}
 
         {/* <Grid xs={12} md={12} lg={12} sx={{
           padding: 0,

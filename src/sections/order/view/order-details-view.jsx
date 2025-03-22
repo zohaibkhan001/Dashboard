@@ -53,7 +53,7 @@ export function OrderDetailsView({ order }) {
             order_id={order?.order_id}
             customer={order?.customer}
             delivery={order?.company_name}
-            // location= {order?.}
+            location={order?.location?.locationName}
             status={order?.status}
             payment={order?.payment}
             orderStatus={order?.status}

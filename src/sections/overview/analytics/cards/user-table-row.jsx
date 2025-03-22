@@ -40,7 +40,7 @@ export function UserTableRow({ row, selected, onEditRow, onSelectRow, onDeleteRo
             <Avatar alt={row.name} src={row.avatarUrl} />
 
             <Stack sx={{ typography: 'body2', flex: '1 1 auto', alignItems: 'flex-start' }}>
-              <Link color="inherit" onClick={onEditRow} sx={{ cursor: 'pointer' }}>
+              <Link color="inherit" onClick={onViewRow} sx={{ cursor: 'pointer' }}>
                 {row.name}
               </Link>
               <Box component="span" sx={{ color: 'text.disabled' }}>

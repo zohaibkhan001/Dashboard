@@ -30,18 +30,6 @@ import { PostDetailsSkeleton } from '../post-skeleton';
 import { PostDetailsToolbar } from '../post-details-toolbar';
 
 export function PostDetailsView({ post, loading, error }) {
-  const [publish, setPublish] = useState('');
-
-  const handleChangePublish = useCallback((newValue) => {
-    setPublish(newValue);
-  }, []);
-
-  useEffect(() => {
-    if (post) {
-      setPublish(post?.publish);
-    }
-  }, [post]);
-
   if (loading) {
     return (
       <DashboardContent maxWidth={false} disablePadding>
@@ -55,7 +43,7 @@ export function PostDetailsView({ post, loading, error }) {
       <DashboardContent maxWidth={false}>
         <EmptyContent
           filled
-          title="no found!"
+          title="not found!"
           action={
             <Button
               component={RouterLink}
@@ -77,15 +65,13 @@ export function PostDetailsView({ post, loading, error }) {
       <Container maxWidth={false} sx={{ px: { sm: 5 } }}>
         <PostDetailsToolbar
           backLink={paths.dashboard.post.root}
-          editLink={paths.dashboard.post.edit(`${post?.title}`)}
+          editLink={paths.dashboard.post.edit(`${post?.blog_id}`)}
           liveLink={paths.post.details(`${post?.title}`)}
-          publish={`${publish}`}
-          onChangePublish={handleChangePublish}
           publishOptions={POST_PUBLISH_OPTIONS}
         />
       </Container>
 
-      <PostDetailsHero title={`${post?.title}`} coverUrl={`${post?.coverUrl}`} />
+      <PostDetailsHero title={post?.title} coverUrl={post?.image} />
 
       <Stack
         sx={{
@@ -96,9 +82,7 @@ export function PostDetailsView({ post, loading, error }) {
           px: { xs: 2, sm: 3 },
         }}
       >
-        <Typography variant="subtitle1">{post?.description}</Typography>
-
-        <Markdown children={post?.content} />
+        <Markdown children={post?.description} />
 
         <Stack
           spacing={3}
@@ -108,49 +92,20 @@ export function PostDetailsView({ post, loading, error }) {
             borderBottom: (theme) => `dashed 1px ${theme.vars.palette.divider}`,
           }}
         >
-          <Stack direction="row" flexWrap="wrap" spacing={1}>
-            {post?.tags.map((tag) => (
-              <Chip key={tag} label={tag} variant="soft" />
-            ))}
-          </Stack>
-
-          <Stack direction="row" alignItems="center">
-            <FormControlLabel
-              control={
-                <Checkbox
-                  defaultChecked
-                  size="small"
-                  color="error"
-                  icon={<Iconify icon="solar:heart-bold" />}
-                  checkedIcon={<Iconify icon="solar:heart-bold" />}
-                  inputProps={{ id: 'favorite-checkbox', 'aria-label': 'Favorite checkbox' }}
-                />
-              }
-              label={fShortenNumber(post?.totalFavorites)}
-              sx={{ mr: 1 }}
-            />
-
+          {/* <Stack direction="row" alignItems="center">
             <AvatarGroup sx={{ [`& .${avatarGroupClasses.avatar}`]: { width: 32, height: 32 } }}>
               {post?.favoritePerson.map((person) => (
                 <Avatar key={person.name} alt={person.name} src={person.avatarUrl} />
               ))}
             </AvatarGroup>
-          </Stack>
+          </Stack> */}
         </Stack>
 
-        <Stack direction="row" sx={{ mb: 3, mt: 5 }}>
-          <Typography variant="h4">Comments</Typography>
-
-          <Typography variant="subtitle2" sx={{ color: 'text.disabled' }}>
-            ({post?.comments.length})
-          </Typography>
-        </Stack>
-
-        <PostCommentForm />
+        {/* <PostCommentForm /> */}
 
         <Divider sx={{ mt: 5, mb: 2 }} />
 
-        <PostCommentList comments={post?.comments ?? []} />
+        {/* <PostCommentList comments={post?.comments ?? []} /> */}
       </Stack>
     </DashboardContent>
   );

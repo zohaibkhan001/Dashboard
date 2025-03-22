@@ -6,6 +6,7 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
 import DialogActions from '@mui/material/DialogActions';
+import { Box } from '@mui/material';
 
 import { Markdown } from 'src/components/markdown';
 import { Scrollbar } from 'src/components/scrollbar';
@@ -69,8 +70,11 @@ export function PostDetailsPreview({
           {(hasHero || previewUrl) && <PostDetailsHero title={title} coverUrl={previewUrl} />}
           <Container sx={{ mt: 5, mb: 10 }}>
             <Stack sx={{ mx: 'auto', maxWidth: 720 }}>
-              <Typography variant="h6">{description}</Typography>
-              <Markdown>{content}</Markdown>
+              <Typography variant="h4" gutterBottom>
+                {title}
+              </Typography>
+
+              <Box sx={{ typography: 'body1' }} dangerouslySetInnerHTML={{ __html: description }} />
             </Stack>
           </Container>
         </Scrollbar>

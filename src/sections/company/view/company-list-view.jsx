@@ -42,6 +42,7 @@ import {
   TableHeadCustom,
   TablePaginationCustom,
 } from 'src/components/table';
+import { LoadingScreen } from 'src/components/loading-screen';
 
 import { CompanyTableRow } from '../company-table-row';
 import { CompanyTableToolbar } from '../company-table-toolbar';
@@ -75,7 +76,7 @@ export function CompanyListView() {
   const { companies, loading } = useSelector((state) => state.allCompanies);
   // console.log(companies);
 
-  const table = useTable({ defaultOrderBy: 'orderNumber' });
+  const table = useTable({ defaultOrderBy: 'company_id' });
 
   const dispatch = useDispatch();
 
@@ -92,7 +93,7 @@ export function CompanyListView() {
   }, [companies]);
 
   useEffect(() => {
-    dispatch(fetchCompanies()); // ✅ Fetch companies when component mounts
+    dispatch(fetchCompanies());
   }, [dispatch]);
 
   const filters = useSetState({
@@ -173,6 +174,10 @@ export function CompanyListView() {
     },
     [filters, table]
   );
+
+  if (loading) {
+    <LoadingScreen />;
+  }
 
   return (
     <>

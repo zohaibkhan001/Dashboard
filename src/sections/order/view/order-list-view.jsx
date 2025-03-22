@@ -42,6 +42,8 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllOrders } from 'src/utils/Redux/slices/allOrderSlice';
 import { LoadingScreen } from 'src/components/loading-screen';
+import api from 'src/utils/api';
+import { NotFoundView } from 'src/sections/error';
 
 import { OrderTableRow } from '../order-table-row';
 import { OrderTableToolbar } from '../order-table-toolbar';
@@ -70,11 +72,36 @@ export function OrderListView() {
   const { token } = useSelector((state) => state.superAdminAuth);
   const dispatch = useDispatch();
 
-  const { orders, loading } = useSelector((state) => state.allOrders);
+  const [loading, setLoading] = useState(false);
+
+  const [orders, setOrders] = useState([]);
+  const [orderError, setOrderError] = useState(null);
 
   useEffect(() => {
-    dispatch(fetchAllOrders(token));
-  }, [dispatch, token]);
+    setLoading(true);
+    const fetchOrders = async () => {
+      try {
+        const response = await api.get('/superAdmin/all_orders', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (response.data.success === 1) {
+          setOrders(response.data.data);
+        }
+      } catch (error) {
+        setOrderError(error);
+        console.error('Error fetching customers:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, [token]);
+
+  useEffect(() => {
+    setTableData(orders);
+  }, [orders]);
 
   const table = useTable({ defaultOrderBy: 'order_id' });
 
@@ -153,6 +180,10 @@ export function OrderListView() {
   if (loading) {
     return <LoadingScreen />;
   }
+
+  // if (orderError) {
+  //   return <NotFoundView />;
+  // }
 
   return (
     <>
@@ -257,12 +288,12 @@ export function OrderListView() {
                   rowCount={dataFiltered.length}
                   numSelected={table.selected.length}
                   onSort={table.onSort}
-                  onSelectAllRows={(checked) =>
-                    table.onSelectAllRows(
-                      checked,
-                      dataFiltered.map((row) => row.id)
-                    )
-                  }
+                  // onSelectAllRows={(checked) =>
+                  //   table.onSelectAllRows(
+                  //     checked,
+                  //     dataFiltered.map((row) => row.id)
+                  //   )
+                  // }
                 />
 
                 <TableBody>

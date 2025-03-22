@@ -22,17 +22,50 @@ import { Label } from 'src/components/label';
 import { Image } from 'src/components/image';
 import { Iconify } from 'src/components/iconify';
 import { usePopover, CustomPopover } from 'src/components/custom-popover';
+import { ConfirmDialog } from 'src/components/custom-dialog';
+import { useBoolean } from 'src/hooks/use-boolean';
+import { Button } from '@mui/material';
+import { useSelector } from 'react-redux';
+import api from 'src/utils/api';
+import { toast } from 'sonner';
 
 // ----------------------------------------------------------------------
 
 export function PostItemHorizontal({ post }) {
   const theme = useTheme();
 
+  const { token } = useSelector((state) => state.superAdminAuth);
+
   const popover = usePopover();
+
+  const confirm = useBoolean();
 
   const router = useRouter();
 
   const { title, description, category, image, createdAt, blog_id } = post;
+
+  const handleDeleteBlog = async () => {
+    try {
+      const response = await api.delete(`/superAdmin/delete_blog/${blog_id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 200) {
+        toast.success('Blog deleted successfully!');
+        setTimeout(() => {
+          router.push(0);
+        }, 2000);
+      } else {
+        toast.error('Failed to delete the blog.');
+        console.error('Unexpected response:', response);
+      }
+    } catch (error) {
+      toast.error(error.msg);
+      console.error('Delete error:', error);
+    }
+  };
 
   return (
     <>
@@ -59,9 +92,15 @@ export function PostItemHorizontal({ post }) {
               {title}
             </Link>
 
-            <Typography variant="body2" sx={{ ...maxLine({ line: 2 }), color: 'text.secondary' }}>
-              {description}
-            </Typography>
+            <Box
+              sx={{
+                typography: 'body2',
+                color: 'text.secondary',
+                ...maxLine({ line: 2 }),
+                overflow: 'hidden',
+              }}
+              dangerouslySetInnerHTML={{ __html: description }}
+            />
           </Stack>
 
           <Box display="flex" alignItems="center">
@@ -134,7 +173,7 @@ export function PostItemHorizontal({ post }) {
           <MenuItem
             onClick={() => {
               popover.onClose();
-              router.push(paths.dashboard.post.details(blog_id));
+              router.push(paths.dashboard.post.edit(blog_id));
             }}
           >
             <Iconify icon="solar:pen-bold" />
@@ -144,6 +183,7 @@ export function PostItemHorizontal({ post }) {
           <MenuItem
             onClick={() => {
               popover.onClose();
+              confirm.onTrue(); // Open confirmation dialog
             }}
             sx={{ color: 'error.main' }}
           >
@@ -152,6 +192,24 @@ export function PostItemHorizontal({ post }) {
           </MenuItem>
         </MenuList>
       </CustomPopover>
+      <ConfirmDialog
+        open={confirm.value}
+        onClose={confirm.onFalse}
+        title="Confirm Deletion"
+        content="Are you sure you want to delete this blog post? This action cannot be undone."
+        action={
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => {
+              confirm.onFalse();
+              handleDeleteBlog(); // ✅ Call the function
+            }}
+          >
+            Delete
+          </Button>
+        }
+      />
     </>
   );
 }

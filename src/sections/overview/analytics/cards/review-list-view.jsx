@@ -32,6 +32,7 @@ import {
   TableSelectedAction,
   TablePaginationCustom,
 } from 'src/components/table';
+import { useSelector } from 'react-redux';
 
 import { ReviewTableRow } from './review-table-row';
 import { ReviewTableToolbar } from './review-table-toolbar';
@@ -51,6 +52,8 @@ const TABLE_HEAD = [
 // ----------------------------------------------------------------------
 
 export function ReviewListView() {
+  const { reviews } = useSelector((state) => state.companyReviews);
+
   const table = useTable();
 
   const router = useRouter();
@@ -109,14 +112,24 @@ export function ReviewListView() {
 
   return (
     <>
-      <DashboardContent sx={{
-        padding: 0,
-        marginTop: '1rem',
-        marginBottom: '1rem',
-        overflowX: 'hidden',
-      }}>
-
-        <Card sx={{ width: { xs: '100%', sm: '100%', md: '100%', lg: '105%' }, padding: 0, marginLeft: '-1.5rem', marginRight: 0, marginBottom: 0, overflowX: 'hidden' }}>
+      <DashboardContent
+        sx={{
+          padding: 0,
+          marginTop: '1rem',
+          marginBottom: '1rem',
+          overflowX: 'hidden',
+        }}
+      >
+        <Card
+          sx={{
+            width: { xs: '100%', sm: '100%', md: '100%', lg: '105%' },
+            padding: 0,
+            marginLeft: '-1.5rem',
+            marginRight: 0,
+            marginBottom: 0,
+            overflowX: 'hidden',
+          }}
+        >
           <ReviewTableToolbar
             filters={filters}
             onResetPage={table.onResetPage}

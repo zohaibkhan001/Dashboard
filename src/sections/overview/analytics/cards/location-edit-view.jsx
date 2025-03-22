@@ -34,13 +34,25 @@ export function LocationEditDialog({
 
   const [formData, setFormData] = useState({
     locationName: '',
-    locationMealTime: [], // New state (Array)
+    locationMealTime: [],
     email: '',
     locationCutoffTime: '',
     locationOpeningTime: '',
   });
 
   const [loading, setLoading] = useState(false);
+
+  const mapMealKeys = (meals) => {
+    const mealMap = {
+      Breakfast: 'breakfast',
+      Lunch: 'lunch',
+      Snacks: 'snack',
+      Dinner: 'dinner',
+      'Midnight Snacks': 'midnight_snacks',
+    };
+
+    return meals.map((meal) => mealMap[meal]).filter(Boolean);
+  };
 
   // Handle text field changes
   const handleChange = (e) => {
@@ -82,7 +94,7 @@ export function LocationEditDialog({
           locationName: formData.locationName,
           company_id, // ✅ Ensure correct company association
           locationEmail: formData.email,
-          locationMealTime: formData.locationMealTime,
+          locationMealTime: mapMealKeys(formData.locationMealTime),
           locationCutoffTime: formData.locationCutoffTime,
           locationOpeningTime: formData.locationOpeningTime,
         },

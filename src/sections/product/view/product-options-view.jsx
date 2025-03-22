@@ -146,7 +146,7 @@ export function ProductOptionsView() {
       location_id: selectedLocations, // Array of selected location IDs
       meal_id: Number(meal_id), // Convert meal_id to a number
       meal_type, // Directly use the meal type from params
-      meal_time: selectedMealTimes,
+      meal_time: meal_type === 'liveCounter' ? ['liveCounter'] : selectedMealTimes,
       ...(meal_type === 'repeating'
         ? { week_number: selectedWeeks } // Use week_number for repeating meals
         : { specific_date: selectedDates }), // Use specific_date otherwise
@@ -155,30 +155,30 @@ export function ProductOptionsView() {
     console.log(payload);
     setLoading(true);
 
-    try {
-      const response = await api.post('/superAdmin/add_to_location_menu', payload, {
-        headers: {
-          Authorization: `Bearer ${token}`, // Include token in headers
-        },
-      });
+    // try {
+    //   const response = await api.post('/superAdmin/add_to_location_menu', payload, {
+    //     headers: {
+    //       Authorization: `Bearer ${token}`, // Include token in headers
+    //     },
+    //   });
 
-      if (response.status === 200) {
-        toast.success('Meal added to selected company locations!');
-        // console.log('API Response:', response.data);
+    //   if (response.status === 200) {
+    //     toast.success('Meal added to selected company locations!');
+    //     // console.log('API Response:', response.data);
 
-        setTimeout(() => {
-          router.push(paths.dashboard.product.root);
-        }, 2000);
-      } else {
-        toast.error('Failed to add meal');
-        console.error('Error:', response.data);
-      }
-    } catch (error) {
-      toast.error(error.msg);
-      console.error(error.msg, error);
-    } finally {
-      setLoading(false);
-    }
+    //     setTimeout(() => {
+    //       router.push(paths.dashboard.product.root);
+    //     }, 2000);
+    //   } else {
+    //     toast.error('Failed to add meal');
+    //     console.error('Error:', response.data);
+    //   }
+    // } catch (error) {
+    //   toast.error(error.msg);
+    //   console.error(error.msg, error);
+    // } finally {
+    //   setLoading(false);
+    // }
   };
 
   const handleCancelClick = () => {
@@ -234,20 +234,23 @@ export function ProductOptionsView() {
 
         {/* Meal Time Section */}
         <Grid container spacing={3}>
-          <Grid xs={12} md={5} lg={5}>
-            <ProductOptions
-              title="Meal Time"
-              list={[
-                { id: 'breakfast', name: 'Breakfast' },
-                { id: 'lunch', name: 'Lunch' },
-                { id: 'snacks', name: 'Snacks' },
-                { id: 'dinner', name: 'Dinner' },
-                { id: 'midnight_snacks', name: 'Midnight Snacks' },
-              ]}
-              selected={selectedMealTimes}
-              onSelectionChange={setSelectedMealTimes}
-            />
-          </Grid>
+          {meal_type !== 'liveCounter' && (
+            <Grid xs={12} md={5} lg={5}>
+              <ProductOptions
+                title="Meal Time"
+                list={[
+                  { id: 'breakfast', name: 'Breakfast' },
+                  { id: 'lunch', name: 'Lunch' },
+                  { id: 'snacks', name: 'Snacks' },
+                  { id: 'dinner', name: 'Dinner' },
+                  { id: 'midnight_snacks', name: 'Midnight Snacks' },
+                ]}
+                selected={selectedMealTimes}
+                onSelectionChange={setSelectedMealTimes}
+              />
+            </Grid>
+          )}
+
           <Grid xs={12} md={7} lg={7}>
             <Card sx={{ p: 0, bgcolor: '#FFFFFF', borderRadius: 2 }}>
               <Typography variant="h5" sx={{ mb: 1, ml: 4, mt: 2 }}>
@@ -313,6 +316,7 @@ export function ProductOptionsView() {
                       setSelectedDates(dates.map((date) => date.format('YYYY-MM-DD')))
                     }
                     placeholder="Click to select...."
+                    minDate={dayjs().format('YYYY-MM-DD')} // ✅ Prevent past dates
                     format="YYYY-MM-DD"
                     highlightToday
                     sort
@@ -322,16 +326,21 @@ export function ProductOptionsView() {
                     input={false} // Keeps the calendar always visible
                     plugins={[<DatePanel removeButton={false} />]}
                     mapDays={({ date }) => {
+                      const today = dayjs().startOf('day');
+                      const current = dayjs(date.toDate()).startOf('day');
+                      const isPast = current.isBefore(today);
                       const formattedDate = date.format('YYYY-MM-DD');
-
                       const isSelected = selectedDates.some(
                         (d) => dayjs(d).format('YYYY-MM-DD') === formattedDate
                       );
 
                       return {
+                        disabled: isPast, // ✅ Prevent selection
+
                         style: {
-                          backgroundColor: isSelected ? '#00A76F' : 'transparent', // ✅ Changed to Green
-                          color: isSelected ? 'white' : 'black',
+                          backgroundColor: isSelected ? '#00A76F' : 'transparent',
+                          color: isPast ? '#ccc' : isSelected ? 'white' : 'black', // ✅ Gray out past
+                          // color: isSelected ? 'white' : 'black',
                           fontWeight: isSelected ? 'bold' : 'normal',
                           borderRadius: '50%',
                           padding: '5px',

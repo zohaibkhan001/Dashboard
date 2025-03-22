@@ -43,6 +43,18 @@ export function NewLocationDialog({ open, onClose, title = 'Add New Location', i
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const mapMealKeys = (meals) => {
+    const mealMap = {
+      Breakfast: 'breakfast',
+      Lunch: 'lunch',
+      Snacks: 'snack',
+      Dinner: 'dinner',
+      'Midnight Snacks': 'midnight_snacks',
+    };
+
+    return meals.map((meal) => mealMap[meal]).filter(Boolean);
+  };
+
   const handleMealChange = (event) => {
     const selectedValues = event.target.value;
     setFormData((prev) => ({
@@ -93,7 +105,7 @@ export function NewLocationDialog({ open, onClose, title = 'Add New Location', i
           locationName: formData.locationName,
           company_id: id,
           locationEmail: formData.email,
-          locationMealTime: formData.selectedMeals,
+          locationMealTime: mapMealKeys(formData.selectedMeals),
           locationCutoffTime: formData.locationCutoffTime,
           locationOpeningTime: formData.locationOpeningTime,
         },

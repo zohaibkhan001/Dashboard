@@ -10,6 +10,7 @@ import { useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 import api from 'src/utils/api';
 import { LoadingScreen } from 'src/components/loading-screen';
+import { NotFoundView } from 'src/sections/error';
 
 // ----------------------------------------------------------------------
 
@@ -50,13 +51,16 @@ export default function Page() {
     return <LoadingScreen />;
   }
 
+  if (error) {
+    return <NotFoundView />;
+  }
   return (
     <>
       <Helmet>
         <title> {metadata.title}</title>
       </Helmet>
 
-      <OrderDetailsView order={order[0]} />
+      <OrderDetailsView order={Array.isArray(order) ? order[0] || {} : {}} />
     </>
   );
 }

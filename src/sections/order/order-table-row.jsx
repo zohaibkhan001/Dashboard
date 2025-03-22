@@ -34,13 +34,13 @@ export function OrderTableRow({ row, selected, onViewRow, onSelectRow, onDeleteR
 
   const renderPrimary = (
     <TableRow hover selected={selected}>
-      <TableCell padding="checkbox">
+      {/* <TableCell padding="checkbox">
         <Checkbox
           checked={selected}
           onClick={onSelectRow}
           inputProps={{ id: `row-checkbox-${row.id}`, 'aria-label': `Row checkbox` }}
         />
-      </TableCell>
+      </TableCell> */}
 
       <TableCell>
         <Link color="inherit" onClick={onViewRow} underline="always" sx={{ cursor: 'pointer' }}>
