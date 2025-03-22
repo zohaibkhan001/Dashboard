@@ -50,15 +50,23 @@ export const navData = [
     items: [
       { title: 'Dashboard', path: paths.dashboard.root, icon: ICONS.dashboard },
       { title: 'Companies', path: paths.dashboard.company.root, icon: ICONS.company },
-      { title: 'Master Menu', path: paths.dashboard.product.root, icon: ICONS.menu,
+      {
+        title: 'Master Menu', path: paths.dashboard.product.root, icon: ICONS.menu,
         children: [
           { title: 'Menu', path: paths.dashboard.product.root },
           { title: 'Categories', path: paths.dashboard.product.category },
         ],
-       },
+      },
       { title: 'Orders', path: paths.dashboard.order.root, icon: ICONS.order },
       // { title: 'Analytics', path: paths.dashboard.general.analytics, icon: ICONS.analytics },
       { title: 'Users', path: paths.dashboard.user.list, icon: ICONS.user },
+      {
+        title: 'Banners', path: paths.dashboard.banners.list, icon: ICONS.label,
+        children: [
+          { title: 'App Banners', path: paths.dashboard.banners.list },
+          { title: 'Dashboard Banners', path: paths.dashboard.banners.dashlist },
+        ],
+      },
       { title: 'Blog', path: paths.dashboard.post.root, icon: ICONS.blog },
       { title: 'Roles', path: paths.dashboard.root, icon: ICONS.disabled },
       { title: 'Settings', path: paths.dashboard.root, icon: ICONS.lock },

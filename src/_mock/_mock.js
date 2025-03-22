@@ -45,6 +45,8 @@ import {
   _createdAt,
   _updatedAt,
   _mealTime,
+  _sections,
+  _bannerID,
 } from './assets';
 
 // ----------------------------------------------------------------------
@@ -73,6 +75,7 @@ export const _mock = {
   cutOffTime: (index) => _cutOffTime[index],
   createdAt: (index) => _createdAt[index],
   updatedAt: (index) => _updatedAt[index],
+  sections: (index) => _sections[index],
   
   // Contact
   email: (index) => _emails[index],
@@ -98,6 +101,7 @@ export const _mock = {
     nativeS: (index) => _nativeS[index],
     nativeM: (index) => _nativeM[index],
     nativeL: (index) => _nativeL[index],
+    bannerID: (index) => _bannerID[index],
   },
   // Review
   remarks : (index) => _remarks[index],

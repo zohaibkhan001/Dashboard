@@ -61,6 +61,14 @@ const UserCreatePage = lazy(() => import('src/pages/dashboard/user/new'));
 const UserEditPage = lazy(() => import('src/pages/dashboard/user/edit'));
 const UserDetailsPage = lazy(() => import('src/pages/dashboard/user/details'));
 
+// Banners
+const AppBannerListPage = lazy(() => import('src/pages/dashboard/banners/list'));
+const AppCreatePage = lazy(() => import('src/pages/dashboard/banners/new'));
+const AppEditPage = lazy(() => import('src/pages/dashboard/banners/edit'));
+const DashBannerListPage = lazy(() => import('src/pages/dashboard/banners/dashlist'));
+const DashCreatePage = lazy(() => import('src/pages/dashboard/banners/dashnew'));
+const DashEditPage = lazy(() => import('src/pages/dashboard/banners/dashedit'));
+
 // Blog
 const BlogPostsPage = lazy(() => import('src/pages/dashboard/post/list'));
 const BlogPostPage = lazy(() => import('src/pages/dashboard/post/details'));
@@ -125,6 +133,17 @@ export const dashboardRoutes = [
           { path: ':id/edit', element: <UserEditPage /> },
           { path: 'account', element: <UserAccountPage /> },
           { path: 'details/:id', element: <UserDetailsPage /> },
+        ],
+      },
+      {
+        path: 'banners',
+        children: [
+          { path: 'list', element: <AppBannerListPage /> },
+          { path: 'new', element: <AppCreatePage /> },
+          { path: ':id/edit', element: <AppEditPage /> },
+          { path: 'dashlist', element: <DashBannerListPage /> },
+          { path: 'dashnew', element: <DashCreatePage /> },
+          { path: ':id/dashedit', element: <DashEditPage /> },
         ],
       },
       {

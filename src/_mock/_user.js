@@ -1,5 +1,5 @@
 import { _mock } from './_mock';
-import { _createdAt, _cutOffTime, _location, _locationEmail, _mealItem, _ratings, _remarks, _updatedAt, _walletBalance } from './assets';
+import { _createdAt, _cutOffTime, _location, _locationEmail, _mealItem, _ratings, _remarks, _updatedAt, _walletBalance, _bannerID } from './assets';
 
 // ----------------------------------------------------------------------
 
@@ -148,6 +148,8 @@ export const _userList = [...Array(20)].map((_, index) => ({
   cutOffTime: _cutOffTime[index],
   createdAt: _createdAt[index],
   updatedAt: _updatedAt[index],
+  sections: _mock.sections(index),
+  bannerID: _bannerID[index],
   status:
     (index % 2 && 'pending') || (index % 3 && 'banned') || (index % 4 && 'rejected') || 'active',
 }));

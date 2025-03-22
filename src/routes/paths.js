@@ -131,6 +131,15 @@ export const paths = {
       userEdit: (customer_id) => `${ROOTS.DASHBOARD}/user/user-edit/${customer_id}`,
       details: (id) => `${ROOTS.DASHBOARD}/user/details/${id}`,
     },
+    banners: {
+      root: `${ROOTS.DASHBOARD}/banners/list`,
+      new: `${ROOTS.DASHBOARD}/banners/new`,
+      dashnew: `${ROOTS.DASHBOARD}/banners/dashnew`,
+      list: `${ROOTS.DASHBOARD}/banners/list`,
+      dashlist: `${ROOTS.DASHBOARD}/banners/dashlist`,
+      edit: (id) => `${ROOTS.DASHBOARD}/banners/${id}/edit`,
+      dashedit: (id) => `${ROOTS.DASHBOARD}/banners/${id}/dashedit`,
+    },
     product: {
       root: `${ROOTS.DASHBOARD}/product`,
       new: `${ROOTS.DASHBOARD}/product/new`,
